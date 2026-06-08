@@ -1,0 +1,7 @@
+*
+
+!.gitignore
+!quickshell/
+!quickshell/**
+!hypr/
+!hypr/**
