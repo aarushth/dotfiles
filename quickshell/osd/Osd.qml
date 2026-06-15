@@ -47,7 +47,7 @@ Scope {
 	property int colNums: 80
 	property int rowNums: 5
 	property int totalBoxes: colNums * rowNums
-	property bool muted: Pipewire.defaultAudioSink?.audio.muted
+	property bool muted: Pipewire.defaultAudioSink?.audio.muted ?? false
 	property real volume: Pipewire.defaultAudioSink?.audio.volume ?? 0
 	property real brightness: 0.0
 	property int maxBrightness: 1

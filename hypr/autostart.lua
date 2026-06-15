@@ -4,7 +4,9 @@
 
 hl.on("hyprland.start", function () 
 -- fingerprint login polkit agent
-hl.exec_cmd("pkill -x hyprpolkitagent 2>/dev/null; hyprpolkitagent &")
+  hl.exec_cmd("pkill -x hyprpolkitagent 2>/dev/null; hyprpolkitagent &")
+
+  hl.exec_cmd("qs")
   
 -- top bar
   hl.exec_cmd("waybar &")
@@ -21,9 +23,8 @@ hl.exec_cmd("pkill -x hyprpolkitagent 2>/dev/null; hyprpolkitagent &")
   hl.exec_cmd("zoxide init --cmd cd bash")
 
 --   alt tab
-  hl.exec_cmd("qs -c overview")
--- volume
-  hl.exec_cmd("qs -c osd")
+--   hl.exec_cmd("q ")
+
 
 --   oneDrive
   hl.exec_cmd("uwsm app -- /home/aarushth/Applications/OneDriveGUI/AppRun")
