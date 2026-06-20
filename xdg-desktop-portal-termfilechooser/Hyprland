@@ -1,0 +1,8 @@
+### $XDG_CONFIG_HOME/xdg-desktop-portal-termfilechooser/$XDG_CURRENT_DESKTOP ###
+
+[filechooser]
+# prioritizes `yazi-wrapper.sh` in `$XDG_CONFIG_HOME` dir over `/usr/local/share` and `/usr/share` dirs
+cmd = yazi-wrapper.sh
+default_dir = $HOME
+open_mode = suggested
+save_mode = last

@@ -5,3 +5,6 @@
 !quickshell/**
 !hypr/
 !hypr/**
+!xdg-desktop-portal-termfilechooser/
+!xdg-desktop-portal-termfilechooser/**
+
