@@ -52,10 +52,10 @@ Singleton {
                 seqId: String(root._seqCounter++)
             });
 
-            root.notifications = [data, ...root.notifications];
+            root.notifications.push(data)
 
             if (root.notifications.length > 5) {
-                root.notifications[root.notifications.length - 1].dismiss();
+                root.notifications[0].dismiss();
             }
         }
     }

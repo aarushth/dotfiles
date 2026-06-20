@@ -12,7 +12,7 @@ Scope {
 	id: root
 	FontLoader {
 		id: khinterference
-		source: "fonts/KHInterferenceTRIAL-Bold.woff2"
+		source: "../fonts/KHInterferenceTRIAL-Bold.woff2"
 	}
 	property bool volumeMode : true
 	// Bind the pipewire node so its volume will be tracked
@@ -30,8 +30,9 @@ Scope {
 		}
 		function brightness(){
 			volumeMode = false
-			brightnessReadProc.running = true
 			root.shouldShowOsd = true
+			brightnessReadProc.running = true
+			
 			hideTimer.restart()
 		}
 	}
@@ -41,7 +42,9 @@ Scope {
 	Timer {
 		id: hideTimer
 		interval: 1500
-		onTriggered: root.shouldShowOsd = false
+		onTriggered: {
+			root.shouldShowOsd = false
+		}
 	}
 
 	property int colNums: 80
@@ -116,9 +119,6 @@ Scope {
 		brightnessMaxProc.running = true
 	}
 
-	// The OSD window will be created and destroyed based on shouldShowOsd.
-	// PanelWindow.visible could be set instead of using a loader, but using
-	// a loader will reduce the memory overhead when the window isn't open.
 	
 	LazyLoader {
 		active: root.shouldShowOsd
@@ -133,11 +133,12 @@ Scope {
 			implicitHeight: boxSize * rowNums
 			color: "transparent"
 
-			// An empty click mask prevents the window from blocking mouse events.
-			// mask: Region {}
 
 			Item {
+				id: fadeRoot
 				anchors.fill: parent
+				visible: true
+
 				TextItem {
 					id: textBottom
 					anchors.fill: parent
@@ -171,12 +172,6 @@ Scope {
 								color: volumeMode ? (muted ? "grey" : "purple") : "green"
 								opacity: isRevealed ? 1 : 0
 
-								Behavior on opacity {
-									NumberAnimation {
-										duration: 800
-										easing.type: Easing.InOutQuad
-									}
-								}
 							}
 						}
 					}

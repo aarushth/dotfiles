@@ -3,27 +3,29 @@
 ---- KEYBINDINGS ----
 ---------------------
 
+
 local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
-local closeWindowBind = hl.bind(mainMod .. " + C", hl.dsp.window.close())
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock"))
-hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("qs -p ipc call wallpaper_picker toggle"))
 hl.bind(mainMod .. " + F", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + J", hl.dsp.window.float({ action = "toggle" }))
-hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("kitty --class clipse -e \'clipse\'"))
-hl.bind(mainMod .. " + period", hl.dsp.exec_cmd("/home/aarushth/Applications/Emojify-x86_64.AppImage"))
+hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("kitty --class clipse -e clipse"))
+hl.bind(mainMod .. " + period", hl.dsp.exec_cmd("rofimoji --action clipboard"))
 hl.bind(mainMod .. " + SUPER_L", hl.dsp.exec_cmd(menu))
 hl.bind(mainMod .. " + P", hl.dsp.layout("togglesplit"))    -- dwindle only
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("hyprshot -m region"))
 hl.bind("ALT + f4", hl.dsp.window.close())
-hl.bind("ALT + TAB", hl.dsp.exec_cmd("~/.config/hypr/scripts/overview_open_or_next_column.sh"), {non_consuming = true})
-
+hl.bind("ALT + TAB", hl.dsp.exec_cmd("$HYPR_SCRIPTS_DIR/overview_open_or_next_column.sh"), {non_consuming = true})
+hl.bind("CTRL + ALT + DELETE", hl.dsp.exec_cmd("wlogout"))
 -- Move focus with mainMod + arrow keys
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
 hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
 hl.bind(mainMod .. " + up",    hl.dsp.focus({ direction = "up" }))
 hl.bind(mainMod .. " + down",  hl.dsp.focus({ direction = "down" }))
+
+hl.bind(mainMod .. " + X", hl.dsp.exec_cmd("qs ipc call notifications dismiss_hovered"))
+hl.bind(mainMod .. " + SHIFT + X", hl.dsp.exec_cmd("qs ipc call notifications dismiss_all"))
 
 -- Switch workspaces with mainMod + [0-9]
 -- Move active window to a workspace with mainMod + SHIFT + [0-9]
@@ -32,7 +34,7 @@ for i = 1, 10 do
     hl.bind(mainMod .. " + " .. key,             hl.dsp.focus({ workspace = i}))
     hl.bind(mainMod .. " + SHIFT + " .. key,     hl.dsp.window.move({ workspace = i }))
 end
-hl.bind(mainMod .. " + 1", hl.dsp.exec_cmd("~/.config/hypr/scripts/open_firefox_ws1.sh"))
+hl.bind(mainMod .. " + 1", hl.dsp.exec_cmd("$HYPR_SCRIPTS_DIR/open_firefox_ws1.sh"))
 
 
 -- Scroll through existing workspaces with mainMod + scroll
@@ -64,4 +66,3 @@ hl.bind(mainMod .. " + SHIFT + left", hl.dsp.window.move({ direction = "left"}))
 hl.bind(mainMod .. " + SHIFT + right", hl.dsp.window.move({ direction = "right"}))
 hl.bind(mainMod .. " + SHIFT + up", hl.dsp.window.move({ direction = "up"}))
 hl.bind(mainMod .. " + SHIFT + down", hl.dsp.window.move({ direction = "down"}))
-

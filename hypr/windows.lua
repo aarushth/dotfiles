@@ -44,10 +44,19 @@ hl.window_rule({
 hl.window_rule({
     match = {
         class = "clipse",
+		
     },
     float = true,
     size = "622 652"
     
+})
+
+hl.window_rule({
+    match = {
+    	title = "termfilechooser",
+    },
+    float = true,
+    size = "622 652"    
 })
 
 --emojify floating
@@ -60,15 +69,33 @@ hl.window_rule({
 })
 
 
---wallpaper picker
-hl.window_rule({
-    name = "wallpaper-picker",
+-- --wallpaper picker
+-- hl.window_rule({
+--     name = "wallpaper-picker",
 
+--     match = {
+--         class = "WallpaperPicker",
+--     },
+
+--     workspace = "special:wallpicker",
+--     float = true,
+--     center = true,
+-- })
+
+-- notification blur
+hl.layer_rule({
     match = {
-        class = "WallpaperPicker",
+        namespace = "quickshell-notification-card-blur"
     },
+    blur = true
+    -- blur_popups = true
+})
 
-    workspace = "special:wallpicker",
-    float = true,
-    center = true,
+hl.config({
+    decoration = {
+        blur = {
+            size = 7,
+            passes = 2,
+        }
+    }
 })
