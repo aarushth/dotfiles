@@ -9,7 +9,6 @@ A standalone workspace overview module for Hyprland using Quickshell - shows all
 ![Qt6](https://img.shields.io/badge/Qt-6-green?style=flat-square)
 ![License](https://img.shields.io/badge/License-GPL-orange?style=flat-square)
 
-
 </div>
 
 ---
@@ -20,7 +19,7 @@ A standalone workspace overview module for Hyprland using Quickshell - shows all
 
 https://github.com/user-attachments/assets/e8f392d7-d831-4dec-9cd3-fb93d1ccc21c
 
-> *Workspace overview showing live window previews with drag-and-drop support*
+> _Workspace overview showing live window previews with drag-and-drop support_
 
 ---
 
@@ -30,7 +29,7 @@ https://github.com/user-attachments/assets/e8f392d7-d831-4dec-9cd3-fb93d1ccc21c
 - 🖥️ Multi-monitor support with proper scaling and vertical/rotated monitors [in experimental branch]
 - 📐 Smart row hiding - optionally hide empty workspace rows
 - 🎯 Click windows to focus them
-- 🖱️ Middle-click windows to close them  
+- 🖱️ Middle-click windows to close them
 - 🔄 Drag and drop windows between workspaces
 - ⌨️ Keyboard navigation (Arrow keys, vim keys, number shortcuts)
 - 🖱️ Auto-close on focus loss / outside click
@@ -76,17 +75,20 @@ Then add the keybind and auto-start to your Hyprland config (see Setup steps 2-4
 
 1. **Install module files** (choose one):
    - **Git clone (manual install):**
+
    ```bash
    git clone https://github.com/Shanu-Kumawat/quickshell-overview ~/.config/quickshell/overview
    ```
    - **AUR package:** use the command above (`yay -S quickshell-overview-git` or `paru -S ...`)
 
 2. **Add keybind** to your Hyprland config (`~/.config/hypr/hyprland.conf`):
+
    ```conf
    bind = Super, TAB, exec, qs ipc -c overview call overview toggle
    ```
 
 3. **Auto-start** the overview (add to Hyprland config):
+
    ```conf
    exec-once = qs -c overview
    ```
@@ -125,21 +127,21 @@ home.packages = with pkgs; [
 
 ## 🎮 Usage
 
-| Action | Description |
-|--------|-------------|
-| **Super + Tab** | Toggle the overview |
-| **Arrow Keys / h/l** | Navigate left/right within current row* |
-| **Up/Down / j/k** | Navigate between workspace rows |
-| **1-9, 0** | Jump to Nth workspace in current group (0 = 10th) |
-| **Mouse wheel on grid** | Move across all normal workspaces, wrapping from last to first |
-| **Escape / Enter** | Close the overview |
+| Action                     | Description                                                              |
+| -------------------------- | ------------------------------------------------------------------------ |
+| **Super + Tab**            | Toggle the overview                                                      |
+| **Arrow Keys / h/l**       | Navigate left/right within current row\*                                 |
+| **Up/Down / j/k**          | Navigate between workspace rows                                          |
+| **1-9, 0**                 | Jump to Nth workspace in current group (0 = 10th)                        |
+| **Mouse wheel on grid**    | Move across all normal workspaces, wrapping from last to first           |
+| **Escape / Enter**         | Close the overview                                                       |
 | **Click outside overview** | Close the overview when `overview.closeOnFocusLoss` is enabled (default) |
-| **Click workspace** | Switch to that workspace |
-| **Click window** | Focus that window |
-| **Middle-click window** | Close that window |
-| **Drag window** | Move window to different workspace |
+| **Click workspace**        | Switch to that workspace                                                 |
+| **Click window**           | Focus that window                                                        |
+| **Middle-click window**    | Close that window                                                        |
+| **Drag window**            | Move window to different workspace                                       |
 
-> *When `hideEmptyRows` is enabled, left/right navigation wraps within the current visible row for better UX
+> \*When `hideEmptyRows` is enabled, left/right navigation wraps within the current visible row for better UX
 
 ---
 
@@ -216,6 +218,7 @@ Edit `~/.config/quickshell/overview/config.json`:
 ```
 
 **Common adjustments:**
+
 - **Too small?** Increase `scale` (try 0.20 or 0.25)
 - **Too big?** Decrease `scale` (try 0.12 or 0.14)
 - **More workspaces?** Change `rows` and `columns` (e.g., 3 rows × 4 columns = 12 workspaces)
@@ -227,6 +230,7 @@ Edit `~/.config/quickshell/overview/config.json`:
 - **Transparency / blur?** Tune `overview.effects.*` (details below)
 
 **Hide empty workspace rows:**
+
 - Set `hideEmptyRows: true` to automatically hide rows that have no windows
 - Keeps your overview clean by only showing rows with active workspaces
 - The current workspace row is always visible, even if empty
@@ -234,6 +238,7 @@ Edit `~/.config/quickshell/overview/config.json`:
 - Great for 2-row setups where you rarely use workspaces 6-10
 
 **Close on focus loss / outside click:**
+
 - `closeOnFocusLoss` defaults to `true`
 - When enabled, clicking outside the overview closes it, similar to menus, dropdowns, and launchers
 - The overview also closes when its Hyprland focus grab is cleared
@@ -311,6 +316,7 @@ Increase `topMargin` to move the overview down. Decrease it to move up.
 - `specialEmptyWorkspaceWallpaper`: optional image path used as the background for special workspace tiles
 
 Interaction behavior:
+
 - Preconfigured special workspaces appear in the overview even when they are empty
 - The special strip shows active special workspaces plus any names you preconfigure
 - This is useful for fixed workflows like `stash`, `music`, or `scratch`
@@ -322,6 +328,7 @@ Interaction behavior:
 - Restart Quickshell after changing `config.json`, otherwise the special workspace list will not refresh immediately
 
 Normal workspace scrolling:
+
 - Scroll on the normal workspace grid to move the active workspace/highlighter across all normal workspaces
 - Scrolling wraps from the last workspace back to `1`, and from `1` back to the last
 
@@ -395,7 +402,7 @@ Stronger glass preset:
       "enableBlur": true,
       "panelOpacity": 0.55,
       "workspaceOpacity": 0.48,
-      "emptyWorkspaceWallpaperOverlayOpacity": 0.10,
+      "emptyWorkspaceWallpaperOverlayOpacity": 0.1,
       "windowOverlayOpacity": 0.08,
       "glassMode": true,
       "glassTintStrength": 0.55,
@@ -533,6 +540,7 @@ Low-memory preset:
 ### Theme & Colors
 
 Most theme sizing/timing options are now configurable via `config.json`:
+
 - `appearance.colorSource` (`default`, `matugen`, `caelestia`)
 - `appearance.caelestia.*` (`autoRefresh`, `refreshInterval`, `accentProfile`)
 - `appearance.rounding.*`
@@ -549,12 +557,14 @@ For full color palette customization, edit `~/.config/quickshell/overview/common
 **1. Install matugen** - follow [matugen's install guide](https://github.com/InioX/matugen?tab=readme-ov-file#installation)
 
 **2. Copy the template** from this repo to matugen's templates folder:
+
 ```bash
 mkdir -p ~/.config/matugen/templates
 cp ~/.config/quickshell/overview/quickshell-overview.qml ~/.config/matugen/templates/
 ```
 
 **3. Add this to `~/.config/matugen/config.toml`** (create the file if it doesn't exist):
+
 ```toml
 [templates.quickshell_overview]
 input_path  = "./templates/quickshell-overview.qml"
@@ -562,6 +572,7 @@ output_path = "~/.config/quickshell/overview/common/Appearance.colors.qml"
 ```
 
 **4. Enable it** in `~/.config/quickshell/overview/config.json`:
+
 ```json
 {
   "appearance": {
@@ -571,6 +582,7 @@ output_path = "~/.config/quickshell/overview/common/Appearance.colors.qml"
 ```
 
 **5. Run matugen** with your wallpaper to generate colors:
+
 ```bash
 matugen image /path/to/your/wallpaper.jpg
 ```
@@ -656,7 +668,7 @@ qs ipc -c overview call overview toggle
 # Open overview
 qs ipc -c overview call overview open
 
-# Close overview  
+# Close overview
 qs ipc -c overview call overview close
 ```
 
@@ -671,7 +683,7 @@ If this project helps your setup and you want to support continued maintenance, 
 
 https://github.com/sponsors/Shanu-Kumawat
 
-##  Credits
+## Credits
 
 Extracted from the overview feature in [illogical-impulse](https://github.com/end-4/dots-hyprland) by [end-4](https://github.com/end-4).
 
