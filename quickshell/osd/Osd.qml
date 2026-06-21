@@ -7,14 +7,28 @@ import Quickshell
 import Quickshell.Services.Pipewire
 import Quickshell.Widgets
 import Quickshell.Io
-
+import "../config/themes"
 Scope {
 	id: root
+	property var theme: DefaultTheme{}
 	FontLoader {
 		id: khinterference
-		source: "../fonts/KHInterferenceTRIAL-Bold.woff2"
+		source: "../config/fonts/KHInterferenceTRIAL-Bold.woff2"
 	}
 	property bool volumeMode : true
+	property bool shouldShowOsd: false
+	property int colNums: 80
+	property int rowNums: 5
+	property int totalBoxes: colNums * rowNums
+	property bool muted: Pipewire.defaultAudioSink?.audio.muted ?? false
+	property real volume: Pipewire.defaultAudioSink?.audio.volume ?? 0
+	property real brightness: 0.0
+	property int maxBrightness: 1
+	property string labelText: (volumeMode ? "VOLUME:" : "BRIGHTNESS: ") + (volumeMode && muted ? "MUTED" : String(Math.round((volumeMode ? volume : brightness)*100)).padStart(3, "0")+ "%") 
+	
+	property color strokeColor: volumeMode ? (muted ? theme.textMuted : theme.accentPurple) : theme.accentGreen
+	property color fillColor: theme.textPrimary
+	
 	// Bind the pipewire node so its volume will be tracked
 	PwObjectTracker {
 		objects: [ Pipewire.defaultAudioSink ]
@@ -37,7 +51,7 @@ Scope {
 		}
 	}
 
-	property bool shouldShowOsd: false
+	
 
 	Timer {
 		id: hideTimer
@@ -47,15 +61,7 @@ Scope {
 		}
 	}
 
-	property int colNums: 80
-	property int rowNums: 5
-	property int totalBoxes: colNums * rowNums
-	property bool muted: Pipewire.defaultAudioSink?.audio.muted ?? false
-	property real volume: Pipewire.defaultAudioSink?.audio.volume ?? 0
-	property real brightness: 0.0
-	property int maxBrightness: 1
-	property string labelText: (volumeMode ? "VOLUME:" : "BRIGHTNESS: ") + (muted ? "MUTED" : String(Math.round((volumeMode ? volume : brightness)*100)).padStart(3, "0")) + "%"
-
+	
 	Process {
 		id: brightnessReadProc
 		command: ["brightnessctl", "get"]
@@ -147,7 +153,7 @@ Scope {
 					font.pointSize: 70					
 					horizontalAlignment: Text.AlignHCenter
 					fillColor: "transparent"
-					strokeColor: volumeMode ? (muted ? "darkGrey" : "green") : "purple"
+					strokeColor: root.strokeColor
 					strokeWidth: 2
 					font.bold: true
 				}
@@ -169,7 +175,7 @@ Scope {
 								height: boxSize
 
 								property bool isRevealed: revealed.includes(modelData)
-								color: volumeMode ? (muted ? "grey" : "purple") : "green"
+								color: root.fillColor
 								opacity: isRevealed ? 1 : 0
 
 							}
@@ -185,7 +191,7 @@ Scope {
 					horizontalAlignment: Text.AlignHCenter
 					font.pointSize: 70
 					font.bold: true
-					fillColor: volumeMode ? (muted ? "darkGrey" : "green") : "purple"
+					fillColor: root.strokeColor
 					strokeStyle: None
 					visible: false
 				}

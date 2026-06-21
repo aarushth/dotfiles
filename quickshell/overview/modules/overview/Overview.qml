@@ -11,6 +11,63 @@ import "."
 
 Scope {
     id: overviewScope
+
+	QtObject {
+		id: overviewActions
+
+		function moveSelectionLinear(deltaIndex) {
+			const workspacesPerGroup = Config.options.overview.rows * Config.options.overview.columns;
+			const currentId = Hyprland.focusedMonitor?.activeWorkspace?.id ?? 1;
+			const useWorkspaceMap = Config.options.overview.useWorkspaceMap;
+			const workspaceMap = Config.options.overview.workspaceMap ?? [];
+			const focusedMonitorId = Hyprland.focusedMonitor?.id ?? root.monitor?.id ?? 0;
+			const workspaceOffset = useWorkspaceMap ? Number(workspaceMap[focusedMonitorId] ?? 0) : 0;
+			const currentGroup = Math.floor((currentId - workspaceOffset - 1) / workspacesPerGroup);
+			const minWorkspaceId = currentGroup * workspacesPerGroup + 1 + workspaceOffset;
+
+			const rows = Config.options.overview.rows;
+			const columns = Config.options.overview.columns;
+			const reverseColumns = Config.options.overview.orderRightLeft;
+			const reverseRows = Config.options.overview.orderBottomUp;
+
+			const clampedIndex = Math.max(0, Math.min(workspacesPerGroup - 1, currentId - minWorkspaceId));
+			const currentNormalRow = Math.floor(clampedIndex / columns);
+			const currentNormalColumn = clampedIndex % columns;
+
+			function toVisualRow(normalRow) {
+				return reverseRows ? (rows - normalRow - 1) : normalRow;
+			}
+
+			function toVisualColumn(normalColumn) {
+				return reverseColumns ? (columns - normalColumn - 1) : normalColumn;
+			}
+
+			function toNormalRow(visualRow) {
+				return reverseRows ? (rows - visualRow - 1) : visualRow;
+			}
+
+			function toNormalColumn(visualColumn) {
+				return reverseColumns ? (columns - visualColumn - 1) : visualColumn;
+			}
+
+			const total = rows * columns;
+			const currentVisualIndex = toVisualRow(currentNormalRow) * columns + toVisualColumn(currentNormalColumn);
+			const targetVisualIndex = ((currentVisualIndex + deltaIndex) % total + total) % total;
+			const targetVisualRow = Math.floor(targetVisualIndex / columns);
+			const targetVisualColumn = targetVisualIndex % columns;
+			const targetNormalRow = toNormalRow(targetVisualRow);
+			const targetNormalColumn = toNormalColumn(targetVisualColumn);
+			const targetId = minWorkspaceId + targetNormalRow * columns + targetNormalColumn;
+
+			
+			Hyprland.dispatch(`hl.dsp.focus({workspace = '${targetId}'})`);
+		}
+
+		function nextColumn() {
+			moveSelectionBy(0, 1);
+		}
+	}
+
     Variants {
         id: overviewVariants
         model: Quickshell.screens
@@ -89,64 +146,7 @@ Scope {
             implicitWidth: screen.width
             implicitHeight: screen.height
 
-            QtObject {
-                id: overviewActions
-
-                function moveSelectionLinear(deltaIndex) {
-                    const workspacesPerGroup = Config.options.overview.rows * Config.options.overview.columns;
-                    const currentId = Hyprland.focusedMonitor?.activeWorkspace?.id ?? 1;
-                    const useWorkspaceMap = Config.options.overview.useWorkspaceMap;
-                    const workspaceMap = Config.options.overview.workspaceMap ?? [];
-                    const focusedMonitorId = Hyprland.focusedMonitor?.id ?? root.monitor?.id ?? 0;
-                    const workspaceOffset = useWorkspaceMap ? Number(workspaceMap[focusedMonitorId] ?? 0) : 0;
-                    const currentGroup = Math.floor((currentId - workspaceOffset - 1) / workspacesPerGroup);
-                    const minWorkspaceId = currentGroup * workspacesPerGroup + 1 + workspaceOffset;
-
-                    const rows = Config.options.overview.rows;
-                    const columns = Config.options.overview.columns;
-                    const reverseColumns = Config.options.overview.orderRightLeft;
-                    const reverseRows = Config.options.overview.orderBottomUp;
-
-                    const clampedIndex = Math.max(0, Math.min(workspacesPerGroup - 1, currentId - minWorkspaceId));
-                    const currentNormalRow = Math.floor(clampedIndex / columns);
-                    const currentNormalColumn = clampedIndex % columns;
-
-                    function toVisualRow(normalRow) {
-                        return reverseRows ? (rows - normalRow - 1) : normalRow;
-                    }
-
-                    function toVisualColumn(normalColumn) {
-                        return reverseColumns ? (columns - normalColumn - 1) : normalColumn;
-                    }
-
-                    function toNormalRow(visualRow) {
-                        return reverseRows ? (rows - visualRow - 1) : visualRow;
-                    }
-
-                    function toNormalColumn(visualColumn) {
-                        return reverseColumns ? (columns - visualColumn - 1) : visualColumn;
-                    }
-
-                    const total = rows * columns;
-                    const currentVisualIndex = toVisualRow(currentNormalRow) * columns + toVisualColumn(currentNormalColumn);
-                    const targetVisualIndex = ((currentVisualIndex + deltaIndex) % total + total) % total;
-                    const targetVisualRow = Math.floor(targetVisualIndex / columns);
-                    const targetVisualColumn = targetVisualIndex % columns;
-                    const targetNormalRow = toNormalRow(targetVisualRow);
-                    const targetNormalColumn = toNormalColumn(targetVisualColumn);
-                    const targetId = minWorkspaceId + targetNormalRow * columns + targetNormalColumn;
-
-                    if (Hyprland.usingLua) {
-                        Hyprland.dispatch(`hl.dsp.focus({workspace = '${targetId}'})`);
-                    } else {
-                        Hyprland.dispatch(`workspace ${targetId}`);
-                    }
-                }
-
-                function nextColumn() {
-                    moveSelectionBy(0, 1);
-                }
-            }
+            
 
             Item {
                 id: keyHandler
@@ -181,72 +181,68 @@ Scope {
                         event.accepted = true;
                     }
                 }
-                Keys.onPressed: event => {
-                    if (event.key === Qt.Key_Left || event.key === Qt.Key_Backtab) {
-                        overviewActions.moveSelectionLinear(-1);
-                        event.accepted = true;
-                    } else if (event.key === Qt.Key_Right || event.key === Qt.Key_Tab) {
-                        overviewActions.moveSelectionLinear(1);
-                        event.accepted = true;
-                    } else {
-                        const workspacesPerGroup = Config.options.overview.rows * Config.options.overview.columns;
-                        const currentId = Hyprland.focusedMonitor?.activeWorkspace?.id ?? 1;
-                        const useWorkspaceMap = Config.options.overview.useWorkspaceMap;
-                        const workspaceMap = Config.options.overview.workspaceMap ?? [];
-                        const focusedMonitorId = Hyprland.focusedMonitor?.id ?? root.monitor?.id ?? 0;
-                        const workspaceOffset = useWorkspaceMap ? Number(workspaceMap[focusedMonitorId] ?? 0) : 0;
-                        const currentGroup = Math.floor((currentId - workspaceOffset - 1) / workspacesPerGroup);
-                        const minWorkspaceId = currentGroup * workspacesPerGroup + 1 + workspaceOffset;
+                // Keys.onPressed: event => {
+                //     // if (event.key === Qt.Key_Left || event.key === Qt.Key_Backtab) {
+                //     //     overviewActions.moveSelectionLinear(-1);
+                //     //     event.accepted = true;
+                //     // } else if (event.key === Qt.Key_Right || event.key === Qt.Key_Tab) {
+                //     //     overviewActions.moveSelectionLinear(1);
+                //     //     event.accepted = true;
+                //     } else {
+                //         const workspacesPerGroup = Config.options.overview.rows * Config.options.overview.columns;
+                //         const currentId = Hyprland.focusedMonitor?.activeWorkspace?.id ?? 1;
+                //         const useWorkspaceMap = Config.options.overview.useWorkspaceMap;
+                //         const workspaceMap = Config.options.overview.workspaceMap ?? [];
+                //         const focusedMonitorId = Hyprland.focusedMonitor?.id ?? root.monitor?.id ?? 0;
+                //         const workspaceOffset = useWorkspaceMap ? Number(workspaceMap[focusedMonitorId] ?? 0) : 0;
+                //         const currentGroup = Math.floor((currentId - workspaceOffset - 1) / workspacesPerGroup);
+                //         const minWorkspaceId = currentGroup * workspacesPerGroup + 1 + workspaceOffset;
 
-                        // Number keys: jump to workspace within the current group
-                        // 1-9 map to positions 1-9, 0 maps to position 10
-                        let targetId = null;
-                        if (event.key >= Qt.Key_1 && event.key <= Qt.Key_9) {
-                            const position = event.key - Qt.Key_0; // 1-9
-                            if (position <= workspacesPerGroup) {
-                                targetId = minWorkspaceId + position - 1;
-                            }
-                        } else if (event.key === Qt.Key_0) {
-                            // 0 = 10th workspace in the group (if group has 10+ workspaces)
-                            if (workspacesPerGroup >= 10) {
-                                targetId = minWorkspaceId + 9; // 10th position = offset 9
-                            }
-                        }
+                //         // Number keys: jump to workspace within the current group
+                //         // 1-9 map to positions 1-9, 0 maps to position 10
+                //         let targetId = null;
+                //         if (event.key >= Qt.Key_1 && event.key <= Qt.Key_9) {
+                //             const position = event.key - Qt.Key_0; // 1-9
+                //             if (position <= workspacesPerGroup) {
+                //                 targetId = minWorkspaceId + position - 1;
+                //             }
+                //         } else if (event.key === Qt.Key_0) {
+                //             // 0 = 10th workspace in the group (if group has 10+ workspaces)
+                //             if (workspacesPerGroup >= 10) {
+                //                 targetId = minWorkspaceId + 9; // 10th position = offset 9
+                //             }
+                //         }
 
-                        if (targetId !== null) {
-                            const maxWorkspaceId = minWorkspaceId + workspacesPerGroup - 1;
-                            const clampedTarget = Math.max(minWorkspaceId, Math.min(maxWorkspaceId, targetId));
+                //         if (targetId !== null) {
+                //             const maxWorkspaceId = minWorkspaceId + workspacesPerGroup - 1;
+                //             const clampedTarget = Math.max(minWorkspaceId, Math.min(maxWorkspaceId, targetId));
 
-				if (Hyprland.usingLua) {
-					Hyprland.dispatch(`hl.dsp.focus({workspace = '${clampedTarget}'})`);
-				} else {
-					Hyprland.dispatch("workspace " + clampedTarget);
+				// 			Hyprland.dispatch(`hl.dsp.focus({workspace = '${clampedTarget}'})`);							
+				// 			event.accepted = true;
+				// 		}
+				// 	}
+				// }	
+			}
+
+			ColumnLayout {
+				id: columnLayout
+				visible: GlobalStates.overviewOpen
+				z: 1
+				anchors {
+					horizontalCenter: parent.horizontalCenter
+					top: parent.top
+					topMargin: Config.options.position.topMargin
 				}
-                            event.accepted = true;
-                        }
-                    }
-                }
-            }
 
-            ColumnLayout {
-                id: columnLayout
-                visible: GlobalStates.overviewOpen
-                z: 1
-                anchors {
-                    horizontalCenter: parent.horizontalCenter
-                    top: parent.top
-                    topMargin: Config.options.position.topMargin
-                }
-
-                Loader {
-                    id: overviewLoader
-                    active: Config?.options.overview.enable ?? true
-                    sourceComponent: OverviewWidget {
-                        panelWindow: root
-                        visible: true
-                    }
-                }
-            }
+				Loader {
+					id: overviewLoader
+					active: Config?.options.overview.enable ?? true
+					sourceComponent: OverviewWidget {
+						panelWindow: root
+						visible: true
+					}
+				}
+			}
         }
     }
 
@@ -261,8 +257,13 @@ Scope {
         function close() {
             GlobalStates.overviewOpen = false;
         }
-        function open() {
+        function open_forward() {
             GlobalStates.overviewOpen = true;
+			overviewActions.moveSelectionLinear(1);
+        }
+		function open_backward() {
+            GlobalStates.overviewOpen = true;
+			overviewActions.moveSelectionLinear(-1);
         }
     }
 }

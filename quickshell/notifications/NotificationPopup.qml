@@ -6,7 +6,8 @@ import Quickshell.Services.Notifications
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Effects
-import "../components"
+import "../config/components"
+import "../config/themes"
 
 Scope {
     id: root
@@ -14,11 +15,11 @@ Scope {
    
 	FontLoader {
 		id: specifypersonal
-		source: "../fonts/SpecifyPERSONAL-ExExpBlack.ttf"
+		source: "../config/fonts/SpecifyPERSONAL-ExExpBlack.ttf"
 	}
 	FontLoader {
 		id: ppfraktionmono
-		source: "../fonts/PPFraktionMono-Regular.woff2"
+		source: "../config/fonts/PPFraktionMono-Regular.woff2"
 	}
 
 	// property string font: "Hack Nerd Font"
@@ -320,7 +321,7 @@ Scope {
 							}
 							verticalAlignment: Text.AlignVCenter
 							font.capitalization: Font.Capitalize
-							text: notifCard.modelData.appName || "Notification"
+							text: notifCard.modelData.summary || "Notification"
 							color: root.theme.textPrimary
 							font.pixelSize: 12
 							font.family: ppfraktionmono.name
@@ -360,7 +361,7 @@ Scope {
 						gridRow: 2
 						gridColumn: 1
 						gridRowSpan: 3
-						gridColumnSpan: parent.bodyColumnSpan
+						gridColumnSpan: notifCard.colNums - 2
 						// Rectangle{
 						// 	color: "green"
 						// 	anchors.fill: parent
@@ -373,7 +374,7 @@ Scope {
 							}
 							width: parent.width
 							verticalAlignment: Text.AlignVCenter
-							text: notifCard.modelData.summary
+							text: notifCard.modelData.appName
 							color: root.theme.textSecondary
 							font.pixelSize: 18
 							font.family: specifypersonal.name
@@ -389,7 +390,7 @@ Scope {
 						gridRow: 4
 						gridColumn: 1
 						gridRowSpan: 1
-						gridColumnSpan: parent.bodyColumnSpan
+						gridColumnSpan: notifCard.colNums - 2
 						Rectangle{
 							anchors{
 								bottom: parent.bottom
@@ -406,9 +407,11 @@ Scope {
 						gridRow: 6
 						gridColumn: 1
 						gridRowSpan: 2
-						gridColumnSpan: parent.bodyColumnSpan
-						 
-						
+						gridColumnSpan: notifCard.colNums - (notifCard.isImage ? 6 : 2)
+						Rectangle{
+							anchors.fill: parent
+							color: "transparent"
+						}
 						Text {
 							text: notifCard.modelData.body
 							color: root.theme.textMuted
@@ -424,10 +427,10 @@ Scope {
 					}
 					//notif body image
 					GridCell{
-						gridRow: 2
-						gridColumn: notifCard.colNums - 7
-						gridRowSpan: 6
-						gridColumnSpan: 6
+						gridRow: 5
+						gridColumn: notifCard.colNums - 5
+						gridRowSpan: 4
+						gridColumnSpan: 4
 						Rectangle{
 							anchors.fill: parent
 							color: "transparent"
@@ -437,13 +440,17 @@ Scope {
 							clip: true
 							Image {
 								id: notifImage
-								anchors.fill: parent
-								anchors.margins: 10
-
+								// anchors.centerIn: parent
+								width: parent.width - 10
+								height: parent.height - 10
+								anchors{
+									right: parent.right
+									verticalCenter: parent.verticalCenter
+								}
 								source: notifCard.modelData.image
 								fillMode: Image.PreserveAspectCrop
-								sourceSize.width: 24
-								sourceSize.height: 24
+								// sourceSize.width: 24
+								// sourceSize.height: 24
 							}
 						}
 					}

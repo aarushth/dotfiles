@@ -16,7 +16,9 @@ hl.bind(mainMod .. " + SUPER_L", hl.dsp.exec_cmd(menu))
 hl.bind(mainMod .. " + P", hl.dsp.layout("togglesplit"))    -- dwindle only
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("hyprshot -m region"))
 hl.bind("ALT + f4", hl.dsp.window.close())
-hl.bind("ALT + TAB", hl.dsp.exec_cmd("$HYPR_SCRIPTS_DIR/overview_open_or_next_column.sh"), {non_consuming = true})
+hl.bind("ALT + TAB", hl.dsp.exec_cmd("qs ipc call overview open_forward"), { consuming = false })
+hl.bind("ALT + SHIFT + TAB", hl.dsp.exec_cmd("qs ipc call overview open_backward"), {non_consuming = true})
+hl.bind("ALT + ALT_L", hl.dsp.exec_cmd("qs ipc call overview close"), {release = true})
 hl.bind("CTRL + ALT + DELETE", hl.dsp.exec_cmd("wlogout"))
 -- Move focus with mainMod + arrow keys
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
@@ -31,10 +33,28 @@ hl.bind(mainMod .. " + SHIFT + X", hl.dsp.exec_cmd("qs ipc call notifications di
 -- Move active window to a workspace with mainMod + SHIFT + [0-9]
 for i = 1, 10 do
     local key = i % 10 -- 10 maps to key 0
-    hl.bind(mainMod .. " + " .. key,             hl.dsp.focus({ workspace = i}))
+    hl.bind(mainMod .. " + " .. key,             hl.dsp.focus({ workspace = i}), {non_consuming = true})
     hl.bind(mainMod .. " + SHIFT + " .. key,     hl.dsp.window.move({ workspace = i }))
 end
-hl.bind(mainMod .. " + 1", hl.dsp.exec_cmd("$HYPR_SCRIPTS_DIR/open_firefox_ws1.sh"))
+
+
+-- hl.bind(mainMod .. " + 1", hl.dsp.exec_cmd("$HYPR_SCRIPTS_DIR/open_firefox_ws1.sh"))
+function open_firefox()
+	local is_firefox_running = false
+
+	for _, window in pairs(hl.get_windows()) do
+		if window.class == "org.mozilla.firefox" then
+			is_firefox_running = true
+			break
+		end
+	end
+
+	if not is_firefox_running then
+    	hl.dispatch(hl.dsp.exec_cmd("firefox"))
+	end
+end
+
+hl.bind(mainMod .. " + 1", open_firefox)
 
 
 -- Scroll through existing workspaces with mainMod + scroll

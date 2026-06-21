@@ -12,6 +12,5 @@ hl.env("QT_QPA_PLATFORMTHEME","qt6ct")
 hl.env("GTK_THEME", "Adwaita:dark")
 hl.env("QS_ICON_THEME", "AdwaitaLegacy")
 
--- firefox fix
+-- firefox extensions fix
 hl.env("MOZ_ENABLE_WAYLAND", "1")
-hl.env("HYPR_SCRIPTS_DIR", "/home/aarushth/.config/hypr/scripts")
