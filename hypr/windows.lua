@@ -50,7 +50,7 @@ hl.window_rule({
     size = "622 652"
     
 })
-
+-- yazi floating as filepicker
 hl.window_rule({
     match = {
     	title = "termfilechooser",
@@ -59,15 +59,7 @@ hl.window_rule({
     size = "622 652"    
 })
 
---emojify floating
-hl.window_rule({
-    match = {
-        class = "xyz.riothedev.emojify",
-    },
-    float = true,
-    size = "400 400"
-})
-
+hl.workspace_rule({workspace = "name:wallpaper"})
 
 -- --wallpaper picker
 -- hl.window_rule({
@@ -87,7 +79,8 @@ hl.layer_rule({
     match = {
         namespace = "quickshell-notification-card-blur"
     },
-    blur = true
+    blur = true,
+	no_anim = true
     -- blur_popups = true
 })
 

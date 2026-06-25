@@ -40,13 +40,6 @@ hl.config({
             render_power = 3,
             color        = 0xee1a1a1a,
         },
-
-        blur = {
-            enabled   = true,
-            size      = 3,
-            passes    = 1,
-            vibrancy  = 0.1696,
-        },
     },
 
     animations = {

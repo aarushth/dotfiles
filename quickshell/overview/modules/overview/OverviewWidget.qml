@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
+import Quickshell.Io
 import "../../common"
 import "../../common/functions"
 import "../../common/widgets"
@@ -43,8 +44,28 @@ Item {
     property int windowZ: 1
     property int windowDraggingZ: 99999
     property real workspaceSpacing: Config.options.overview.workspaceSpacing
-    property string emptyWorkspaceWallpaperPath: Config.options.overview.emptyWorkspaceWallpaper
+    property string emptyWorkspaceWallpaperPath: ""
     property string specialEmptyWorkspaceWallpaperPath: Config.options.overview.specialEmptyWorkspaceWallpaper
+	FileView {
+		id: wallpaper
+  		path: Quickshell.env("HOME") + "/.config/quickshell/config/current_wallpaper"
+		watchChanges: true
+		onFileChanged: wallpaperLoader.running = true
+	}
+	Process {
+		id: wallpaperLoader
+		running: true
+		command: ["cat", Quickshell.env("HOME") + "/.config/quickshell/config/current_wallpaper"]
+
+		stdout: SplitParser {
+			onRead: data => {
+				let path = data.trim()
+				if (path !== "") {
+					root.emptyWorkspaceWallpaperPath = path
+				}
+			}
+		}
+	}
     property bool showSpecialWorkspaces: Config.options.overview.showSpecialWorkspaces
     property var configuredSpecialWorkspaces: Config.options.overview.specialWorkspaces ?? []
     property int specialWorkspaceColumns: Math.max(1, Config.options.overview.specialWorkspaceColumns)
@@ -435,7 +456,6 @@ Item {
                     spacing: workspaceSpacing
                     visible: !Config.options.overview.hideEmptyRows ||
                              (root.rowsWithContent && root.rowsWithContent.has(rowIndex))
-                    height: visible ? implicitHeight : 0
 
                     Repeater { // Workspace repeater
                         model: Config.options.overview.columns
@@ -467,7 +487,7 @@ Item {
                                 id: workspaceWallpaper
                                 visible: workspace.showWallpaper
                                 anchors.fill: parent
-                                source: root.wallpaperSource(root.emptyWorkspaceWallpaperPath)
+                                source: root.emptyWorkspaceWallpaperPath
                                 fillMode: Image.PreserveAspectCrop
                                 asynchronous: true
                                 cache: true
@@ -671,7 +691,7 @@ Item {
                                 Image {
                                     visible: specialWorkspaceTile.showWallpaper
                                     anchors.fill: parent
-                                    source: root.wallpaperSource(root.specialEmptyWorkspaceWallpaperPath)
+                                    source: root.specialEmptyWorkspaceWallpaperPath
                                     fillMode: Image.PreserveAspectCrop
                                     asynchronous: true
                                     cache: true

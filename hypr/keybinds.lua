@@ -11,11 +11,28 @@ hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock"))
 hl.bind(mainMod .. " + F", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + J", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("kitty --class clipse -e clipse"))
+hl.bind(mainMod .. " + W", function()
+    hl.dispatch(hl.dsp.focus({workspace = "name:wallpaper"}))
+	hl.dispatch(hl.dsp.exec_cmd("qs ipc call wallpaper open"))
+end)
+hl.bind("CTRL + ALT + Backspace", function()
+    hl.dispatch(hl.dsp.focus({workspace = "name:btop"}))
+	hl.dispatch(hl.dsp.exec_cmd("kitty -e btop"))
+end)
 hl.bind(mainMod .. " + period", hl.dsp.exec_cmd("rofimoji --action clipboard"))
 hl.bind(mainMod .. " + SUPER_L", hl.dsp.exec_cmd(menu))
 hl.bind(mainMod .. " + P", hl.dsp.layout("togglesplit"))    -- dwindle only
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("hyprshot -m region"))
-hl.bind("ALT + f4", hl.dsp.window.close())
+
+hl.bind("ALT + f4", function ()
+	if hl.get_active_window().title == "quickshell-wallpaper-picker" then
+		hl.dispatch(hl.dsp.exec_cmd("qs ipc call wallpaper close"))
+	else
+		hl.dispatch(hl.dsp.window.close())
+	end
+end)
+
+
 hl.bind("ALT + TAB", hl.dsp.exec_cmd("qs ipc call overview open_forward"), { consuming = false })
 hl.bind("ALT + SHIFT + TAB", hl.dsp.exec_cmd("qs ipc call overview open_backward"), {non_consuming = true})
 hl.bind("ALT + ALT_L", hl.dsp.exec_cmd("qs ipc call overview close"), {release = true})
@@ -33,28 +50,25 @@ hl.bind(mainMod .. " + SHIFT + X", hl.dsp.exec_cmd("qs ipc call notifications di
 -- Move active window to a workspace with mainMod + SHIFT + [0-9]
 for i = 1, 10 do
     local key = i % 10 -- 10 maps to key 0
-    hl.bind(mainMod .. " + " .. key,             hl.dsp.focus({ workspace = i}), {non_consuming = true})
+    hl.bind(mainMod .. " + " .. key,             hl.dsp.focus({ workspace = i}))
     hl.bind(mainMod .. " + SHIFT + " .. key,     hl.dsp.window.move({ workspace = i }))
 end
 
+hl.bind(mainMod .. " + 1", 
+	function ()
+		local is_firefox_running = false
 
--- hl.bind(mainMod .. " + 1", hl.dsp.exec_cmd("$HYPR_SCRIPTS_DIR/open_firefox_ws1.sh"))
-function open_firefox()
-	local is_firefox_running = false
-
-	for _, window in pairs(hl.get_windows()) do
-		if window.class == "org.mozilla.firefox" then
-			is_firefox_running = true
-			break
+		for _, window in pairs(hl.get_windows()) do
+			if window.class == "org.mozilla.firefox" then
+				is_firefox_running = true
+				break
+			end
 		end
-	end
 
-	if not is_firefox_running then
-    	hl.dispatch(hl.dsp.exec_cmd("firefox"))
-	end
-end
-
-hl.bind(mainMod .. " + 1", open_firefox)
+		if not is_firefox_running then
+    		hl.dispatch(hl.dsp.exec_cmd("firefox"))
+		end
+	end)
 
 
 -- Scroll through existing workspaces with mainMod + scroll

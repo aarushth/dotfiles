@@ -181,47 +181,6 @@ Scope {
                         event.accepted = true;
                     }
                 }
-                // Keys.onPressed: event => {
-                //     // if (event.key === Qt.Key_Left || event.key === Qt.Key_Backtab) {
-                //     //     overviewActions.moveSelectionLinear(-1);
-                //     //     event.accepted = true;
-                //     // } else if (event.key === Qt.Key_Right || event.key === Qt.Key_Tab) {
-                //     //     overviewActions.moveSelectionLinear(1);
-                //     //     event.accepted = true;
-                //     } else {
-                //         const workspacesPerGroup = Config.options.overview.rows * Config.options.overview.columns;
-                //         const currentId = Hyprland.focusedMonitor?.activeWorkspace?.id ?? 1;
-                //         const useWorkspaceMap = Config.options.overview.useWorkspaceMap;
-                //         const workspaceMap = Config.options.overview.workspaceMap ?? [];
-                //         const focusedMonitorId = Hyprland.focusedMonitor?.id ?? root.monitor?.id ?? 0;
-                //         const workspaceOffset = useWorkspaceMap ? Number(workspaceMap[focusedMonitorId] ?? 0) : 0;
-                //         const currentGroup = Math.floor((currentId - workspaceOffset - 1) / workspacesPerGroup);
-                //         const minWorkspaceId = currentGroup * workspacesPerGroup + 1 + workspaceOffset;
-
-                //         // Number keys: jump to workspace within the current group
-                //         // 1-9 map to positions 1-9, 0 maps to position 10
-                //         let targetId = null;
-                //         if (event.key >= Qt.Key_1 && event.key <= Qt.Key_9) {
-                //             const position = event.key - Qt.Key_0; // 1-9
-                //             if (position <= workspacesPerGroup) {
-                //                 targetId = minWorkspaceId + position - 1;
-                //             }
-                //         } else if (event.key === Qt.Key_0) {
-                //             // 0 = 10th workspace in the group (if group has 10+ workspaces)
-                //             if (workspacesPerGroup >= 10) {
-                //                 targetId = minWorkspaceId + 9; // 10th position = offset 9
-                //             }
-                //         }
-
-                //         if (targetId !== null) {
-                //             const maxWorkspaceId = minWorkspaceId + workspacesPerGroup - 1;
-                //             const clampedTarget = Math.max(minWorkspaceId, Math.min(maxWorkspaceId, targetId));
-
-				// 			Hyprland.dispatch(`hl.dsp.focus({workspace = '${clampedTarget}'})`);							
-				// 			event.accepted = true;
-				// 		}
-				// 	}
-				// }	
 			}
 
 			ColumnLayout {

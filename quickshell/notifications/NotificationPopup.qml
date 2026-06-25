@@ -21,10 +21,6 @@ Scope {
 		id: ppfraktionmono
 		source: "../config/fonts/PPFraktionMono-Regular.woff2"
 	}
-
-	// property string font: "Hack Nerd Font"
-	// property string font: ppfraktionmono
-	// property string titleFont: specifypersonal
     property int boxSize: 15
     property int maxColNums: 24
     property int maxRowNums: 13
@@ -103,6 +99,7 @@ Scope {
 			required property var modelData;
 			required property int index
 
+			property bool closing: false
 			property bool isImage: notifCard.modelData.image !== "" && notifImage.status === Image.Ready
 			property int rowNums: 11 + (notifCard.modelData.actions.length > 0 ? 2 : 0)
 			property int colNums: 24
@@ -114,7 +111,10 @@ Scope {
 								notifCard.modelData.urgency === NotificationUrgency.Low ? root.theme.urgencyLow : root.theme.urgencyNormal
 			
 			function close(){
-				grid.reset()
+				if(!closing){
+					grid.reset()
+					closing = true
+				}
 			}
 			PanelWindow{
 				id: squares
@@ -227,7 +227,7 @@ Scope {
 				}  
 				HoverHandler {
 					id: cardHover
-					onHoveredChanged: notifCard.modelData.hovered = hovered
+					onHoveredChanged: {notifCard.modelData.hovered = hovered}
 					blocking: false
 				}
 
@@ -354,6 +354,7 @@ Scope {
 							hoverEnabled: true
 							cursorShape: Qt.PointingHandCursor
 							onClicked: grid.reset()
+							// onHoveredChanged: 
 						}
 					}
 					//notif title
@@ -362,10 +363,6 @@ Scope {
 						gridColumn: 1
 						gridRowSpan: 3
 						gridColumnSpan: notifCard.colNums - 2
-						// Rectangle{
-						// 	color: "green"
-						// 	anchors.fill: parent
-						// }
 						Text {
 							anchors{
 								verticalCenter: parent.verticalCenter
@@ -474,9 +471,11 @@ Scope {
 								radius: 1
 								color: notifCard.cardColor
 								opacity: 1
-
+								Component.onCompleted: timer.start()
 								SequentialAnimation {
-									running: notifCard.modelData.timerRunning
+									id: timer
+									// running: true
+									paused: !(notifCard.modelData.timerRunning)
 									// PauseAnimation { duration: 50 }
 									NumberAnimation {
 										target: progressBar
@@ -486,7 +485,10 @@ Scope {
 									}
 									ScriptAction{
 										script: {
-											grid.reset()
+											if(!notifCard.closing){
+												grid.reset()
+												notifCard.closing = true
+											}
 										}
 									}
 								}

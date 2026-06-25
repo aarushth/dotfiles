@@ -26,9 +26,11 @@ Scope {
 	property int maxBrightness: 1
 	property string labelText: (volumeMode ? "VOLUME:" : "BRIGHTNESS: ") + (volumeMode && muted ? "MUTED" : String(Math.round((volumeMode ? volume : brightness)*100)).padStart(3, "0")+ "%") 
 	
-	property color strokeColor: volumeMode ? (muted ? theme.textMuted : theme.accentPurple) : theme.accentGreen
-	property color fillColor: theme.textPrimary
+	property color strokeColor: theme.textPrimary
+	property color fillColor: volumeMode ? (muted ? theme.textMuted : theme.accentPurple) : theme.accentGreen
 	
+	property real percent: volumeMode ? volume : brightness
+	property int revealInd: percent * totalBoxes
 	// Bind the pipewire node so its volume will be tracked
 	PwObjectTracker {
 		objects: [ Pipewire.defaultAudioSink ]
@@ -39,19 +41,15 @@ Scope {
 		function volume() {
 			volumeMode = true
 			root.shouldShowOsd = true
-			reslice()
 			hideTimer.restart()
 		}
 		function brightness(){
 			volumeMode = false
 			root.shouldShowOsd = true
 			brightnessReadProc.running = true
-			
 			hideTimer.restart()
 		}
 	}
-
-	
 
 	Timer {
 		id: hideTimer
@@ -67,13 +65,12 @@ Scope {
 		command: ["brightnessctl", "get"]
 		running: false
 		stdout: StdioCollector {
-		onStreamFinished: {
-			const val = parseInt(text.trim());
-			if (!isNaN(val) && root.maxBrightness > 0) {
-				root.brightness = val / root.maxBrightness
-				root.reslice()
+			onStreamFinished: {
+				const val = parseInt(text.trim());
+				if (!isNaN(val) && root.maxBrightness > 0) {
+					root.brightness = val / root.maxBrightness
+				}
 			}
-		}
 		}
 	}
 	Process {
@@ -83,41 +80,34 @@ Scope {
 		stdout: StdioCollector {
 		onStreamFinished: {
 			const val = parseInt(text.trim());
-			if (!isNaN(val)) {
-				root.maxBrightness = val
+				if (!isNaN(val)) {
+					root.maxBrightness = val
+				}
 			}
-		}
 		}
 	}
 	
-	property var revealed: []
-	property var unrevealed: []
-	property var boxes: null
+	property var boxes: []
 
 	function initVals() {
-		boxes = []
+		var temp = []
+        boxes = new Array(totalBoxes)
 		for (let x = 0; x < colNums; x++) {
 			for (let y = 0; y < rowNums; y++) {
 				let leftBias = (colNums - x) / colNums
 				let random = Math.random()
 
-				boxes.push({
+				temp.push({
 					id: y * colNums + x,
 					score: leftBias * 0.80 + random * 0.20
 				})
 			}
 		}
 
-		boxes.sort((a, b) => b.score - a.score)
-	}
-	function reslice(){
-		let percent = volumeMode ? volume : brightness
-		if (!boxes)
-        	return
-		revealed = boxes
-			.slice(0, percent * totalBoxes)
-			.map(b => b.id)
-		unrevealed = boxes.slice(percent * totalBoxes).map(b => b.id)
+		temp.sort((a, b) => b.score - a.score)
+		for (let i = 0; i < temp.length; i++) {
+            boxes[temp[i].id] = i   
+        }
 	}
 
 	Component.onCompleted: {
@@ -125,7 +115,6 @@ Scope {
 		brightnessMaxProc.running = true
 	}
 
-	
 	LazyLoader {
 		active: root.shouldShowOsd
 		PanelWindow {
@@ -153,7 +142,7 @@ Scope {
 					font.pointSize: 70					
 					horizontalAlignment: Text.AlignHCenter
 					fillColor: "transparent"
-					strokeColor: root.strokeColor
+					strokeColor: root.fillColor
 					strokeWidth: 2
 					font.bold: true
 				}
@@ -161,7 +150,7 @@ Scope {
 					id: squares
 					anchors.fill: parent
 					visible: true
-
+					
 					Grid {
 						anchors.fill: parent
 						columns: colNums
@@ -173,10 +162,10 @@ Scope {
 							delegate: Rectangle {
 								width: boxSize
 								height: boxSize
-
-								property bool isRevealed: revealed.includes(modelData)
+								property int idx: 100000
+								Component.onCompleted: idx = root.boxes[index]
 								color: root.fillColor
-								opacity: isRevealed ? 1 : 0
+								opacity: (idx < root.revealInd) ? 1 : 0
 
 							}
 						}
@@ -192,7 +181,7 @@ Scope {
 					font.pointSize: 70
 					font.bold: true
 					fillColor: root.strokeColor
-					strokeStyle: None
+					strokeStyle: 0
 					visible: false
 				}
 
