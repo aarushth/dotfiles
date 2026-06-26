@@ -5,16 +5,16 @@ import Quickshell.Wayland
 import Qt.labs.folderlistmodel
 import Quickshell
 import Quickshell.Io
+import "../config/themes/"
 
 Item {
     id: root
     width: Screen.width
-
-	property bool shouldShowPicker : false
+	property var theme: DefaultTheme{}
+	property bool shouldShowPicker: false
 	readonly property real itemWidth: 400
     readonly property real itemHeight: 420
-    readonly property real borderWidth: 3
-    readonly property real spacing: 10
+    readonly property real spacing: 5
     readonly property real skewFactor: -0.35
 	property real scrollThreshold: 150
 	property int scrollAccum: 0
@@ -28,8 +28,15 @@ Item {
 			closing = false
 		}
 		function close(){
-			root.shouldShowPicker = false
+			closing = true
+			closeTimer.start()
 		}
+	}
+	Timer {
+		id: closeTimer
+		running: false
+		interval: 400
+		onTriggered: {root.shouldShowPicker = false}
 	}
 	property string url: ""
     function applyWallpaper(fileUrl) {
@@ -51,10 +58,7 @@ Item {
 			onRead: data => {
 				let path = data.trim()
 				if (path !== "") {
-					// console.warn(path)
 					root.url = path
-					root.shouldShowPicker = true
-					closing = true
 				}
 			}
 		}
@@ -142,21 +146,11 @@ Item {
 	LazyLoader {
 		id: loader
 		active: root.shouldShowPicker
-		PanelWindow{
+		Component.onCompleted: {root.shouldShowPicker = false}
+		FloatingWindow{
 			id: window
-			anchors {
-				top: true
-				right: true
-				bottom: true
-				left: true
-			}
-			margins{
-				left: 0
-			}
-			WlrLayershell.namespace: "quickshell-wallpaper-picker"
-			WlrLayershell.layer: WlrLayer.Background
-			WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
-
+			title: "quickshell-wallpaper-picker"
+			
 			color: "transparent"
 			Grid {
 				id: grid
@@ -173,7 +167,7 @@ Item {
 						height: boxSize
 						property int idx: 100000
 						Component.onCompleted: idx = root.boxes[index]
-						color: "black"
+						color: root.theme.accentPurple
 						opacity: (idx < root.revealInd) ? 1 : 0
 
 					}
@@ -189,20 +183,18 @@ Item {
 
 				highlightRangeMode: ListView.StrictlyEnforceRange
 
-				preferredHighlightBegin: (width / 2) - ((root.itemWidth * 1.5 + root.spacing) / 2)
-				preferredHighlightEnd: (width / 2) + ((root.itemWidth * 1.5 + root.spacing) / 2)
+				preferredHighlightBegin: (width / 2) - ((root.itemWidth * 1.5) / 2)
+				preferredHighlightEnd: (width / 2) + ((root.itemWidth * 1.5 ) / 2)
 
 				highlightMoveDuration: 500
 				focus: true
 
 				model: srcModel
-				spacing: root.spacing
+				spacing: 0
 
 				// currentIndex: 
 				Component.onCompleted: {
 					let savedPath = root.url
-					
-
 					for (let i = 0; i < srcModel.count; ++i) {
 						let filePath = srcModel.get(i, "filePath") // or fileUrl.toLocalFile()
 						if (filePath === savedPath) {
@@ -253,7 +245,7 @@ Item {
 
 					
 
-					width: targetWidth -root.spacing
+					width: targetWidth
 					height: targetHeight
 
 					
@@ -263,7 +255,7 @@ Item {
 					Item {
 						id: skewMask
 						anchors.centerIn: parent
-						anchors.horizontalCenterOffset: (root.itemHeight * 0.5 * -root.skewFactor) + root.spacing + 0.5
+						anchors.horizontalCenterOffset: (root.itemHeight * 0.5 * -root.skewFactor) + 0.5
 						property bool entered: false
 						width: targetWidth
 						height: root.closing ? 0 : (entered ? targetHeight : 0)
@@ -297,7 +289,7 @@ Item {
 
 						Item {
 							anchors.fill: parent
-							anchors.margins: root.borderWidth
+							anchors.margins: root.spacing
 							clip: true
 
 							Image {

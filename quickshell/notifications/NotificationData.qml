@@ -66,14 +66,6 @@ QtObject {
         }
     }
 
-    readonly property Timer _timer: Timer {
-        running: timerRunning
-        interval: timeOut
-        // onTriggered: {
-        //     notificationData.dismiss()
-        // }
-    }
-
     Component.onCompleted: {
         if (!notification) return;
         notifId   = String(notification.id || "");
@@ -91,7 +83,6 @@ QtObject {
         });
 		rowNums = 11 + (actions.length > 0 ? 2 : 0)
 		cardHeight = rowNums * 15
-		// console.warn("height", cardHeight)
     }
 
     function dismiss(): void {

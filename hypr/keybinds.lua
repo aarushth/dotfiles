@@ -2,7 +2,26 @@
 ---------------------
 ---- KEYBINDINGS ----
 ---------------------
+hl.config({
+    input = {
+        kb_layout  = "us",
+        kb_variant = "",
+        kb_model   = "",
+        kb_options = "",
+        kb_rules   = "",
+        follow_mouse = 1,
+        sensitivity = 0, 
+        touchpad = {
+            natural_scroll = true,
+        },
+    },
+})
 
+hl.gesture({
+    fingers = 3,
+    direction = "horizontal",
+    action = "workspace"
+})
 
 local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 
@@ -10,19 +29,20 @@ hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock"))
 hl.bind(mainMod .. " + F", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + J", hl.dsp.window.float({ action = "toggle" }))
-hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("kitty --class clipse -e clipse"))
-hl.bind(mainMod .. " + W", function()
-    hl.dispatch(hl.dsp.focus({workspace = "name:wallpaper"}))
-	hl.dispatch(hl.dsp.exec_cmd("qs ipc call wallpaper open"))
-end)
-hl.bind("CTRL + ALT + Backspace", function()
-    hl.dispatch(hl.dsp.focus({workspace = "name:btop"}))
-	hl.dispatch(hl.dsp.exec_cmd("kitty -e btop"))
-end)
+hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("kitty -o background_opacity=1.0 --class clipse -e clipse "))
+hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("qs ipc call wallpaper open"))
+hl.bind("CTRL + ALT + Backspace", function ()
+		for _, window in pairs(hl.get_windows()) do
+			if window.class == "btop" then
+				return hl.dispatch(hl.dsp.focus({workspace = "name:btop"}))
+			end
+		end
+		hl.dispatch(hl.dsp.exec_cmd("kitty --class btop -e btop"))
+	end)
 hl.bind(mainMod .. " + period", hl.dsp.exec_cmd("rofimoji --action clipboard"))
 hl.bind(mainMod .. " + SUPER_L", hl.dsp.exec_cmd(menu))
-hl.bind(mainMod .. " + P", hl.dsp.layout("togglesplit"))    -- dwindle only
-hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("hyprshot -m region"))
+hl.bind(mainMod .. " + P", hl.dsp.layout("togglesplit"))
+hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("grim -g \"$(slurp)\" -t ppm - | satty -f - --copy-command wl-copy --output-filename ~/Pictures/Screenshots/satty-$(date '+%Y%m%d-%H:%M:%S').png"))
 
 hl.bind("ALT + f4", function ()
 	if hl.get_active_window().title == "quickshell-wallpaper-picker" then
@@ -33,16 +53,15 @@ hl.bind("ALT + f4", function ()
 end)
 
 
-hl.bind("ALT + TAB", hl.dsp.exec_cmd("qs ipc call overview open_forward"), { consuming = false })
-hl.bind("ALT + SHIFT + TAB", hl.dsp.exec_cmd("qs ipc call overview open_backward"), {non_consuming = true})
-hl.bind("ALT + ALT_L", hl.dsp.exec_cmd("qs ipc call overview close"), {release = true})
 hl.bind("CTRL + ALT + DELETE", hl.dsp.exec_cmd("wlogout"))
+
 -- Move focus with mainMod + arrow keys
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
 hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
 hl.bind(mainMod .. " + up",    hl.dsp.focus({ direction = "up" }))
 hl.bind(mainMod .. " + down",  hl.dsp.focus({ direction = "down" }))
 
+--notifications
 hl.bind(mainMod .. " + X", hl.dsp.exec_cmd("qs ipc call notifications dismiss_hovered"))
 hl.bind(mainMod .. " + SHIFT + X", hl.dsp.exec_cmd("qs ipc call notifications dismiss_all"))
 
@@ -56,24 +75,30 @@ end
 
 hl.bind(mainMod .. " + 1", 
 	function ()
-		local is_firefox_running = false
-
 		for _, window in pairs(hl.get_windows()) do
 			if window.class == "org.mozilla.firefox" then
-				is_firefox_running = true
-				break
+				return hl.dispatch(hl.dsp.no_op())
 			end
 		end
-
-		if not is_firefox_running then
-    		hl.dispatch(hl.dsp.exec_cmd("firefox"))
-		end
+		hl.dispatch(hl.dsp.exec_cmd("firefox"))
 	end)
 
 
 -- Scroll through existing workspaces with mainMod + scroll
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
 hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }))
+
+hl.bind("ALT + TAB", function()
+    hl.plugin.hyprexpo.expo("toggle")
+end)
+hl.define_submap("hyprexpo", function()
+    hl.bind("left",   function() hl.plugin.hyprexpo.kb_focus("left") end)
+    hl.bind("right",  function() hl.plugin.hyprexpo.kb_focus("right") end)
+    hl.bind("up",     function() hl.plugin.hyprexpo.kb_focus("up") end)
+    hl.bind("down",   function() hl.plugin.hyprexpo.kb_focus("down") end)
+    hl.bind("return", function() hl.plugin.hyprexpo.kb_confirm() end)
+    hl.bind("escape", function() hl.plugin.hyprexpo.expo("cancel") end)
+end)
 
 -- Move/resize windows with mainMod + LMB/RMB and dragging
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })

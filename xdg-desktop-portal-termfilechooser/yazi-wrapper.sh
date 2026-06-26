@@ -16,7 +16,7 @@ path="$4"
 out="$5"
 
 cmd="yazi"
-termcmd="kitty --title termfilechooser"
+termcmd="$TERMCMD"
 
 
 if [ "$save" = "1" ]; then

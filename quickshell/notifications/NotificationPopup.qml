@@ -116,90 +116,7 @@ Scope {
 					closing = true
 				}
 			}
-			PanelWindow{
-				id: squares
-				focusable: false
-				color: "transparent"
-				WlrLayershell.namespace: "quickshell-notification-card"
-				WlrLayershell.layer: WlrLayer.Overlay
-				WlrLayershell.keyboardFocus: WlrKeyboardFocus.None 
-				anchors {
-					top: true
-					right: true
-				}
-
-				margins {
-					right: notifCard.modelData.hovered ? 30 : 10
-					top: notifCard.modelData.yPos
-				}  
-				HoverHandler {
-					id: cardGridHover
-					onHoveredChanged: notifCard.modelData.hovered = hovered
-				}
-				implicitWidth: notifCard.cardWidth
-				implicitHeight: notifCard.cardHeight
-				Grid {
-					id: grid
-					anchors.fill: parent
-					columns: notifCard.colNums
-					rows: notifCard.rowNums
-					property int revealInd: 0
-					property bool entering: true
-					SequentialAnimation{
-						id: entryAnim
-						running: false
-						NumberAnimation{
-							target: grid
-							property: "revealInd"
-							from: 0; to: root.maxTotalBoxes
-							duration: 500
-							easing.type: Easing.OutCubic
-							running: false
-						}
-						ScriptAction{ script: {notifWindow.visible = grid.entering} }
-						NumberAnimation{
-							target: grid
-							property: "revealInd"
-							from: root.maxTotalBoxes; to: 0
-							duration: 500
-							easing.type: Easing.OutCubic
-							running: false
-						}
-						ScriptAction{ script: {
-							squares.visible = false
-							notifCard.modelData.timerStart = true
-							entryAnim.stop()
-							if(!grid.entering){
-								notifCard.modelData.dismiss()
-							}
-						} }
-					}
-					function reset(){
-						revealInd = 0
-						squares.visible = true
-						entering = false
-						entryAnim.restart()
-					}
-					
-					
-					Repeater {
-						model: notifCard.totalBoxes
-
-						delegate: Rectangle {
-							width: root.boxSize
-							height: root.boxSize
-
-							property int idx: 100000
-							Component.onCompleted: idx = notifCard.boxes[index]
-							color: notifCard.modelData.urgency === NotificationUrgency.Critical ? root.theme.urgencyCritical :
-									notifCard.modelData.urgency === NotificationUrgency.Low ? root.theme.urgencyLow : root.theme.urgencyNormal
-
-							opacity: (idx < grid.revealInd) ? 1 : 0
-						}
-					}
-					Component.onCompleted: entryAnim.start()
-				}
-			}
+			
 			PanelWindow {
 				id: notifWindow
 				visible: false
@@ -211,8 +128,6 @@ Scope {
 				WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
 				exclusionMode: ExclusionMode.Ignore
-
-
 				anchors {
 					top: true
 					right: true
@@ -340,7 +255,7 @@ Scope {
 							text: "󰅖"
 							color: root.theme.textPrimary
 							font.pixelSize: closeHover.containsMouse ? 25 : 15
-							font.family: root.font
+							font.family: ppfraktionmono
 							Behavior on font.pixelSize {
 								NumberAnimation {
 									duration: 100
@@ -509,7 +424,7 @@ Scope {
 								left: parent.left
 							}
 							color: "#272528"
-							border.color: "#747275"
+							border.color: root.theme.textSecondary
 							radius: 3
 							// visible: notifCard.modelData.urgency === NotificationUrgency.Critical
 							Text{
@@ -520,9 +435,9 @@ Scope {
 								horizontalAlignment: Text.AlignHCenter
 								verticalAlignment: Text.AlignVCenter
 								
-								color: "#747275"
+								color: root.theme.textSecondary
 								text: "󰅖"
-								font.family: root.font
+								font.family: ppfraktionmono
 							}
 						}
 					}
@@ -540,7 +455,7 @@ Scope {
 							}
 							verticalAlignment: Text.AlignVCenter
 							font.family: ppfraktionmono.name
-							color: root.theme.textMuted
+							color: root.theme.textSecondary
 							text: "Dismiss"
 						}
 					}
@@ -609,6 +524,86 @@ Scope {
 					}      
 
 				}                    
+			}
+			PanelWindow{
+				id: squares
+				focusable: false
+				color: "transparent"
+				WlrLayershell.namespace: "quickshell-notification-card"
+				WlrLayershell.layer: WlrLayer.Overlay
+				WlrLayershell.keyboardFocus: WlrKeyboardFocus.None 
+				anchors {
+					top: true
+					right: true
+				}
+
+				margins {
+					right: notifCard.modelData.hovered ? 30 : 10
+					top: notifCard.modelData.yPos
+				}  
+				HoverHandler {
+					id: cardGridHover
+					onHoveredChanged: notifCard.modelData.hovered = hovered
+				}
+				implicitWidth: notifCard.cardWidth
+				implicitHeight: notifCard.cardHeight
+				Grid {
+					id: grid
+					anchors.fill: parent
+					columns: notifCard.colNums
+					rows: notifCard.rowNums
+					property int revealInd: 0
+					property bool entering: true
+					SequentialAnimation{
+						id: entryAnim
+						running: false
+						NumberAnimation{
+							target: grid
+							property: "revealInd"
+							from: 0; to: root.maxTotalBoxes
+							duration: 500
+							running: false
+						}
+						PauseAnimation{ duration: 100 }
+						ScriptAction{ script: {notifWindow.visible = grid.entering} }
+						NumberAnimation{
+							target: grid
+							property: "revealInd"
+							from: root.maxTotalBoxes; to: 0
+							duration: 500
+							running: false
+						}
+						ScriptAction{ script: {
+							squares.visible = false
+							notifCard.modelData.timerStart = true
+							entryAnim.stop()
+							if(!grid.entering){
+								notifCard.modelData.dismiss()
+							}
+						} }
+					}
+					function reset(){
+						revealInd = 0
+						squares.visible = true
+						entering = false
+						entryAnim.restart()
+					}
+					
+					Repeater {
+						model: notifCard.totalBoxes
+
+						delegate: Rectangle {
+							width: root.boxSize
+							height: root.boxSize
+
+							property int idx: 100000
+							Component.onCompleted: idx = notifCard.boxes[index]
+							color: notifCard.cardColor
+							opacity: (idx < grid.revealInd) ? 1 : 0
+						}
+					}
+					Component.onCompleted: entryAnim.start()
+				}
 			}
 		}
 	}

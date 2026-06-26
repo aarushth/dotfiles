@@ -47,32 +47,51 @@ hl.window_rule({
 		
     },
     float = true,
-    size = "622 652"
+    size = "622 652",
+	border_size = 2,
     
 })
+hl.window_rule({
+	match = {
+		title = "quickshell-wallpaper-picker",
+	},
+    workspace = "name:wallpaper",
+	no_anim = true,
+	rounding = 0,
+	border_size = 0,
+})
+hl.workspace_rule({workspace = "name:wallpaper", gaps_out = 0})
+
+--btop
+hl.window_rule({
+	match = {
+		class = "btop",
+	},
+    workspace = "name:btop",
+	-- opacity = 0.5
+})
+-- satty floating
+hl.window_rule({
+    match = {
+        title = "satty",
+		
+    },
+    float = true,
+    size = "600 400"
+    
+})
+
 -- yazi floating as filepicker
 hl.window_rule({
     match = {
     	title = "termfilechooser",
     },
     float = true,
-    size = "622 652"    
+    size = "622 652",
+	border_size = 2,
 })
 
-hl.workspace_rule({workspace = "name:wallpaper"})
 
--- --wallpaper picker
--- hl.window_rule({
---     name = "wallpaper-picker",
-
---     match = {
---         class = "WallpaperPicker",
---     },
-
---     workspace = "special:wallpicker",
---     float = true,
---     center = true,
--- })
 
 -- notification blur
 hl.layer_rule({
@@ -81,9 +100,7 @@ hl.layer_rule({
     },
     blur = true,
 	no_anim = true
-    -- blur_popups = true
 })
-
 hl.config({
     decoration = {
         blur = {

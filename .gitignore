@@ -7,4 +7,6 @@
 !hypr/**
 !xdg-desktop-portal-termfilechooser/
 !xdg-desktop-portal-termfilechooser/**
+!kitty/
+!kitty/**
 
