@@ -53,8 +53,8 @@ Singleton {
             });
 
             root.notifications.push(data)
-
-            if (root.notifications.length > 5) {
+			// TODO fix dismiss logic
+            if (root.notifications.length > 4) {
                 root.notifications[0].dismiss();
             }
         }
@@ -72,12 +72,9 @@ Singleton {
 
     function dismissAll(): void {
         const toRemove = [...root.notifications];
-        root.notifications = [];
         for (const n of toRemove) {
-            if (!n.closed) {
-                n.closed = true;
-                if (n.notification) try { n.notification.dismiss(); } catch(e) {}
-                n.destroy();
+            if (!n.triggerClose) {
+				n.dismiss()
             }
         }
     }

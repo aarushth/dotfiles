@@ -25,18 +25,19 @@ hl.config({
 hl.config({
     plugin = {
         hyprexpo = {
-            columns = 3	,
-			max_workspace = 12,
-			-- rows = 4,
-            gaps_in = 5,
+            columns = 4,
+            gaps_in = 3,
             gaps_out = 0,
-            bg_col = "rgb(111111)",
-            workspace_method = "first 1",
-            -- gesture_distance = 30,
+			workspace_method = "first",
+			skip_empty = true,
             cancel_key = "escape",
             show_cursor = 1,
-			keynav_wrap_h = 0,
-			keynav_wrap_v = 0
+			label_enable = false
         },
     },
+})
+hl.plugin.hyprexpo.gesture({
+    fingers = 4,
+    direction = "up",
+    action = "expo",
 })

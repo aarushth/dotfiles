@@ -1,7 +1,6 @@
-#!/usr/bin/sh
-# This wrapper script is invoked by xdg-desktop-portal-termfilechooser.
-#
-# For more information about input/output arguments read `xdg-desktop-portal-termfilechooser(5)`
+#!/usr/bin/env bash
+set -x
+exec >/tmp/yazi-wrapper.log 2>&1
 
 set -e
 
@@ -16,7 +15,7 @@ path="$4"
 out="$5"
 
 cmd="yazi"
-termcmd="$TERMCMD"
+termcmd="${TERMCMD:- kitty --title termfilechooser -o background_opacity=1.0}"
 
 
 if [ "$save" = "1" ]; then

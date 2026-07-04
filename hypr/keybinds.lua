@@ -30,7 +30,10 @@ hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock"))
 hl.bind(mainMod .. " + F", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + J", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("kitty -o background_opacity=1.0 --class clipse -e clipse "))
-hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("qs ipc call wallpaper open"))
+hl.bind(mainMod .. " + W", function()
+	hl.dispatch(hl.dsp.exec_cmd("qs ipc call wallpaper open"))
+	hl.dispatch(hl.dsp.focus({workspace = "name:wp"}))
+end)
 hl.bind("CTRL + ALT + Backspace", function ()
 		for _, window in pairs(hl.get_windows()) do
 			if window.class == "btop" then
@@ -98,6 +101,7 @@ hl.define_submap("hyprexpo", function()
     hl.bind("down",   function() hl.plugin.hyprexpo.kb_focus("down") end)
     hl.bind("return", function() hl.plugin.hyprexpo.kb_confirm() end)
     hl.bind("escape", function() hl.plugin.hyprexpo.expo("cancel") end)
+	
 end)
 
 -- Move/resize windows with mainMod + LMB/RMB and dragging

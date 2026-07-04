@@ -14,8 +14,18 @@ local suppressMaximizeRule = hl.window_rule({
 
     suppress_event = "maximize",
 })
--- suppressMaximizeRule:set_enabled(false)
-
+hl.layer_rule({
+    match = {
+        namespace = ".*"  -- wildcard matches all layers
+    },
+	blur = false,
+})
+hl.window_rule({
+	match = {
+        namespace = ".*"  -- wildcard matches all layers
+    },
+	no_blur = true
+})
 hl.window_rule({
     -- Fix some dragging issues with XWayland
     name  = "fix-xwayland-drags",
@@ -55,12 +65,12 @@ hl.window_rule({
 	match = {
 		title = "quickshell-wallpaper-picker",
 	},
-    workspace = "name:wallpaper",
+    workspace = "name:wp",
 	no_anim = true,
 	rounding = 0,
 	border_size = 0,
 })
-hl.workspace_rule({workspace = "name:wallpaper", gaps_out = 0})
+hl.workspace_rule({workspace = "name:wp", gaps_out = 0})
 
 --btop
 hl.window_rule({
@@ -68,8 +78,35 @@ hl.window_rule({
 		class = "btop",
 	},
     workspace = "name:btop",
-	-- opacity = 0.5
 })
+
+hl.window_rule({
+	match = {
+		title = "Outlook uw",
+	},
+    workspace = "name:uw",
+})
+hl.window_rule({
+	match = {
+		title = "Outlook personal",
+	},
+    workspace = "name:mail",
+})
+hl.window_rule({
+	match = {
+		title = "Outlook cse",
+	},
+    workspace = "name:cse",
+})
+hl.window_rule({
+	match = {
+		title = "gmail",
+	},
+    workspace = "name:gmail",
+})
+
+
+
 -- satty floating
 hl.window_rule({
     match = {
@@ -99,6 +136,7 @@ hl.layer_rule({
         namespace = "quickshell-notification-card-blur"
     },
     blur = true,
+	order = 1,
 	no_anim = true
 })
 hl.config({
@@ -108,4 +146,10 @@ hl.config({
             passes = 2,
         }
     }
+})
+hl.layer_rule({
+	match = {
+		namespace = "quickshell-notification-card"
+	},
+	order = 0
 })

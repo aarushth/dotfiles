@@ -5,12 +5,11 @@ import Quickshell.Wayland
 import Qt.labs.folderlistmodel
 import Quickshell
 import Quickshell.Io
-import "../config/themes/"
+import "../config/singletons"
 
 Item {
     id: root
     width: Screen.width
-	property var theme: DefaultTheme{}
 	property bool shouldShowPicker: false
 	readonly property real itemWidth: 400
     readonly property real itemHeight: 420
@@ -43,12 +42,7 @@ Item {
 		switchAnim.running = true
 		root.url = fileUrl.toString().substring(7)
     }
-    readonly property string srcDir: {
-        const dir = Quickshell.env("WALLPAPER_DIR")
-        return (dir && dir !== "") 
-        ? dir 
-        : Quickshell.env("HOME") + "/Pictures/Wallpaper"
-    }
+    readonly property string srcDir: Quickshell.env("HOME") + "/Pictures/Wallpapers"
 	Process {
 		id: wallpaperLoader
 		running: true
@@ -150,7 +144,6 @@ Item {
 		FloatingWindow{
 			id: window
 			title: "quickshell-wallpaper-picker"
-			
 			color: "transparent"
 			Grid {
 				id: grid
@@ -167,7 +160,7 @@ Item {
 						height: boxSize
 						property int idx: 100000
 						Component.onCompleted: idx = root.boxes[index]
-						color: root.theme.accentPurple
+						color: Theme.accentPurple
 						opacity: (idx < root.revealInd) ? 1 : 0
 
 					}
@@ -175,6 +168,7 @@ Item {
 			}
 			ListView {
 				id: view
+				model: srcModel
 				width: screen.width * 1.5
 				height: root.itemHeight
 				anchors.centerIn: parent
@@ -188,8 +182,9 @@ Item {
 
 				highlightMoveDuration: 500
 				focus: true
-
-				model: srcModel
+				property int loadedImages: 0
+				property bool startAnimation: loadedImages >= srcModel.count
+				
 				spacing: 0
 
 				// currentIndex: 
@@ -204,7 +199,6 @@ Item {
 					}
 				}
 				Keys.onPressed: (event)=> { 
-					// console.warn(event.key)
 					if (event.key == Qt.Key_Return) {
 						let url = srcModel.get(view.currentIndex, "fileUrl")
         				root.applyWallpaper(url)
@@ -258,7 +252,7 @@ Item {
 						anchors.horizontalCenterOffset: (root.itemHeight * 0.5 * -root.skewFactor) + 0.5
 						property bool entered: false
 						width: targetWidth
-						height: root.closing ? 0 : (entered ? targetHeight : 0)
+						height: root.closing ? 0 : (view.startAnimation ? targetHeight : 0)
 						visible: height > 20
 						Behavior on height {
 							NumberAnimation {
@@ -283,7 +277,6 @@ Item {
 								}else{
 									root.applyWallpaper(fileUrl)
 								}
-								// TODO apply wallpaper
 							}
 						}
 
@@ -293,18 +286,25 @@ Item {
 							clip: true
 
 							Image {
+								id: image
 								anchors.centerIn: parent
 								anchors.horizontalCenterOffset: -50
 								width: (root.itemWidth * 1.5) + ((root.itemHeight) * Math.abs(root.skewFactor)) + 50
 								height: root.itemHeight
 								fillMode: Image.PreserveAspectCrop
 								source: fileUrl
+								cache: true
 								transform: Matrix4x4 {
 									property real s: -root.skewFactor
 									matrix: Qt.matrix4x4(1, s, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
 								}
-								Component.onCompleted: skewMask.entered = true
-
+								asynchronous: true
+								onStatusChanged: {
+									if (image.status == Image.Ready) {
+										view.loadedImages++
+									}
+								}
+								 
 							}
 						}
 					}

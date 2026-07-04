@@ -9,4 +9,7 @@
 !xdg-desktop-portal-termfilechooser/**
 !kitty/
 !kitty/**
-
+!nvim/
+!nvim/**
+!yazi/
+!yazi/**

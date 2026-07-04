@@ -5,7 +5,7 @@ QtObject {
     id: notificationData
 
     property Notification notification: null
-    property bool closed: false
+    property bool triggerClose: false
 
     property string seqId: ""
     property string notifId: ""
@@ -15,93 +15,117 @@ QtObject {
     property string appIcon: ""
     property string appName: ""
     property string image: ""
-    property var    actions: []
-    property int    urgency: NotificationUrgency.Normal
-    property real   expireTimeout: defaultTimeout
-	property int rowNums: 0
-	property int cardHeight: 0
-	property int yPos: 0
+    property var actions: []
+    property int urgency: NotificationUrgency.Normal
+    property real expireTimeout: defaultTimeout
+    property int rowNums: 0
+    property int cardHeight: 0
+    property int yPos: 800
     property bool hovered: false
-	property bool timerStart: false
-	readonly property bool timerRunning: timerStart && !notificationData.closed && !notificationData.hovered && notificationData.urgency !== NotificationUrgency.Critical
+    property bool timerStart: false
+    readonly property bool timerRunning: timerStart && !notificationData.triggerClose && !notificationData.hovered && notificationData.urgency !== NotificationUrgency.Critical
 
     readonly property int defaultTimeout: 5000  // ms — fallback auto-dismiss when app sends -1/0
-	readonly property int timeOut: notificationData.expireTimeout > 0 ? notificationData.expireTimeout : notificationData.defaultTimeout
+    readonly property int timeOut: notificationData.expireTimeout > 0 ? notificationData.expireTimeout : notificationData.defaultTimeout
     readonly property Connections _conn: Connections {
         target: notificationData.notification
 
         function onClosed(): void {
-            if (notificationData.closed) return;
-            notificationData.closed = true;
+            if (notificationData.triggerClose)
+                return;
+            notificationData.triggerClose = true;
             NotificationService._remove(notificationData);
             notificationData.destroy();
         }
 
         function onSummaryChanged(): void {
-            if (notificationData.notification) notificationData.summary = notificationData.notification.summary || "";
+            if (notificationData.notification)
+                notificationData.summary = notificationData.notification.summary || "";
         }
         function onBodyChanged(): void {
-            if (notificationData.notification) notificationData.body = notificationData.notification.body || "";
+            if (notificationData.notification)
+                notificationData.body = notificationData.notification.body || "";
         }
         function onAppIconChanged(): void {
-            if (notificationData.notification) notificationData.appIcon = notificationData.notification.appIcon || "";
+            if (notificationData.notification)
+                notificationData.appIcon = notificationData.notification.appIcon || "";
         }
         function onAppNameChanged(): void {
-            if (notificationData.notification) notificationData.appName = notificationData.notification.appName || "";
+            if (notificationData.notification)
+                notificationData.appName = notificationData.notification.appName || "";
         }
         function onImageChanged(): void {
-            if (notificationData.notification) notificationData.image = notificationData.notification.image || "";
+            if (notificationData.notification)
+                notificationData.image = notificationData.notification.image || "";
         }
         function onUrgencyChanged(): void {
-            if (notificationData.notification) notificationData.urgency = notificationData.notification.urgency;
+            if (notificationData.notification)
+                notificationData.urgency = notificationData.notification.urgency;
         }
         function onExpireTimeoutChanged(): void {
-            if (notificationData.notification) notificationData.expireTimeout = notificationData.notification.expireTimeout;
+            if (notificationData.notification)
+                notificationData.expireTimeout = notificationData.notification.expireTimeout;
         }
         function onActionsChanged(): void {
-            if (!notificationData.notification) return;
-            notificationData.actions = notificationData.notification.actions.map(function(a) {
-                return { identifier: a.identifier, text: a.text };
+            if (!notificationData.notification)
+                return;
+            notificationData.actions = notificationData.notification.actions.map(function (a) {
+                return {
+                    identifier: a.identifier,
+                    text: a.text
+                };
             });
         }
     }
 
     Component.onCompleted: {
-        if (!notification) return;
-        notifId   = String(notification.id || "");
-        summary   = notification.summary   || "";
-        body      = notification.body      || "";
-        appIcon   = notification.appIcon   || "";
-        appName   = notification.appName   || "";
-        image     = notification.image     || "";
-        urgency   = notification.urgency;
+        if (!notification)
+            return;
+        notifId = String(notification.id || "");
+        summary = notification.summary || "";
+        body = notification.body || "";
+        appIcon = notification.appIcon || "";
+        appName = notification.appName || "";
+        image = notification.image || "";
+        urgency = notification.urgency;
 
         const rawTimeout = notification.expireTimeout;
         expireTimeout = rawTimeout > 0 ? rawTimeout : defaultTimeout;
-        actions   = notification.actions.map(function(a) {
-            return { identifier: a.identifier, text: a.text };
+        actions = notification.actions.map(function (a) {
+            return {
+                identifier: a.identifier,
+                text: a.text
+            };
         });
-		rowNums = 11 + (actions.length > 0 ? 2 : 0)
-		cardHeight = rowNums * 15
+        rowNums = 11 + (actions.length > 0 ? 2 : 0);
+        cardHeight = rowNums * 15;
     }
 
     function dismiss(): void {
-        if (closed) return;
-        closed = true;
+        triggerClose = true;
+    }
+    function completeDismiss(): void {
         NotificationService._remove(notificationData);
-        if (notification) try { notification.dismiss(); } catch(e) {}
+        if (notification)
+            try {
+                notification.completeDismiss();
+            } catch (e) {}
         destroy();
     }
 
     function invokeAction(identifier): void {
-        if (!identifier || closed) return;
-        closed = true;
+        if (!identifier || triggerClose)
+            return;
+        triggerClose = true;
         NotificationService._remove(notificationData);
         if (notification) {
-            const action = notification.actions.find(function(a) {
+            const action = notification.actions.find(function (a) {
                 return a.identifier === identifier;
             });
-            if (action) try { action.invoke(); } catch(e) {}
+            if (action)
+                try {
+                    action.invoke();
+                } catch (e) {}
         }
         destroy();
     }

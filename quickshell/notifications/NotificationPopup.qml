@@ -6,22 +6,11 @@ import Quickshell.Services.Notifications
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Effects
-import "../config/components"
-import "../config/themes"
+import "../config"
 
 Scope {
     id: root
-    property var theme: DefaultTheme {}
-   
-	FontLoader {
-		id: specifypersonal
-		source: "../config/fonts/SpecifyPERSONAL-ExExpBlack.ttf"
-	}
-	FontLoader {
-		id: ppfraktionmono
-		source: "../config/fonts/PPFraktionMono-Regular.woff2"
-	}
-    property int boxSize: 15
+    property int boxSize: 12
     property int maxColNums: 24
     property int maxRowNums: 13
 	property int maxTotalBoxes: maxColNums * maxRowNums
@@ -54,9 +43,7 @@ Scope {
         target: "notifications"
 
         function dismiss_all() {
-			for(let i = 0; i < NotificationService.notifications.length; i++){
-				notifRepeater.itemAt(i).close()
-			}
+			NotificationService.dismissAll()
         }
 
         function dnd_toggle(){
@@ -65,7 +52,7 @@ Scope {
 		function dismiss_hovered(){
 			for(let i = 0; i < NotificationService.notifications.length; i++){
 				if(NotificationService.notifications[i].hovered){
-					notifRepeater.itemAt(i).close()
+					NotificationService.notifications[i].dismiss()
 					return;
 				}
 			}
@@ -94,11 +81,11 @@ Scope {
 			}
 		}
 		//single card
-		Item {
+		delegate: Item {
 			id: notifCard
 			required property var modelData;
 			required property int index
-
+			property var triggerClose: modelData.triggerClose
 			property bool closing: false
 			property bool isImage: notifCard.modelData.image !== "" && notifImage.status === Image.Ready
 			property int rowNums: 11 + (notifCard.modelData.actions.length > 0 ? 2 : 0)
@@ -107,24 +94,30 @@ Scope {
 			property int cardHeight: rowNums * root.boxSize
 			property int cardWidth: colNums * root.boxSize
 			property var boxes: root.boxes.slice(0, totalBoxes)
-			property color cardColor: notifCard.modelData.urgency === NotificationUrgency.Critical ? root.theme.urgencyCritical :
-								notifCard.modelData.urgency === NotificationUrgency.Low ? root.theme.urgencyLow : root.theme.urgencyNormal
+			property color cardColor: notifCard.modelData.urgency === NotificationUrgency.Critical ? Theme.urgencyCritical :
+								notifCard.modelData.urgency === NotificationUrgency.Low ? Theme.urgencyLow : Theme.urgencyNormal
 			
-			function close(){
+			
+			function beginCloseAnim(){
 				if(!closing){
-					grid.reset()
+					grid.entryAnim.restart()
 					closing = true
 				}
 			}
+			onTriggerCloseChanged: {
+				if(triggerClose){
+					beginCloseAnim()
+				}
+			}
+			
 			
 			PanelWindow {
 				id: notifWindow
 				visible: false
 				focusable: false
 				color: "transparent"
-				
 				WlrLayershell.namespace: "quickshell-notification-card-blur"
-				WlrLayershell.layer: WlrLayer.Top
+				WlrLayershell.layer: WlrLayer.Overlay
 				WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
 				exclusionMode: ExclusionMode.Ignore
@@ -140,6 +133,17 @@ Scope {
 					right: notifCard.modelData.hovered ? 30 : 10
 					top: notifCard.modelData.yPos
 				}  
+				Behavior on margins.right{
+					NumberAnimation {
+						duration: 100
+					}
+				}
+				Behavior on margins.top{
+					NumberAnimation {
+						duration: 400
+						easing.type: Easing.InQuad 
+					}
+				}
 				HoverHandler {
 					id: cardHover
 					onHoveredChanged: {notifCard.modelData.hovered = hovered}
@@ -172,7 +176,7 @@ Scope {
 						opacity: 0.6
 						Rectangle{
 							anchors.fill:parent
-							color: root.theme.bgBase
+							color: Theme.bgBase
 						}
 					}
 					//icon
@@ -198,13 +202,13 @@ Scope {
 								if (name.includes("discord"))  return "󰙯";
 								if (name.includes("firefox"))  return "󰈹";
 								if (name.includes("spotify"))  return "󰓇";
-								if (name.includes("terminal") || name.includes("kitty") || name.includes("alacritty")) return "";
+								if (name.includes("kitty"))  return "";
 								return "󰂚";
 							}
 
-							color: root.theme.textPrimary
+							color: Theme.textPrimary
 							font.pixelSize: 15
-							font.family: ppfraktionmono.name
+							font.family: Theme.fontNormal
 						}
 					}
 					//divider 
@@ -237,9 +241,9 @@ Scope {
 							verticalAlignment: Text.AlignVCenter
 							font.capitalization: Font.Capitalize
 							text: notifCard.modelData.summary || "Notification"
-							color: root.theme.textPrimary
+							color: Theme.textPrimary
 							font.pixelSize: 12
-							font.family: ppfraktionmono.name
+							font.family: Theme.fontNormal
 						}
 					}
 					//x button
@@ -253,9 +257,9 @@ Scope {
 						Text {
 							anchors.centerIn: parent
 							text: "󰅖"
-							color: root.theme.textPrimary
+							color: Theme.textPrimary
 							font.pixelSize: closeHover.containsMouse ? 25 : 15
-							font.family: ppfraktionmono
+							font.family: Theme.fontNormal
 							Behavior on font.pixelSize {
 								NumberAnimation {
 									duration: 100
@@ -268,7 +272,7 @@ Scope {
 							anchors.fill: parent
 							hoverEnabled: true
 							cursorShape: Qt.PointingHandCursor
-							onClicked: grid.reset()
+							onClicked: notifCard.modelData.dismiss()
 							// onHoveredChanged: 
 						}
 					}
@@ -282,16 +286,15 @@ Scope {
 							anchors{
 								verticalCenter: parent.verticalCenter
 								left: parent.left
-								// topMargin: 8
 							}
 							width: parent.width
 							verticalAlignment: Text.AlignVCenter
 							text: notifCard.modelData.appName
-							color: root.theme.textSecondary
+							color: Theme.textSecondary
 							font.pixelSize: 18
-							font.family: specifypersonal.name
+							font.family: Theme.fontTitle
+							font.styleName: "Black"
 							font.capitalization: Font.AllUppercase
-							font.bold: true
 							elide: Text.ElideRight
 							Layout.fillWidth: true
 							visible: text !== ""
@@ -311,7 +314,7 @@ Scope {
 							}
 							height: 1
 							opacity: 0.1
-							color: root.theme.textMuted
+							color: Theme.textMuted
 						}
 					}
 					//notif body text
@@ -326,9 +329,9 @@ Scope {
 						}
 						Text {
 							text: notifCard.modelData.body
-							color: root.theme.textMuted
+							color: Theme.textMuted
 							width: parent.width
-							font.family: ppfraktionmono.name
+							font.family: Theme.fontNormal
 							wrapMode: Text.Wrap
 							maximumLineCount: 2
 							elide: Text.ElideRight
@@ -376,7 +379,7 @@ Scope {
 							anchors.fill: parent
 							Rectangle{
 								anchors.fill: parent
-								color: root.theme.textPrimary
+								color: Theme.textPrimary
 							}
 							Rectangle {
 								id: progressBar
@@ -399,12 +402,7 @@ Scope {
 										duration: notifCard.modelData.timeOut
 									}
 									ScriptAction{
-										script: {
-											if(!notifCard.closing){
-												grid.reset()
-												notifCard.closing = true
-											}
-										}
+										script: notifCard.modelData.dismiss()
 									}
 								}
 							}
@@ -424,7 +422,7 @@ Scope {
 								left: parent.left
 							}
 							color: "#272528"
-							border.color: root.theme.textSecondary
+							border.color: Theme.textSecondary
 							radius: 3
 							// visible: notifCard.modelData.urgency === NotificationUrgency.Critical
 							Text{
@@ -435,9 +433,9 @@ Scope {
 								horizontalAlignment: Text.AlignHCenter
 								verticalAlignment: Text.AlignVCenter
 								
-								color: root.theme.textSecondary
+								color: Theme.textSecondary
 								text: "󰅖"
-								font.family: ppfraktionmono
+								font.family: Theme.fontNormal
 							}
 						}
 					}
@@ -454,8 +452,8 @@ Scope {
 								leftMargin: 10
 							}
 							verticalAlignment: Text.AlignVCenter
-							font.family: ppfraktionmono.name
-							color: root.theme.textSecondary
+							font.family: Theme.fontNormal
+							color: Theme.textSecondary
 							text: "Dismiss"
 						}
 					}
@@ -474,17 +472,18 @@ Scope {
 							visible: notifCard.modelData.actions.length > 0
 							Repeater {
 								model: notifCard.modelData.actions
-								anchors.fill: parent
+								Layout.preferredWidth: parent.width
+								Layout.preferredHeight: parent.height
 								Rectangle {
 									id: actionBtn
 									required property var modelData
 									required property int index
 
-									anchors.verticalCenter: parent.verticalCenter
-									width: notifCard.cardWidth/notifCard.modelData.actions.length
-									height: parent.height
+									// anchors.verticalCenter: parent.verticalCenter
+									Layout.preferredWidth: notifCard.cardWidth/notifCard.modelData.actions.length
+									Layout.preferredHeight: parent.height
 									opacity: 0.6
-									color: actionHover.containsMouse ? root.theme.bgButtonHover : root.theme.bgButton
+									color: actionHover.containsMouse ? Theme.bgButtonHover : Theme.bgButton
 									Behavior on color {
 										ColorAnimation { duration: 100 }
 									}
@@ -494,11 +493,14 @@ Scope {
 
 									Text {
 										id: actionText
-										anchors.centerIn: parent
 										text: actionBtn.modelData.text || ""
-										color: root.theme.textSecondary
+										color: Theme.textSecondary
+										verticalAlignment: Text.AlignVCenter
+										horizontalAlignment: Text.AlignHCenter
 										font.pixelSize: 11
-										font.family: ppfraktionmono.name
+										font.family: Theme.fontNormal
+										width: parent.Layout.preferredWidth
+										height: parent.Layout.preferredHeight
 									}
 
 									MouseArea {
@@ -541,22 +543,39 @@ Scope {
 					right: notifCard.modelData.hovered ? 30 : 10
 					top: notifCard.modelData.yPos
 				}  
+				implicitWidth: notifCard.cardWidth
+				implicitHeight: notifCard.cardHeight
+				Behavior on margins.right{
+					NumberAnimation {
+						duration: 100
+					}
+				}
+				Behavior on margins.top{
+					NumberAnimation {
+						duration: 400
+						easing.type: Easing.InQuad 
+					}
+				}
 				HoverHandler {
 					id: cardGridHover
 					onHoveredChanged: notifCard.modelData.hovered = hovered
 				}
-				implicitWidth: notifCard.cardWidth
-				implicitHeight: notifCard.cardHeight
+				
 				Grid {
 					id: grid
 					anchors.fill: parent
 					columns: notifCard.colNums
 					rows: notifCard.rowNums
 					property int revealInd: 0
-					property bool entering: true
-					SequentialAnimation{
+					property var entryAnim: SequentialAnimation{
 						id: entryAnim
 						running: false
+						ScriptAction{
+							script:{
+								grid.revealInd = 0
+								squares.visible = true
+							}
+						}
 						NumberAnimation{
 							target: grid
 							property: "revealInd"
@@ -565,7 +584,7 @@ Scope {
 							running: false
 						}
 						PauseAnimation{ duration: 100 }
-						ScriptAction{ script: {notifWindow.visible = grid.entering} }
+						ScriptAction{ script: {notifWindow.visible = !notifCard.closing} }
 						NumberAnimation{
 							target: grid
 							property: "revealInd"
@@ -573,20 +592,16 @@ Scope {
 							duration: 500
 							running: false
 						}
-						ScriptAction{ script: {
-							squares.visible = false
-							notifCard.modelData.timerStart = true
-							entryAnim.stop()
-							if(!grid.entering){
-								notifCard.modelData.dismiss()
+						ScriptAction{ 
+							script: {
+								squares.visible = false
+								notifCard.modelData.timerStart = true
+								entryAnim.stop()
+								if(notifCard.closing){
+									notifCard.modelData.completeDismiss()
+								}
 							}
-						} }
-					}
-					function reset(){
-						revealInd = 0
-						squares.visible = true
-						entering = false
-						entryAnim.restart()
+						}
 					}
 					
 					Repeater {
