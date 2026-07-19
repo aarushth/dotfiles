@@ -15,15 +15,21 @@ Scope{
 	PwObjectTracker {
 		objects: [ Pipewire.defaultAudioSink ]
 	}
+	function showVolume(){
+		volumeCalled = !volumeCalled
+	}
+	function showBrightness(){
+		brightnessReadProc.running = true
+		brightnessCalled = !brightnessCalled
+	}
 	IpcHandler {
 		target: "osd"
 
 		function volume() {
-			volumeCalled = !volumeCalled
+			showVolume()
 		}
 		function brightness(){
-			brightnessReadProc.running = true
-			brightnessCalled = !brightnessCalled
+			showBrightness()
 		}
 	}
 	Process {
@@ -49,6 +55,7 @@ Scope{
 			const val = parseInt(text.trim());
 				if (!isNaN(val)) {
 					root.maxBrightness = val
+					brightnessReadProc.running = true
 				}
 			}
 		}

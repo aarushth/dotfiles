@@ -53,7 +53,6 @@ Singleton {
             });
 
             root.notifications.push(data)
-			// TODO fix dismiss logic
             if (root.notifications.length > 4) {
                 root.notifications[0].dismiss();
             }

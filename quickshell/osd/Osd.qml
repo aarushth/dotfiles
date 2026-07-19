@@ -78,6 +78,7 @@ Scope {
 		PanelWindow {
 			property int boxSize: screen.width / colNums
 			WlrLayershell.layer: WlrLayer.Overlay
+			WlrLayershell.namespace: "quickshell-osd"
 			anchors.top: true
 			exclusiveZone: 0
 			implicitWidth: screen.width

@@ -5,7 +5,7 @@ import Quickshell.Wayland
 import Qt.labs.folderlistmodel
 import Quickshell
 import Quickshell.Io
-import "../config/singletons"
+import "../config"
 
 Item {
     id: root
@@ -21,7 +21,13 @@ Item {
 
 	IpcHandler {
 		target: "wallpaper"
-
+		function toggle(){
+			root.shouldShowPicker = !root.shouldShowPicker
+			closing = !root.shouldShowPicker
+			if(closing){
+				closeTimer.start()
+			}
+		}
 		function open() {
 			root.shouldShowPicker = true
 			closing = false
@@ -145,6 +151,9 @@ Item {
 			id: window
 			title: "quickshell-wallpaper-picker"
 			color: "transparent"
+			Component.onCompleted: {
+				window.grabFocus()
+			}
 			Grid {
 				id: grid
 				anchors.fill: parent

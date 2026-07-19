@@ -11,7 +11,7 @@ require('windows')
 ----------------
 ----  MISC  ----
 ----------------
-
+-- 
 hl.config({
     misc = {
         force_default_wallpaper = 0,    
@@ -25,19 +25,14 @@ hl.config({
 hl.config({
     plugin = {
         hyprexpo = {
-            columns = 4,
+            columns = 3,
             gaps_in = 3,
             gaps_out = 0,
-			workspace_method = "first",
-			skip_empty = true,
+			workspace_method = "center current",
+			skip_empty = false,
             cancel_key = "escape",
             show_cursor = 1,
 			label_enable = false
         },
     },
-})
-hl.plugin.hyprexpo.gesture({
-    fingers = 4,
-    direction = "up",
-    action = "expo",
 })

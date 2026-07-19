@@ -7,12 +7,12 @@ QtObject {
 	readonly property color bgButton: '#4C4F5C'
 	readonly property color bgOverlay: '#171717'
 
-
 	readonly property color textPrimary: "#000000"
 	readonly property color textSecondary: "#ffffff"
 	readonly property color textMuted: '#929191'
 
 	readonly property color accentPurple: '#4c09f5'
+	readonly property color accentPurpleHover: '#3b06c0'
 	readonly property color accentGreen: "#02C939"
 	readonly property color accentYellow: "#FFE910"
 	readonly property color accentOrange: "#FF4B00"

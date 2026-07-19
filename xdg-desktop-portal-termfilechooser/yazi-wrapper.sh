@@ -25,6 +25,8 @@ elif [ "$directory" = "1" ]; then
     set -- --cwd-file="$out" "$path"
 elif [ "$multiple" = "1" ]; then
     # upload multiple files
+Requisite=graphical-session.target
+After=graphical-session.target
     set -- --chooser-file="$out" "$path"
 else
     # upload only 1 file

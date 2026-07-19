@@ -16,17 +16,17 @@ hl.config({
         },
     },
 })
-
 hl.gesture({
     fingers = 3,
     direction = "horizontal",
     action = "workspace"
 })
 
+
 local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
-hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock"))
+hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("loginctl lock-session"))
 hl.bind(mainMod .. " + F", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + J", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("kitty -o background_opacity=1.0 --class clipse -e clipse "))
@@ -35,17 +35,19 @@ hl.bind(mainMod .. " + W", function()
 	hl.dispatch(hl.dsp.focus({workspace = "name:wp"}))
 end)
 hl.bind("CTRL + ALT + Backspace", function ()
-		for _, window in pairs(hl.get_windows()) do
-			if window.class == "btop" then
-				return hl.dispatch(hl.dsp.focus({workspace = "name:btop"}))
-			end
+	for _, window in pairs(hl.get_windows()) do
+		if window.class == "btop" then
+			return hl.dispatch(hl.dsp.focus({workspace = "name:btop"}))
 		end
-		hl.dispatch(hl.dsp.exec_cmd("kitty --class btop -e btop"))
-	end)
+	end
+	hl.dispatch(hl.dsp.exec_cmd("kitty --class btop -e btop"))
+end)
+
 hl.bind(mainMod .. " + period", hl.dsp.exec_cmd("rofimoji --action clipboard"))
 hl.bind(mainMod .. " + SUPER_L", hl.dsp.exec_cmd(menu))
 hl.bind(mainMod .. " + P", hl.dsp.layout("togglesplit"))
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("grim -g \"$(slurp)\" -t ppm - | satty -f - --copy-command wl-copy --output-filename ~/Pictures/Screenshots/satty-$(date '+%Y%m%d-%H:%M:%S').png"))
+hl.bind(mainMod .. " + SHIFT + P", hl.dsp.exec_cmd("hyprpicker -a"))
 
 hl.bind("ALT + f4", function ()
 	if hl.get_active_window().title == "quickshell-wallpaper-picker" then
@@ -56,7 +58,7 @@ hl.bind("ALT + f4", function ()
 end)
 
 
-hl.bind("CTRL + ALT + DELETE", hl.dsp.exec_cmd("wlogout"))
+hl.bind("CTRL + ALT + DELETE", hl.dsp.exec_cmd("qs ipc call wlogout toggle"))
 
 -- Move focus with mainMod + arrow keys
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
@@ -115,15 +117,6 @@ hl.bind("XF86AudioMute",        hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_S
 hl.bind("XF86AudioMicMute",     hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),   { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessUp",  hl.dsp.exec_cmd("brightnessctl -q set 5%+ & qs ipc call osd brightness"),                  { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessDown",hl.dsp.exec_cmd("brightnessctl -q set 5%- & qs ipc call osd brightness"),                  { locked = true, repeating = true })
-
--- Requires playerctl
-hl.bind("XF86AudioNext",  hl.dsp.exec_cmd("playerctl next"),       { locked = true })
-hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
-hl.bind("XF86AudioPlay",  hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
-hl.bind("XF86AudioPrev",  hl.dsp.exec_cmd("playerctl previous"),   { locked = true })
-
--- lock on lid close
-hl.bind("switch:on:Lid Switch", hl.dsp.exec_cmd("hyprlock"), { locked = true })
 
 hl.bind(mainMod .. " + SHIFT + left", hl.dsp.window.move({ direction = "left"}))
 hl.bind(mainMod .. " + SHIFT + right", hl.dsp.window.move({ direction = "right"}))

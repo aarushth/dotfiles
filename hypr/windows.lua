@@ -136,7 +136,7 @@ hl.layer_rule({
         namespace = "quickshell-notification-card-blur"
     },
     blur = true,
-	order = 1,
+	order = 2,
 	no_anim = true
 })
 hl.config({
@@ -151,5 +151,30 @@ hl.layer_rule({
 	match = {
 		namespace = "quickshell-notification-card"
 	},
+	order = 1
+})
+hl.layer_rule({
+	match = {
+		namespace = "quickshell-osd"
+	},
+	order = 1
+})
+hl.layer_rule({
+	match = {
+		namespace = "quickshell-lockscreen"
+	},
 	order = 0
 })
+hl.layer_rule({
+	match = {
+		namespace = "rofi"
+	},
+	order = 1
+})
+hl.layer_rule({
+	match = {
+		namespace = "quickshell-wlogout"
+	},
+	order = 1
+})
+

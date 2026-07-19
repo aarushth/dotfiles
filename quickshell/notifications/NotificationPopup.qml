@@ -35,9 +35,7 @@ Scope {
         
     }
 
-    Component.onCompleted: {
-        initVals()
-    }
+    Component.onCompleted: initVals()
 
     IpcHandler {
         target: "notifications"
@@ -119,7 +117,6 @@ Scope {
 				WlrLayershell.namespace: "quickshell-notification-card-blur"
 				WlrLayershell.layer: WlrLayer.Overlay
 				WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-
 				exclusionMode: ExclusionMode.Ignore
 				anchors {
 					top: true

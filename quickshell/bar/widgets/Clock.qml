@@ -13,7 +13,7 @@ Rectangle{
 		precision: SystemClock.Minutes
 	}
 	color: Theme.accentPurple
-	width: root.boxSize * 5
+	width: root.boxSize * 7
 	ColumnLayout{
 		id: column
 		anchors.fill: parent
@@ -30,7 +30,7 @@ Rectangle{
 		Text {
 			Layout.preferredWidth: parent.width
 			color: Theme.bgBase
-			text: Qt.formatDate(clock.date, "MMM dd yyyy")
+			text: Qt.formatDate(clock.date, "MMM·dd·yyyy")
 			horizontalAlignment: Text.AlignHCenter
 			font.pixelSize: 10
 			font.family: Theme.fontFancy

@@ -6,13 +6,16 @@ import "notifications"
 import "osd"
 import "wallpaper"
 import "bar"
-import "config/themes" as Theme
+import "wlogout"
+import "lockscreen"
 
 Scope{
     NotificationPopup {}
     Osd{}
 	WallpaperPicker {}
 	Bar{}
+	WLogout{}
+	Lockscreen{}
 }
 
 
