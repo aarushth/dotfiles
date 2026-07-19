@@ -122,13 +122,59 @@ Scope{
 							delegate: Item{
 								required property LogoutButton modelData
 								required property int index
-								property color textColor: index === root.selectedIndex ? Theme.bgBase : Theme.textMuted
+								property color textColor:Theme.textMuted
 								Layout.preferredWidth: root.boxSize * cols
 								Layout.preferredHeight: root.boxSize * rows
+								Item{
+									id: text
+									anchors.fill: parent
+									visible: false
+									Text {
+										id: icon
+										anchors{
+											top: parent.top
+											bottom: parent.bottom
+											left: parent.left
+										}
+										width: root.boxSize * 2
+										text: modelData.icon
+										font.pointSize: 18
+										color: textColor
+										verticalAlignment: Text.AlignVCenter
+										horizontalAlignment: Text.AlignHCenter
+										font.family: "Symbols Nerd Font Mono"
+									}
+									Rectangle{
+										id: divider
+										anchors{
+											top: parent.top
+											bottom: parent.bottom
+											left: icon.right
+										}
+										width: 1
+										color: Theme.bgBase
+									}
+									Text {
+										id: label
+										anchors{
+											top: parent.top
+											bottom: parent.bottom
+											left: divider.right
+											right: parent.right
+											leftMargin: root.boxSize / 2
+										}
+										text: modelData.text
+										font.pointSize: 18
+										color: textColor
+										verticalAlignment: Text.AlignVCenter
+										font.family: Theme.fontNormal
+									}
+								}
 								Grid{
 									id: gridSelect
 									rows: root.rows
 									columns: root.cols
+									visible: false
 									anchors.fill: parent
 									property int revealInd: parent.index == root.selectedIndex ? root.totalBoxes : 0
 									Behavior on revealInd{
@@ -163,45 +209,17 @@ Scope{
 										}
 									}
 								}
-								Text {
-									id: icon
-									anchors{
-										top: parent.top
-										bottom: parent.bottom
-										left: parent.left
-									}
-									width: root.boxSize * 2
-									text: modelData.icon
-									font.pointSize: 18
-									color: textColor
-									verticalAlignment: Text.AlignVCenter
-									horizontalAlignment: Text.AlignHCenter
-									font.family: "Symbols Nerd Font Mono"
+								OpacityMask{
+									anchors.fill: parent
+									source: gridSelect
+									maskSource:  text
+									invert: true
 								}
-								Rectangle{
-									id: divider
-									anchors{
-										top: parent.top
-										bottom: parent.bottom
-										left: icon.right
-									}
-									width: 1
-									color: Theme.bgBase
-								}
-								Text {
-									id: label
-									anchors{
-										top: parent.top
-										bottom: parent.bottom
-										left: divider.right
-										right: parent.right
-										leftMargin: root.boxSize / 2
-									}
-									text: modelData.text
-									font.pointSize: 18
-									color: textColor
-									verticalAlignment: Text.AlignVCenter
-									font.family: Theme.fontNormal
+								OpacityMask{
+									anchors.fill: parent
+									source: text
+									maskSource:  gridSelect
+									invert: true
 								}
 								Grid{
 									id: grid
@@ -222,9 +240,7 @@ Scope{
 											opacity: (idx < grid.revealInd) ? 0 : 0.3
 										}
 									}
-								}
-								
-								
+								}	
 							}
 						}
 					}

@@ -1,7 +1,6 @@
 -------------------------------
 ---- ENVIRONMENT VARIABLES ----
 -------------------------------
-hl.env("XCURSOR_SIZE", "24")
 hl.env("HYPRCURSOR_SIZE", "24")
 -- hl.env("PATH", "$PATH:/home/aarushth/.cargo/bin")
 -- dark mode

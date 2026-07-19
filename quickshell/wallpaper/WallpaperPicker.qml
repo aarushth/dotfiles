@@ -22,19 +22,11 @@ Item {
 	IpcHandler {
 		target: "wallpaper"
 		function toggle(){
-			root.shouldShowPicker = !root.shouldShowPicker
-			closing = !root.shouldShowPicker
+			closing = root.shouldShowPicker
+			root.shouldShowPicker = true
 			if(closing){
 				closeTimer.start()
 			}
-		}
-		function open() {
-			root.shouldShowPicker = true
-			closing = false
-		}
-		function close(){
-			closing = true
-			closeTimer.start()
 		}
 	}
 	Timer {
@@ -49,6 +41,7 @@ Item {
 		root.url = fileUrl.toString().substring(7)
     }
     readonly property string srcDir: Quickshell.env("HOME") + "/Pictures/Wallpapers"
+
 	Process {
 		id: wallpaperLoader
 		running: true
@@ -151,9 +144,11 @@ Item {
 			id: window
 			title: "quickshell-wallpaper-picker"
 			color: "transparent"
-			Component.onCompleted: {
-				window.grabFocus()
-			}
+			// Component.onCompleted: {
+			// 	window.grabFocus()
+			// }
+			
+			
 			Grid {
 				id: grid
 				anchors.fill: parent
@@ -193,10 +188,8 @@ Item {
 				focus: true
 				property int loadedImages: 0
 				property bool startAnimation: loadedImages >= srcModel.count
-				
 				spacing: 0
 
-				// currentIndex: 
 				Component.onCompleted: {
 					let savedPath = root.url
 					for (let i = 0; i < srcModel.count; ++i) {
@@ -247,7 +240,6 @@ Item {
 					readonly property real targetHeight: root.itemHeight
 
 					
-
 					width: targetWidth
 					height: targetHeight
 
@@ -262,7 +254,7 @@ Item {
 						property bool entered: false
 						width: targetWidth
 						height: root.closing ? 0 : (view.startAnimation ? targetHeight : 0)
-						visible: height > 20
+						visible: view.startAnimation && height > 20
 						Behavior on height {
 							NumberAnimation {
 								duration: 400
@@ -307,7 +299,6 @@ Item {
 									property real s: -root.skewFactor
 									matrix: Qt.matrix4x4(1, s, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
 								}
-								asynchronous: true
 								onStatusChanged: {
 									if (image.status == Image.Ready) {
 										view.loadedImages++
