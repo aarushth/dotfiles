@@ -44,7 +44,6 @@ Scope {
 			root.shouldShowOsd = false
 		}
 	}
-	https://github.com/qt-labs/qtquickdesigner-components
 	property var boxes: []
 
 	function initVals() {
