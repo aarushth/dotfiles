@@ -15,6 +15,12 @@ local suppressMaximizeRule = hl.window_rule({
     suppress_event = "maximize",
 })
 hl.layer_rule({
+	match = {
+		namespace = "rofi"
+	},
+	order = 1
+})
+hl.layer_rule({
     match = {
         namespace = ".*"  -- wildcard matches all layers
     },
@@ -61,16 +67,6 @@ hl.window_rule({
 	border_size = 2,
     
 })
-hl.window_rule({
-	match = {
-		title = "quickshell-wallpaper-picker",
-	},
-    workspace = "name:wp",
-	no_anim = true,
-	rounding = 0,
-	border_size = 0,
-})
-hl.workspace_rule({workspace = "name:wp", gaps_out = 0})
 
 --btop
 hl.window_rule({
@@ -131,50 +127,4 @@ hl.window_rule({
 
 
 -- notification blur
-hl.layer_rule({
-    match = {
-        namespace = "quickshell-notification-card-blur"
-    },
-    blur = true,
-	order = 2,
-	no_anim = true
-})
-hl.config({
-    decoration = {
-        blur = {
-            size = 7,
-            passes = 2,
-        }
-    }
-})
-hl.layer_rule({
-	match = {
-		namespace = "quickshell-notification-card"
-	},
-	order = 1
-})
-hl.layer_rule({
-	match = {
-		namespace = "quickshell-osd"
-	},
-	order = 1
-})
-hl.layer_rule({
-	match = {
-		namespace = "quickshell-lockscreen"
-	},
-	order = 0
-})
-hl.layer_rule({
-	match = {
-		namespace = "rofi"
-	},
-	order = 1
-})
-hl.layer_rule({
-	match = {
-		namespace = "quickshell-wlogout"
-	},
-	order = 1
-})
 

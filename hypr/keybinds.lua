@@ -23,17 +23,12 @@ hl.gesture({
 })
 
 
-local mainMod = "SUPER" -- Sets "Windows" key as main modifier
+mainMod = "SUPER" -- Sets "Windows" key as main modifier
 
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
-hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("loginctl lock-session"))
 hl.bind(mainMod .. " + F", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + J", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("kitty -o background_opacity=1.0 --class clipse -e clipse "))
-hl.bind(mainMod .. " + W", function()
-	hl.dispatch(hl.dsp.exec_cmd("qs ipc call wallpaper toggle"))
-	hl.dispatch(hl.dsp.focus({workspace = "name:wp"}))
-end)
 hl.bind("CTRL + ALT + Backspace", function ()
 	for _, window in pairs(hl.get_windows()) do
 		if window.class == "btop" then
@@ -42,23 +37,12 @@ hl.bind("CTRL + ALT + Backspace", function ()
 	end
 	hl.dispatch(hl.dsp.exec_cmd("kitty --class btop -e btop"))
 end)
-
 hl.bind(mainMod .. " + period", hl.dsp.exec_cmd("rofimoji --action clipboard"))
 hl.bind(mainMod .. " + SUPER_L", hl.dsp.exec_cmd(menu))
 hl.bind(mainMod .. " + P", hl.dsp.layout("togglesplit"))
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("grim -g \"$(slurp)\" -t ppm - | satty -f - --copy-command wl-copy --output-filename ~/Pictures/Screenshots/satty-$(date '+%Y%m%d-%H:%M:%S').png"))
 hl.bind(mainMod .. " + SHIFT + P", hl.dsp.exec_cmd("hyprpicker -a"))
 
-hl.bind("ALT + f4", function ()
-	if hl.get_active_window().title == "quickshell-wallpaper-picker" then
-		hl.dispatch(hl.dsp.exec_cmd("qs ipc call wallpaper close"))
-	else
-		hl.dispatch(hl.dsp.window.close())
-	end
-end)
-
-
-hl.bind("CTRL + ALT + DELETE", hl.dsp.exec_cmd("qs ipc call wlogout toggle"))
 
 -- Move focus with mainMod + arrow keys
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
@@ -66,9 +50,6 @@ hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
 hl.bind(mainMod .. " + up",    hl.dsp.focus({ direction = "up" }))
 hl.bind(mainMod .. " + down",  hl.dsp.focus({ direction = "down" }))
 
---notifications
-hl.bind(mainMod .. " + X", hl.dsp.exec_cmd("qs ipc call notifications dismiss_hovered"))
-hl.bind(mainMod .. " + SHIFT + X", hl.dsp.exec_cmd("qs ipc call notifications dismiss_all"))
 
 -- Switch workspaces with mainMod + [0-9]
 -- Move active window to a workspace with mainMod + SHIFT + [0-9]

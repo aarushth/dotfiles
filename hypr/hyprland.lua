@@ -8,6 +8,7 @@ require('env')
 require('animations')
 require('look')
 require('windows')
+require('quickshell')
 ----------------
 ----  MISC  ----
 ----------------
