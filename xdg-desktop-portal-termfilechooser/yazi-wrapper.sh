@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 set -x
-exec >/tmp/yazi-wrapper.log 2>&1
 
 set -e
-
+export EDITOR=code
 if [ "$6" -ge 4 ]; then
     set -x
 fi
@@ -22,11 +21,9 @@ if [ "$save" = "1" ]; then
     # save a file
     set -- --chooser-file="$out" "$path"
 elif [ "$directory" = "1" ]; then
-    set -- --cwd-file="$out" "$path"
+    set -- --chooser-file="$out".1 --cwd-file="$out" "$path"
 elif [ "$multiple" = "1" ]; then
     # upload multiple files
-Requisite=graphical-session.target
-After=graphical-session.target
     set -- --chooser-file="$out" "$path"
 else
     # upload only 1 file
@@ -47,10 +44,8 @@ sh -c "$command"
 
 
 if [ "$directory" = "1" ]; then
-    if [ ! -s "$out" ] && [ -s "$out"".1" ]; then
-        cat "$out"".1" > "$out"
-        rm "$out"".1"
-    else
-        rm "$out"".1"
+    if [ -s "$out".1 ]; then
+        cat "$out".1 > "$out"
     fi
+    rm -f "$out".1
 fi

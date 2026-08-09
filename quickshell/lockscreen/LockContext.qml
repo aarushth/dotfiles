@@ -7,7 +7,6 @@ Scope {
 
     signal unlocked()
 	signal failure()
-
     property alias message: pam.message
     property alias messageIsError: pam.messageIsError
     property alias responseRequired: pam.responseRequired
@@ -40,7 +39,9 @@ Scope {
             pam.respond(password)
 		}
     }
-
+	function abort(){
+		pam.abort()
+	}
     function restart() {
         pam.abort()
         pam.start()

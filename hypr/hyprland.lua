@@ -12,7 +12,7 @@ require('quickshell')
 ----------------
 ----  MISC  ----
 ----------------
--- 
+ 
 hl.config({
     misc = {
         force_default_wallpaper = 0,    
@@ -21,19 +21,16 @@ hl.config({
 		focus_on_activate = true,
     },
 })
-
-
 hl.config({
     plugin = {
         hyprexpo = {
-            columns = 3,
-            gaps_in = 3,
+            gaps_in = 0,
             gaps_out = 0,
-			workspace_method = "center current",
-			skip_empty = false,
-            cancel_key = "escape",
+            bg_col = "rgb(111111)",
+            gesture_distance = 200,
             show_cursor = 1,
-			label_enable = false
+			border_width = 3,
+			border_color_focus = "rgb(02C939)"
         },
     },
 })

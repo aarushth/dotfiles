@@ -74,77 +74,81 @@ Scope {
 
 	LazyLoader {
 		active: root.shouldShowOsd
-		PanelWindow {
-			property int boxSize: screen.width / colNums
-			WlrLayershell.layer: WlrLayer.Overlay
-			WlrLayershell.namespace: "quickshell-osd"
-			anchors.top: true
-			exclusiveZone: 0
-			implicitWidth: screen.width
-			implicitHeight: boxSize * rowNums
-			color: "transparent"
-
-
-			Item {
-				id: fadeRoot
-				anchors.fill: parent
-				visible: true
-
-				TextItem {
-					id: textBottom
-					anchors.fill: parent
-					text: labelText
-					font.family: Theme.fontFancy
-					font.pointSize: 70					
-					horizontalAlignment: Text.AlignHCenter
-					fillColor: "transparent"
-					strokeColor: root.fillColor
-					strokeWidth: 2
-					font.bold: true
-				}
+		Variants{
+			model: Quickshell.screens
+			delegate: PanelWindow {
+				id: window
+				property var modelData
+				property int boxSize: screen.width / colNums
+				screen: modelData
+				WlrLayershell.layer: WlrLayer.Overlay
+				WlrLayershell.namespace: "quickshell-osd"
+				anchors.top: true
+				exclusiveZone: 0
+				implicitWidth: screen.width
+				implicitHeight: boxSize * rowNums
+				color: "transparent"
 				Item {
-					id: squares
+					id: fadeRoot
 					anchors.fill: parent
 					visible: true
-					
-					Grid {
+
+					TextItem {
+						id: textBottom
 						anchors.fill: parent
-						columns: colNums
-						rows: rowNums
+						text: labelText
+						font.family: Theme.fontFancy
+						font.pointSize: window.implicitHeight * 0.9			
+						horizontalAlignment: Text.AlignHCenter
+						fillColor: "transparent"
+						strokeColor: root.fillColor
+						strokeWidth: 2
+						font.bold: true
+					}
+					Item {
+						id: squares
+						anchors.fill: parent
+						visible: true
+						
+						Grid {
+							anchors.fill: parent
+							columns: colNums
+							rows: rowNums
 
-						Repeater {
-							model: totalBoxes
+							Repeater {
+								model: totalBoxes
 
-							delegate: Rectangle {
-								width: boxSize
-								height: boxSize
-								property int idx: 100000
-								Component.onCompleted: idx = root.boxes[index]
-								color: root.fillColor
-								opacity: (idx < root.revealInd) ? 1 : 0
+								delegate: Rectangle {
+									width: boxSize
+									height: boxSize
+									property int idx: 100000
+									Component.onCompleted: idx = root.boxes[index]
+									color: root.fillColor
+									opacity: (idx < root.revealInd) ? 1 : 0
 
+								}
 							}
 						}
 					}
-				}
 
-				TextItem {
-					id: textTop
-					anchors.fill: parent
-					text: labelText
-					font.family: Theme.fontFancy
-					horizontalAlignment: Text.AlignHCenter
-					font.pointSize: 70
-					font.bold: true
-					fillColor: root.strokeColor
-					strokeStyle: 0
-					visible: false
-				}
+					TextItem {
+						id: textTop
+						anchors.fill: parent
+						text: labelText
+						font.family: Theme.fontFancy
+						horizontalAlignment: Text.AlignHCenter
+						font.pointSize: window.implicitHeight * 0.9	
+						font.bold: true
+						fillColor: root.strokeColor
+						strokeStyle: 0
+						visible: false
+					}
 
-				OpacityMask {
-					anchors.fill: parent
-					source: textTop
-					maskSource: squares
+					OpacityMask {
+						anchors.fill: parent
+						source: textTop
+						maskSource: squares
+					}
 				}
 			}
 		}

@@ -1,3 +1,4 @@
 singleton Theme 1.0 Theme.qml
 singleton OsdData 1.0 OsdData.qml
 singleton Icons 1.0 Icons.qml
+singleton SysInfo 1.0 SysInfo.qml

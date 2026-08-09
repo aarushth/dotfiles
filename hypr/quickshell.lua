@@ -3,12 +3,12 @@ hl.window_rule({
 	match = {
 		title = "quickshell-wallpaper-picker",
 	},
-    workspace = "name:wp",
+    workspace = "name:wp1",
 	no_anim = true,
 	rounding = 0,
 	border_size = 0,
 })
-hl.workspace_rule({workspace = "name:wp", gaps_out = 0})
+hl.workspace_rule({workspace = "name:wp1", gaps_out = 0})
 
 -- add blur to actual notification card, but not to reveal animation
 hl.layer_rule({
@@ -57,15 +57,20 @@ hl.layer_rule({
 
 -- loginctl lock-session is set to 'qs ipc call lockscreen lock' in my hypridle.conf
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("loginctl lock-session"))
+
+
 -- toggle wallpaper picker
 hl.bind(mainMod .. " + W", function()
 	hl.dispatch(hl.dsp.exec_cmd("qs ipc call wallpaper toggle"))
-	hl.dispatch(hl.dsp.focus({workspace = "name:wp"}))
+	for _, monitor in ipairs(hl.get_monitors()) do
+		hl.dispatch(hl.dsp.focus({ monitor = monitor.name}))
+		hl.dispatch(hl.dsp.focus({ workspace = "name:wp" .. _, on_current_monitor = true}))
+	end
 end)
 
 -- override window.close for wallpaper-picker so close animation plays cleanly
 hl.bind("ALT + f4", function ()
-	if hl.get_active_window().title == "quickshell-wallpaper-picker" then
+	if not (hl.get_active_window() == null) and hl.get_active_window().title == "quickshell-wallpaper-picker" then
 		hl.dispatch(hl.dsp.exec_cmd("qs ipc call wallpaper close"))
 	else
 		hl.dispatch(hl.dsp.window.close())

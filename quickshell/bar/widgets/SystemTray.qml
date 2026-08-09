@@ -44,7 +44,7 @@ Rectangle{
 
 				Repeater {
 					model: menuOpener.children
-					required property int index
+					property int index
 					delegate: Rectangle {
 						Layout.fillWidth: true
 						Layout.preferredWidth: label.contentWidth + 20 // add padding

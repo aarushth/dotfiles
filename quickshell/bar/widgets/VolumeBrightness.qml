@@ -52,7 +52,7 @@ ColumnLayout{
 				horizontalAlignment: Text.AlignHCenter
 				verticalAlignment: Text.AlignVCenter
 				text: modelData
-				font.family: Theme.fontNormal || "Symbols Nerd Font Mono"
+				font.family: Theme.fontNormal || Theme.fontIcon
 				font.pixelSize: 14
 				color: OsdData.muted && index == 0 ? Theme.textMuted : Theme.bgBase
 			}

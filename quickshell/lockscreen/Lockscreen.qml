@@ -25,39 +25,53 @@ ShellRoot {
 	}
 	property bool shouldShowLockscreen: false
 	property bool shouldShowUnlockscreen: false
+	property int screens: Quickshell.screens.length
 	
 	IpcHandler{
 		target: "lockscreen"
-
 		function lock(){
 			root.shouldShowLockscreen = true
-			console.warn(new Date().toISOString(), "Lock requested")
+		}
+		function postsleep(){
+			lock.locked = true
+			lockContext.restart()
 		}
 	}
-	LazyLoader {
-		active: shouldShowLockscreen
-		IntroLockscreen{
-			Timer{
-				id: timer
-				interval: 100
-				running: false
-				onTriggered: root.shouldShowLockscreen = false
-			}
-			onLocked: {
-				lock.locked = true
-				lockContext.restart()
-				timer.restart()
-			}
+	Variants{
+		model: Quickshell.screens
+		delegate: Item {
+			id: root
+			property var modelData
 			
+			LazyLoader {
+				active: shouldShowLockscreen
+				IntroLockscreen{
+					screen: modelData
+					Timer{
+						id: timer
+						interval: 100
+						running: false
+						onTriggered: shouldShowLockscreen = false
+					}
+					onLocked: {
+						lock.locked = true
+						lockContext.restart()
+						timer.restart()
+					}
+					
+				}
+			}
+			LazyLoader {
+				active: shouldShowUnlockscreen
+				Unlockscreen{
+					screen: modelData
+					onUnlocked: shouldShowUnlockscreen = false
+				}
+			}
 		}
-	}
-	LazyLoader {
-		active: shouldShowUnlockscreen
-		Unlockscreen{}
 	}
 	WlSessionLock {
 		id: lock
-
 		locked: false
 
 		surface: WlSessionLockSurface {
@@ -69,6 +83,7 @@ ShellRoot {
 					id: lockSurface
 					anchors.fill: parent
 					context: lockContext
+					suspendable: screens == 1
 				}
 			}
 		}

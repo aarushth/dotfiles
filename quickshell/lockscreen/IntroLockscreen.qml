@@ -508,7 +508,7 @@ PanelWindow {
 					font.pixelSize: 100
 					verticalAlignment: Text.AlignVCenter
 					horizontalAlignment: Text.AlignHCenter
-					font.family: "Symbols Nerd Font Mono"
+					font.family: Theme.fontIcon
 				}
 				Text{
 					id: centerLabel

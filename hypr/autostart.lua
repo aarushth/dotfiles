@@ -17,9 +17,8 @@ hl.on("hyprland.start", function ()
 	-- clipoard history
 	hl.exec_cmd("clipse -listen")
 
-	-- plugins
-	hl.exec_cmd("hyprpm reload")
 	hl.exec_cmd("hypridle")
+	hl.exec_cmd("hyrpexpo")
 end)
 
 hl.on("hyprland.shutdown", function()

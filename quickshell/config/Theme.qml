@@ -28,4 +28,5 @@ QtObject {
 	readonly property string fontNormal: "PP Fraktion Mono"
 	readonly property string fontTitle: "Specify PERSONAL Extraexpanded"
 	readonly property string fontFancy: "KH Interference TRIAL"
+	readonly property string fontIcon: "Symbols Nerd Font Mono"
 }

@@ -1,32 +1,35 @@
 import QtQuick
 import Quickshell.Services.Notifications
+import Quickshell
 
-QtObject {
+Scope{
     id: notificationData
 
     property Notification notification: null
     property bool triggerClose: false
 
     property string seqId: ""
-    property string notifId: ""
+    property string notifId: String(notification.id || "")
 
-    property string summary: ""
-    property string body: ""
-    property string appIcon: ""
-    property string appName: ""
-    property string image: ""
-    property var actions: []
-    property int urgency: NotificationUrgency.Normal
-    property real expireTimeout: defaultTimeout
-    property int rowNums: 0
-    property int cardHeight: 0
+    property string summary: notification.summary || ""
+    property string body: notification.body || ""
+    property string appIcon: notification.appIcon || ""
+    property string appName: notification.appName || ""
+    property string image: notification.image || ""
+    property var actions: notification.actions.map(function (a) {
+            return {
+                identifier: a.identifier,
+                text: a.text
+            };
+        });
+    property int urgency: notification.urgency
+    property real expireTimeout: notification.expireTimeout > 0 ? notification.expireTimeout : defaultTimeout
+    property int rowNums: 11 + (actions.length > 0 ? 2 : 0)
+    property int cardHeight: rowNums * 15
     property int yPos: 800
     property bool hovered: false
-    property bool timerStart: false
-    readonly property bool timerRunning: timerStart && !notificationData.triggerClose && !notificationData.hovered && notificationData.urgency !== NotificationUrgency.Critical
-
-    readonly property int defaultTimeout: 5000  // ms — fallback auto-dismiss when app sends -1/0
-    readonly property int timeOut: notificationData.expireTimeout > 0 ? notificationData.expireTimeout : notificationData.defaultTimeout
+    readonly property bool timerPaused: notificationData.triggerClose || notificationData.hovered
+    readonly property int defaultTimeout: 5000  
     readonly property Connections _conn: Connections {
         target: notificationData.notification
 
@@ -34,8 +37,10 @@ QtObject {
             if (notificationData.triggerClose)
                 return;
             notificationData.triggerClose = true;
-            NotificationService._remove(notificationData);
-            notificationData.destroy();
+            Qt.callLater(function () {
+                NotificationService._remove(notificationData);
+                notificationData.destroy();
+            });
         }
 
         function onSummaryChanged(): void {
@@ -77,47 +82,38 @@ QtObject {
             });
         }
     }
-
-    Component.onCompleted: {
-        if (!notification)
-            return;
-        notifId = String(notification.id || "");
-        summary = notification.summary || "";
-        body = notification.body || "";
-        appIcon = notification.appIcon || "";
-        appName = notification.appName || "";
-        image = notification.image || "";
-        urgency = notification.urgency;
-
-        const rawTimeout = notification.expireTimeout;
-        expireTimeout = rawTimeout > 0 ? rawTimeout : defaultTimeout;
-        actions = notification.actions.map(function (a) {
-            return {
-                identifier: a.identifier,
-                text: a.text
-            };
-        });
-        rowNums = 11 + (actions.length > 0 ? 2 : 0);
-        cardHeight = rowNums * 15;
-    }
-
+	property int timerValue: expireTimeout
+	property var timer: SequentialAnimation {
+		id: timer
+		paused: running && timerPaused
+		NumberAnimation {
+			target: notificationData
+			property: "timerValue"
+			to: 0
+			duration: notificationData.expireTimeout
+		}
+		ScriptAction{
+			script: notificationData.dismiss()
+		}
+	}
     function dismiss(): void {
         triggerClose = true;
     }
     function completeDismiss(): void {
-        NotificationService._remove(notificationData);
-        if (notification)
-            try {
-                notification.completeDismiss();
-            } catch (e) {}
-        destroy();
+        Qt.callLater(function () {
+            NotificationService._remove(notificationData);
+            if (notification)
+                try {
+                    notification.completeDismiss();
+                } catch (e) {}
+            destroy();
+        });
     }
 
     function invokeAction(identifier): void {
         if (!identifier || triggerClose)
             return;
         triggerClose = true;
-        NotificationService._remove(notificationData);
         if (notification) {
             const action = notification.actions.find(function (a) {
                 return a.identifier === identifier;
@@ -127,6 +123,9 @@ QtObject {
                     action.invoke();
                 } catch (e) {}
         }
-        destroy();
+        Qt.callLater(function () {
+            NotificationService._remove(notificationData);
+            destroy();
+        });
     }
 }

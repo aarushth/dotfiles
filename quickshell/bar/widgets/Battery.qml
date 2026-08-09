@@ -1,8 +1,7 @@
-import Quickshell
-import Quickshell.Widgets
-import Quickshell.Services.UPower
+// import Quickshell
 import QtQuick
 import QtQuick.Layouts
+import Quickshell.Services.UPower
 import "../../config"
 
 Rectangle{
@@ -12,11 +11,14 @@ Rectangle{
 	required property int rows
 	required property var boxes
 	property var battery: UPower.displayDevice
+	property string batteryPercentage: String(Math.round(battery.percentage * 100)).padStart(3, 0) + "%"
 	property string batteryIcon: battery.state == UPowerDeviceState.Charging ? Icons.batteryChargingIcons[Math.round(battery.percentage * 10)] : Icons.batteryIcons[Math.round(battery.percentage * 10)]
-
 	property string powerProfileIcon: Icons.powerProfileIcons.get(PowerProfile.toString(PowerProfiles.profile))
+	function cyclePowerProfile(){
+		PowerProfiles.profile = PowerProfile.toString((PowerProfiles.profile + 1) % 3)
+	}
+	readonly property color batteryTextColor: batteryPercentage <= 0.15 ? Theme.accentRed : Theme.bgBase
 	
-	property color textColor: battery.percentage <= 0.15 ? Theme.accentRed : Theme.bgBase
 	implicitHeight: parent.height
 	width: root.boxSize * cols
 	color: Theme.accentPurple
@@ -44,7 +46,7 @@ Rectangle{
 		id: mouse
 		anchors.fill: parent
 		hoverEnabled: true
-		onClicked: PowerProfiles.profile = PowerProfile.toString((PowerProfiles.profile + 1) % 3)
+		onClicked: cyclePowerProfile()
 	}
 	ColumnLayout{
 		anchors.fill: parent
@@ -55,9 +57,9 @@ Rectangle{
 			horizontalAlignment: Text.AlignHCenter
 			verticalAlignment: Text.AlignBottom
 			font.pixelSize: 15
-			text: batteryIcon + " " + powerProfileIcon
-			font.family: "Symbols Nerd Font"
-			color: textColor
+			text: root.batteryIcon + " " + root.powerProfileIcon
+			font.family: Theme.fontIcon
+			color: batteryTextColor
 		}
 		Text{
 			Layout.preferredWidth: parent.width
@@ -65,9 +67,9 @@ Rectangle{
 			horizontalAlignment: Text.AlignHCenter
 			verticalAlignment: Text.AlignVCenter
 			font.pixelSize: 15
-			text: String(Math.round(battery.percentage * 100)).padStart(3, 0) + "%"
+			text: batteryPercentage
 			font.family: Theme.fontFancy
-			color: textColor
+			color: batteryTextColor
 		}
 	}
 }

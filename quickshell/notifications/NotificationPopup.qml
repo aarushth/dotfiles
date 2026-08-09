@@ -56,7 +56,9 @@ Scope {
 			}
 		}
     }
-	Repeater {
+	Item {
+		id: notifRepeaterHost
+		Repeater {
 		id: notifRepeater
 		model: ScriptModel {
 			values: NotificationService.notifications
@@ -67,226 +69,284 @@ Scope {
 			if(heights.length == 0){
 				heights.push(0)
 			}else{
-				heights.push(heights[index - 1] + notifRepeater.itemAt(index - 1).modelData.cardHeight)
+				heights.push(heights[index - 1] + notifRepeater.itemAt(index - 1).notificationData.cardHeight)
 			}
-			item.modelData.yPos = heights[index] + (index + 1) * 10
+			item.notificationData.yPos = heights[index] + (index + 1) * 10
 		}
 		onItemRemoved: function(index, item) {
 			heights.splice(index, 1)
 			for(let i = index; i < heights.length; i++){
 				heights[i] = heights[i] - item.cardHeight
-				notifRepeater.itemAt(i).modelData.yPos = heights[i] + (i + 1) * 10
+				notifRepeater.itemAt(i).notificationData.yPos = heights[i] + (i + 1) * 10
 			}
 		}
-		//single card
 		delegate: Item {
 			id: notifCard
-			required property var modelData;
+			required property NotificationData modelData
+            property NotificationData notificationData: modelData
 			required property int index
-			property var triggerClose: modelData.triggerClose
+			property var triggerClose: notificationData.triggerClose
 			property bool closing: false
-			property bool isImage: notifCard.modelData.image !== "" && notifImage.status === Image.Ready
-			property int rowNums: 11 + (notifCard.modelData.actions.length > 0 ? 2 : 0)
+			property bool isImage: notificationData.image !== "" && notifImage.status === Image.Ready
+			property int rowNums: 11 + (notificationData.actions.length > 0 ? 2 : 0)
 			property int colNums: 24
 			property int totalBoxes: rowNums * colNums
 			property int cardHeight: rowNums * root.boxSize
 			property int cardWidth: colNums * root.boxSize
 			property var boxes: root.boxes.slice(0, totalBoxes)
-			property color cardColor: notifCard.modelData.urgency === NotificationUrgency.Critical ? Theme.urgencyCritical :
-								notifCard.modelData.urgency === NotificationUrgency.Low ? Theme.urgencyLow : Theme.urgencyNormal
+			property color cardColor: notificationData.urgency === NotificationUrgency.Critical ? Theme.urgencyCritical :
+								notificationData.urgency === NotificationUrgency.Low ? Theme.urgencyLow : Theme.urgencyNormal
 			
-			
-			function beginCloseAnim(){
-				if(!closing){
-					grid.entryAnim.restart()
+			onTriggerCloseChanged: {
+				if(triggerClose && !closing){
+					for (const item of variants.instances) {
+						item.beginCloseAnim()
+					}
 					closing = true
 				}
 			}
-			onTriggerCloseChanged: {
-				if(triggerClose){
-					beginCloseAnim()
-				}
-			}
 			
-			
-			PanelWindow {
-				id: notifWindow
-				visible: false
-				focusable: false
-				color: "transparent"
-				WlrLayershell.namespace: "quickshell-notification-card-blur"
-				WlrLayershell.layer: WlrLayer.Overlay
-				WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-				exclusionMode: ExclusionMode.Ignore
-				anchors {
-					top: true
-					right: true
-				}
-
-							
-				implicitWidth: notifCard.cardWidth
-				implicitHeight: notifCard.cardHeight
-				margins {
-					right: notifCard.modelData.hovered ? 30 : 10
-					top: notifCard.modelData.yPos
-				}  
-				Behavior on margins.right{
-					NumberAnimation {
-						duration: 100
+			Variants{
+				id: variants
+				model: Quickshell.screens
+				delegate: Item{
+					required property var modelData
+					function beginCloseAnim() {
+						grid.entryAnim.restart()
 					}
-				}
-				Behavior on margins.top{
-					NumberAnimation {
-						duration: 400
-						easing.type: Easing.InQuad 
-					}
-				}
-				HoverHandler {
-					id: cardHover
-					onHoveredChanged: {notifCard.modelData.hovered = hovered}
-					blocking: false
-				}
-
-				SimpleGrid{
-					anchors.fill: parent
-					columns: notifCard.colNums
-					rows: notifCard.rowNums
-					property int bodyColumnSpan: notifCard.colNums - (notifCard.isImage ? 9 : 2)
-					//top bar background
-					GridCell{
-						gridColumn: 0
-						gridRow: 0
-						gridColumnSpan: notifCard.colNums
-						gridRowSpan: 2
-						Rectangle{
-							anchors.fill:parent
-							color: notifCard.cardColor
-
-						}
-					}
-					//greybackground
-					GridCell{
-						gridColumn: 0
-						gridRow: 2
-						gridColumnSpan: notifCard.colNums
-						gridRowSpan: notifCard.rowNums - 2
-						opacity: 0.6
-						Rectangle{
-							anchors.fill:parent
-							color: Theme.bgBase
-						}
-					}
-					//icon
-					GridCell{
-						gridColumn: 0
-						gridRow: 0
-						gridColumnSpan: 2
-						gridRowSpan: 2
-						IconImage {
-							anchors.centerIn: parent
-							source: Quickshell.iconPath(notifCard.modelData.appIcon, true)
-							implicitSize: root.boxSize * 2
-							visible: notifCard.modelData.appIcon !== ""
+					
+					PanelWindow{
+						id: squares
+						screen: modelData
+						focusable: false
+						color: "transparent"
+						WlrLayershell.namespace: "quickshell-notification-card"
+						WlrLayershell.layer: WlrLayer.Overlay
+						WlrLayershell.keyboardFocus: WlrKeyboardFocus.None 
+						anchors {
+							top: true
+							right: true
 						}
 
-						Text {
-							anchors.centerIn: parent
-							visible: notifCard.modelData.appIcon === ""
-
-							text: {
-								const name = notifCard.modelData.appName.toLowerCase();
-								if (notifCard.modelData.urgency === NotificationUrgency.Critical) return "󰀦";
-								if (name.includes("discord"))  return "󰙯";
-								if (name.includes("firefox"))  return "󰈹";
-								if (name.includes("spotify"))  return "󰓇";
-								if (name.includes("kitty"))  return "";
-								return "󰂚";
+						margins {
+							right: notifCard.notificationData.hovered ? 30 : 10
+							top: notifCard.notificationData.yPos?? 0
+						}  
+						implicitWidth: notifCard.cardWidth
+						implicitHeight: notifCard.cardHeight
+						Behavior on margins.right{
+							NumberAnimation {
+								duration: 100
 							}
+						}
+						Behavior on margins.top{
+							NumberAnimation {
+								duration: 400
+								easing.type: Easing.InQuad 
+							}
+						}
+						HoverHandler {
+							id: cardGridHover
+							onHoveredChanged: notifCard.notificationData.hovered = hovered
+						}
+						
+						Item {
+							id: grid
+							anchors.fill: parent
+							property int revealInd: 0
+							property var entryAnim: SequentialAnimation{
+								id: entryAnim
+								running: false
+								ScriptAction{
+									script:{
+										grid.revealInd = 0
+										squares.visible = true
+									}
+								}
+								NumberAnimation{
+									target: grid
+									property: "revealInd"
+									from: 0; to: root.maxTotalBoxes
+									duration: 500
+									running: false
+								}
+								PauseAnimation{ duration: 100 }
+								ScriptAction{ script: {notifWindow.visible = !notifCard.closing} }
+								NumberAnimation{
+									target: grid
+									property: "revealInd"
+									from: root.maxTotalBoxes; to: 0
+									duration: 500
+									running: false
+								}
+								ScriptAction{ 
+									script: {
+										squares.visible = false
+										if(notificationData.urgency !== NotificationUrgency.Critical){
+											notificationData.timer.start()
+										}
+										if(notifCard.closing){
+											notifCard.notificationData.completeDismiss()
+										}
+									}
+								}
+							}
+							Component.onCompleted: entryAnim.start()
+							Repeater {
+								model: notifCard.totalBoxes
 
-							color: Theme.textPrimary
-							font.pixelSize: 15
-							font.family: Theme.fontNormal
+								delegate: Rectangle {
+									x: (index % notifCard.colNums) * root.boxSize
+									y: Math.floor(index / notifCard.colNums) * root.boxSize
+									width: root.boxSize
+									height: root.boxSize
+									property int idx: notifCard.boxes[index]
+									color: notifCard.cardColor
+									opacity: (idx < grid.revealInd) ? 1 : 0
+								}
+							}
+							
 						}
 					}
-					//divider 
-					GridCell{
-						gridColumn: 2
-						gridRow: 0
-						gridColumnSpan: 1
-						gridRowSpan: 2
+					PanelWindow {
+						id: notifWindow
+						screen: modelData
+						visible: false
+						focusable: false
+						color: "transparent"
+						WlrLayershell.namespace: "quickshell-notification-card-blur"
+						WlrLayershell.layer: WlrLayer.Overlay
+						WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+						exclusionMode: ExclusionMode.Ignore
+						anchors {
+							top: true
+							right: true
+						}		
+						implicitWidth: notifCard.cardWidth
+						implicitHeight: notifCard.cardHeight
+						margins {
+							right: notifCard.notificationData.hovered ? 30 : 10
+							top: notifCard.notificationData.yPos
+						}  
+						Behavior on margins.right{
+							NumberAnimation {
+								duration: 100
+							}
+						}
+						Behavior on margins.top{
+							NumberAnimation {
+								duration: 400
+								easing.type: Easing.InQuad 
+							}
+						}
+						HoverHandler {
+							id: cardHover
+							onHoveredChanged: {notifCard.notificationData.hovered = hovered}
+							blocking: false
+						}
 						Rectangle{
-							anchors {
+							id: topBackground
+							anchors{
 								top: parent.top
+								left: parent.left
+								right: parent.right
+							}
+							height: root.boxSize * 2
+							color: notifCard.cardColor
+						}
+						Rectangle{
+							anchors{
+								top: topBackground.bottom
+								left: parent.left
+								right: parent.right
 								bottom: parent.bottom
+							}
+							color: Theme.bgBase
+							opacity: 0.6
+						}
+						Text {
+							id: icon
+							anchors{
+								top: parent.top
+								left: parent.left
+							}
+							verticalAlignment: Text.AlignVCenter
+							horizontalAlignment: Text.AlignHCenter
+							width: root.boxSize * 2
+							height: boxSize * 2
+							text: Icons.get(notifCard.notificationData.appName.toLowerCase()) ?? "󰂚"
+							color: Theme.textPrimary
+							font.pixelSize: 12
+							font.family: Theme.fontIcon
+						}
+						Rectangle{
+							id: divider
+							anchors {
+								top: icon.top
+								left: icon.right
+								bottom: icon.bottom
 							}
 							width: 1
 							color: "black"
 						}
-					}
-					//app name
-					GridCell{
-						gridColumn: 2
-						gridRow: 0
-						gridColumnSpan: notifCard.colNums - 4
-						gridRowSpan: 2
 						Text {
+							id: appName
 							anchors{
-								left: parent.left
+								top: divider.top
+								bottom: divider.bottom
+								left: divider.right
+								right: parent.right
 								leftMargin: 10
-								verticalCenter: parent.verticalCenter
 							}
 							verticalAlignment: Text.AlignVCenter
 							font.capitalization: Font.Capitalize
-							text: notifCard.modelData.summary || "Notification"
+							text: notifCard.notificationData.summary || "Notification"
 							color: Theme.textPrimary
 							font.pixelSize: 12
 							font.family: Theme.fontNormal
 						}
-					}
-					//x button
-					GridCell{
-						id: xButton
-						gridColumn: notifCard.colNums - 2
-						gridRow: 0
-						gridColumnSpan: 2
-						gridRowSpan: 2
-
-						Text {
-							anchors.centerIn: parent
-							text: "󰅖"
-							color: Theme.textPrimary
-							font.pixelSize: closeHover.containsMouse ? 25 : 15
-							font.family: Theme.fontNormal
-							Behavior on font.pixelSize {
-								NumberAnimation {
-									duration: 100
+						Item{
+							anchors{
+								top: appName.top
+								bottom: appName.bottom
+								right: parent.right
+							}
+							width: boxSize * 2
+							Text {
+								anchors.fill: parent
+								verticalAlignment: Text.AlignVCenter
+								horizontalAlignment: Text.AlignHCenter
+								text: "󰅖"
+								color: Theme.textPrimary
+								font.pixelSize: closeHover.containsMouse ? 15 : 10
+								font.family: Theme.fontIcon
+								Behavior on font.pixelSize {
+									NumberAnimation {
+										duration: 100
+									}
 								}
 							}
-						}
 
-						MouseArea {
-							id: closeHover
-							anchors.fill: parent
-							hoverEnabled: true
-							cursorShape: Qt.PointingHandCursor
-							onClicked: notifCard.modelData.dismiss()
-							// onHoveredChanged: 
-						}
-					}
-					//notif title
-					GridCell{
-						gridRow: 2
-						gridColumn: 1
-						gridRowSpan: 3
-						gridColumnSpan: notifCard.colNums - 2
-						Text {
-							anchors{
-								verticalCenter: parent.verticalCenter
-								left: parent.left
+							MouseArea {
+								id: closeHover
+								anchors.fill: parent
+								hoverEnabled: true
+								cursorShape: Qt.PointingHandCursor
+								onClicked: notifCard.notificationData.dismiss()
 							}
-							width: parent.width
+						}
+						Text {
+							id: title
+							anchors{
+								top: appName.bottom
+								left: parent.left
+								right: parent.right
+								leftMargin: boxSize
+								rightMargin: boxSize
+							}
+							height: boxSize * 3
 							verticalAlignment: Text.AlignVCenter
-							text: notifCard.modelData.appName
+							text: notifCard.notificationData.appName
 							color: Theme.textSecondary
 							font.pixelSize: 18
 							font.family: Theme.fontTitle
@@ -296,84 +356,65 @@ Scope {
 							Layout.fillWidth: true
 							visible: text !== ""
 						}
-					}
-					//divider
-					GridCell{
-						gridRow: 4
-						gridColumn: 1
-						gridRowSpan: 1
-						gridColumnSpan: notifCard.colNums - 2
 						Rectangle{
 							anchors{
-								bottom: parent.bottom
-								left: parent.left
-								right: parent.right
+								top: title.bottom
+								left: title.left
+								right: title.right
 							}
 							height: 1
 							opacity: 0.1
 							color: Theme.textMuted
 						}
-					}
-					//notif body text
-					GridCell{
-						gridRow: 6
-						gridColumn: 1
-						gridRowSpan: 2
-						gridColumnSpan: notifCard.colNums - (notifCard.isImage ? 6 : 2)
-						Rectangle{
-							anchors.fill: parent
-							color: "transparent"
-						}
 						Text {
-							text: notifCard.modelData.body
+							anchors{
+								top: title.bottom
+								left: parent.left
+								topMargin: boxSize / 4
+								leftMargin: boxSize
+								rightMargin: boxSize
+							}
+							text: notifCard.notificationData.body
 							color: Theme.textMuted
-							width: parent.width
+							height: boxSize * 4
+							width: (notifCard.colNums - (notifCard.isImage ? 6 : 2)) * boxSize 
 							font.family: Theme.fontNormal
+							font.pixelSize: 11
 							wrapMode: Text.Wrap
-							maximumLineCount: 2
+							maximumLineCount: 3
 							elide: Text.ElideRight
-							Layout.fillWidth: true
 							visible: text !== ""
-							textFormat: Text.PlainText
 						}
-					}
-					//notif body image
-					GridCell{
-						gridRow: 5
-						gridColumn: notifCard.colNums - 5
-						gridRowSpan: 4
-						gridColumnSpan: 4
 						Rectangle{
-							anchors.fill: parent
+							anchors{
+								top: title.bottom
+								right: parent.right
+								rightMargin: boxSize
+							}
 							color: "transparent"
 							visible: notifCard.isImage
-							width: parent.width
-							height: parent.height
+							width: boxSize * 4
+							height: boxSize * 4
 							clip: true
 							Image {
 								id: notifImage
-								// anchors.centerIn: parent
 								width: parent.width - 10
 								height: parent.height - 10
 								anchors{
 									right: parent.right
 									verticalCenter: parent.verticalCenter
 								}
-								source: notifCard.modelData.image
+								source: notifCard.notificationData.image
 								fillMode: Image.PreserveAspectCrop
-								// sourceSize.width: 24
-								// sourceSize.height: 24
 							}
 						}
-					}
-					//timer bar
-					GridCell{
-						gridRow: 9
-						gridColumn: 0
-						gridRowSpan: 2
-						gridColumnSpan: notifCard.colNums
 						Item{
-							anchors.fill: parent
+							anchors{
+								left: parent.left
+								right: parent.right
+								bottom: actions.visible ? actions.top : parent.bottom
+							}
+							height: boxSize * 2
 							Rectangle{
 								anchors.fill: parent
 								color: Theme.textPrimary
@@ -381,116 +422,79 @@ Scope {
 							Rectangle {
 								id: progressBar
 								height: parent.height
-								width: parent.width
-								visible: notifCard.modelData.urgency !== NotificationUrgency.Critical
+								width: parent.width * notificationData.timerValue / notificationData.expireTimeout
+								visible: notifCard.notificationData.urgency !== NotificationUrgency.Critical
 								radius: 1
 								color: notifCard.cardColor
 								opacity: 1
-								Component.onCompleted: timer.start()
-								SequentialAnimation {
-									id: timer
-									// running: true
-									paused: !(notifCard.modelData.timerRunning)
-									// PauseAnimation { duration: 50 }
-									NumberAnimation {
-										target: progressBar
-										property: "width"
-										to: 0
-										duration: notifCard.modelData.timeOut
-									}
-									ScriptAction{
-										script: notifCard.modelData.dismiss()
-									}
+							}
+							Rectangle{
+								id: xIcon
+								width: 14
+								height: 14
+								anchors{
+									verticalCenter: progressBar.verticalCenter
+									left: progressBar.left
+									leftMargin: boxSize
+								}
+								color: Theme.bgBase
+								border.color: Theme.textSecondary
+								radius: 3
+								Text{
+									anchors.centerIn: parent
+									width: parent.width
+									height: parent.height
+
+									horizontalAlignment: Text.AlignHCenter
+									verticalAlignment: Text.AlignVCenter
+									
+									color: Theme.textSecondary
+									text: "󰅖"
+									font.family: Theme.fontNormal
 								}
 							}
-						}
-					}
-					//press X
-					GridCell{
-						gridRow: 9
-						gridColumn: 1
-						gridRowSpan: 2
-						gridColumnSpan: 2
-						Rectangle{
-							width: 14
-							height: 14
-							anchors{
-								verticalCenter: parent.verticalCenter
-								left: parent.left
-							}
-							color: "#272528"
-							border.color: Theme.textSecondary
-							radius: 3
-							// visible: notifCard.modelData.urgency === NotificationUrgency.Critical
 							Text{
-								anchors.centerIn: parent
-								width: parent.width
-								height: parent.height
-
-								horizontalAlignment: Text.AlignHCenter
+								anchors{
+									top: progressBar.top
+									bottom: progressBar.bottom
+									left: xIcon.right
+									leftMargin: boxSize
+								}
 								verticalAlignment: Text.AlignVCenter
-								
-								color: Theme.textSecondary
-								text: "󰅖"
 								font.family: Theme.fontNormal
+								color: Theme.textSecondary
+								text: "Dismiss"
 							}
 						}
-					}
-					//dismiss text
-					GridCell{
-						gridRow: 9
-						gridColumn: 2
-						gridRowSpan: 2
-						gridColumnSpan: root.colNums - 4
-						Text{
-							anchors{
-								verticalCenter: parent.verticalCenter
-								left: parent.left
-								leftMargin: 10
-							}
-							verticalAlignment: Text.AlignVCenter
-							font.family: Theme.fontNormal
-							color: Theme.textSecondary
-							text: "Dismiss"
-						}
-					}
-					//actions
-					GridCell{
-						gridRow: 11
-						gridColumn: 0
-						gridRowSpan: 2
-						gridColumnSpan: notifCard.colNums
 						RowLayout {
-							width: parent.width
-							height:parent.height
+							id: actions
+							anchors{
+								bottom: parent.bottom
+								left: parent.left
+								right: parent.right
+							}
+							height: boxSize * 2
 							uniformCellSizes: true
 							spacing: 0
-							
-							visible: notifCard.modelData.actions.length > 0
+							visible: notifCard.notificationData.actions.length > 0
 							Repeater {
-								model: notifCard.modelData.actions
+								model: notifCard.notificationData.actions
 								Layout.preferredWidth: parent.width
 								Layout.preferredHeight: parent.height
 								Rectangle {
 									id: actionBtn
-									required property var modelData
+									property var action: modelData
 									required property int index
-
-									// anchors.verticalCenter: parent.verticalCenter
-									Layout.preferredWidth: notifCard.cardWidth/notifCard.modelData.actions.length
+									Layout.preferredWidth: notifCard.cardWidth/notifCard.notificationData.actions.length
 									Layout.preferredHeight: parent.height
 									opacity: 0.6
 									color: actionHover.containsMouse ? Theme.bgButtonHover : Theme.bgButton
 									Behavior on color {
 										ColorAnimation { duration: 100 }
 									}
-
-									Accessible.role: Accessible.Button
-									Accessible.name: actionBtn.modelData.text || ""
-
 									Text {
 										id: actionText
-										text: actionBtn.modelData.text || ""
+										text: action.text || ""
 										color: Theme.textSecondary
 										verticalAlignment: Text.AlignVCenter
 										horizontalAlignment: Text.AlignHCenter
@@ -505,7 +509,7 @@ Scope {
 										anchors.fill: parent
 										hoverEnabled: true
 										cursorShape: Qt.PointingHandCursor
-										onClicked: notifCard.modelData.invokeAction(actionBtn.modelData.identifier)
+										onClicked: notifCard.notificationData.invokeAction(action.identifier)
 									}
 									Rectangle{
 										anchors {
@@ -514,110 +518,18 @@ Scope {
 											right: parent.right
 										}
 										color: "black"
-										visible: parent.index + 1 < notifCard.modelData.actions.length
+										visible: parent.index + 1 < notifCard.notificationData.actions.length
 										width: 1
 									}
 								}
 							}
-						}
-					}      
-
-				}                    
-			}
-			PanelWindow{
-				id: squares
-				focusable: false
-				color: "transparent"
-				WlrLayershell.namespace: "quickshell-notification-card"
-				WlrLayershell.layer: WlrLayer.Overlay
-				WlrLayershell.keyboardFocus: WlrKeyboardFocus.None 
-				anchors {
-					top: true
-					right: true
-				}
-
-				margins {
-					right: notifCard.modelData.hovered ? 30 : 10
-					top: notifCard.modelData.yPos
-				}  
-				implicitWidth: notifCard.cardWidth
-				implicitHeight: notifCard.cardHeight
-				Behavior on margins.right{
-					NumberAnimation {
-						duration: 100
-					}
-				}
-				Behavior on margins.top{
-					NumberAnimation {
-						duration: 400
-						easing.type: Easing.InQuad 
-					}
-				}
-				HoverHandler {
-					id: cardGridHover
-					onHoveredChanged: notifCard.modelData.hovered = hovered
-				}
-				
-				Grid {
-					id: grid
-					anchors.fill: parent
-					columns: notifCard.colNums
-					rows: notifCard.rowNums
-					property int revealInd: 0
-					property var entryAnim: SequentialAnimation{
-						id: entryAnim
-						running: false
-						ScriptAction{
-							script:{
-								grid.revealInd = 0
-								squares.visible = true
-							}
-						}
-						NumberAnimation{
-							target: grid
-							property: "revealInd"
-							from: 0; to: root.maxTotalBoxes
-							duration: 500
-							running: false
-						}
-						PauseAnimation{ duration: 100 }
-						ScriptAction{ script: {notifWindow.visible = !notifCard.closing} }
-						NumberAnimation{
-							target: grid
-							property: "revealInd"
-							from: root.maxTotalBoxes; to: 0
-							duration: 500
-							running: false
-						}
-						ScriptAction{ 
-							script: {
-								squares.visible = false
-								notifCard.modelData.timerStart = true
-								entryAnim.stop()
-								if(notifCard.closing){
-									notifCard.modelData.completeDismiss()
-								}
-							}
-						}
+						}                 
 					}
 					
-					Repeater {
-						model: notifCard.totalBoxes
-
-						delegate: Rectangle {
-							width: root.boxSize
-							height: root.boxSize
-
-							property int idx: 100000
-							Component.onCompleted: idx = notifCard.boxes[index]
-							color: notifCard.cardColor
-							opacity: (idx < grid.revealInd) ? 1 : 0
-						}
-					}
-					Component.onCompleted: entryAnim.start()
 				}
 			}
 		}
 	}
 
+	}
 }

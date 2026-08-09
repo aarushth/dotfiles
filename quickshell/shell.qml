@@ -8,7 +8,6 @@ import "wallpaper"
 import "bar"
 import "wlogout"
 import "lockscreen"
-
 Scope{
     NotificationPopup {}
     Osd{}

@@ -10,18 +10,28 @@ hl.config({
         kb_options = "",
         kb_rules   = "",
         follow_mouse = 1,
-        sensitivity = 0, 
+        sensitivity = 0.5, 
         touchpad = {
             natural_scroll = true,
+			clickfinger_behavior = false,
+			middle_button_emulation = true,
+			tap_to_click = false
         },
     },
+})
+hl.device({
+    name = "tpps/2-elan-trackpoint",
+    sensitivity = -0.5
+})
+hl.device({
+    name = "sinowealth-game-mouse",
+    sensitivity = -1
 })
 hl.gesture({
     fingers = 3,
     direction = "horizontal",
-    action = "workspace"
+    action = "workspace",
 })
-
 
 mainMod = "SUPER" -- Sets "Windows" key as main modifier
 
@@ -32,7 +42,7 @@ hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("kitty -o background_opacity=1.0 --cl
 hl.bind("CTRL + ALT + Backspace", function ()
 	for _, window in pairs(hl.get_windows()) do
 		if window.class == "btop" then
-			return hl.dispatch(hl.dsp.focus({workspace = "name:btop"}))
+			return hl.dispatch(hl.dsp.focus({workspace = "name:btop", on_current_monitor = true}))
 		end
 	end
 	hl.dispatch(hl.dsp.exec_cmd("kitty --class btop -e btop"))
@@ -43,6 +53,21 @@ hl.bind(mainMod .. " + P", hl.dsp.layout("togglesplit"))
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("grim -g \"$(slurp)\" -t ppm - | satty -f - --copy-command wl-copy --output-filename ~/Pictures/Screenshots/satty-$(date '+%Y%m%d-%H:%M:%S').png"))
 hl.bind(mainMod .. " + SHIFT + P", hl.dsp.exec_cmd("hyprpicker -a"))
 
+-- hl.bind("ALT + TAB", hl.dsp.exec_cmd("qs ipc call overview toggle"))
+hl.bind("ALT + TAB", function()
+    hl.plugin.hyprexpo.expo("toggle")
+end)
+hl.define_submap("hyprexpo", function()
+    hl.bind("left",      function() hl.plugin.hyprexpo.kb_focus("left") end)
+    hl.bind("right",      function() hl.plugin.hyprexpo.kb_focus("right") end)
+    hl.bind("up",      function() hl.plugin.hyprexpo.kb_focus("up") end)
+    hl.bind("down",      function() hl.plugin.hyprexpo.kb_focus("down") end)
+	hl.bind("TAB", function() hl.plugin.hyprexpo.kb_focus("next") end)
+	hl.bind("SHIFT + TAB", function() hl.plugin.hyprexpo.kb_focus("previous") end)
+    hl.bind("return", function() hl.plugin.hyprexpo.kb_confirm() end)
+    hl.bind("escape", function() hl.plugin.hyprexpo.expo("cancel") end)
+	hl.bind("ALT + TAB", function() hl.plugin.hyprexpo.expo("cancel") end)
+end)
 
 -- Move focus with mainMod + arrow keys
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
@@ -55,7 +80,7 @@ hl.bind(mainMod .. " + down",  hl.dsp.focus({ direction = "down" }))
 -- Move active window to a workspace with mainMod + SHIFT + [0-9]
 for i = 1, 10 do
     local key = i % 10 -- 10 maps to key 0
-    hl.bind(mainMod .. " + " .. key,             hl.dsp.focus({ workspace = i}))
+    hl.bind(mainMod .. " + " .. key, hl.dsp.focus({ workspace = i, on_current_monitor = true}))
     hl.bind(mainMod .. " + SHIFT + " .. key,     hl.dsp.window.move({ workspace = i }))
 end
 
@@ -71,30 +96,18 @@ hl.bind(mainMod .. " + 1",
 
 
 -- Scroll through existing workspaces with mainMod + scroll
-hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
-hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }))
+hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1", on_current_monitor = true }))
+hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1", on_current_monitor = true}))
 
-hl.bind("ALT + TAB", function()
-    hl.plugin.hyprexpo.expo("toggle")
-end)
-hl.define_submap("hyprexpo", function()
-    hl.bind("left",   function() hl.plugin.hyprexpo.kb_focus("left") end)
-    hl.bind("right",  function() hl.plugin.hyprexpo.kb_focus("right") end)
-    hl.bind("up",     function() hl.plugin.hyprexpo.kb_focus("up") end)
-    hl.bind("down",   function() hl.plugin.hyprexpo.kb_focus("down") end)
-    hl.bind("return", function() hl.plugin.hyprexpo.kb_confirm() end)
-    hl.bind("escape", function() hl.plugin.hyprexpo.expo("cancel") end)
-	
-end)
-
--- Move/resize windows with mainMod + LMB/RMB and dragging
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
-hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
 -- Laptop multimedia keys for volume and LCD brightness
 hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ 0 & wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 2%+ & qs ipc call osd volume"), { locked = true, repeating = true })
+hl.bind("F3", 					hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ 0 & wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 2%+ & qs ipc call osd volume"), {  non_consuming = true, locked = true, repeating = true })
 hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ 0 & wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%- & qs ipc call osd volume"),      { locked = true, repeating = true })
+hl.bind("F2",					hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ 0 & wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%- & qs ipc call osd volume"),      { non_consuming = true, locked = true, repeating = true })
 hl.bind("XF86AudioMute",        hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle & qs ipc call osd volume"),     { locked = true, repeating = true })
+hl.bind("F1", 					hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle & qs ipc call osd volume"),     { non_consuming = true, locked = true, repeating = true })
 hl.bind("XF86AudioMicMute",     hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),   { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessUp",  hl.dsp.exec_cmd("brightnessctl -q set 5%+ & qs ipc call osd brightness"),                  { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessDown",hl.dsp.exec_cmd("brightnessctl -q set 5%- & qs ipc call osd brightness"),                  { locked = true, repeating = true })

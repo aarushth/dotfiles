@@ -24,6 +24,8 @@ QtObject {
 		["spotify", ""],
 		["com.discordapp.Discord", ""],
 		["steam", "󰓓"],
+		//marathon game
+		["alephone", "󰊴"],
 		["qdirstat", ""],
 		["localsend", "󱒃"],
 		["btop", ""],
@@ -34,7 +36,8 @@ QtObject {
 		["wifitui", ""],
 		["bluetui", "󰂯"],
 		["yazi", ""],
-		["mpv", ""]
+		["mpv", ""],
+		["zoom", ""]
 		])
 	readonly property var brightnessIcons: [
 		"󰹐", 

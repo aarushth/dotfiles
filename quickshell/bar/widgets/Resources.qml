@@ -11,86 +11,13 @@ Item{
 	required property int rows
 	required property int cols
 	required property var boxes
-	property int lastTotalTime: 1
-	property int lastIdleTime: 1
-	property string tempPath: ""
-	property int maxRam: 1
-
-	property int usage: 1
-	property int temp: 1
-	property int ram: 1
 	
-	property string usageString: Icons.cpuIcon + String(usage).padStart(3, 0) + "%" 
-	property string tempString: Icons.getTempIcon(temp) + String(temp).padStart(3, 0) + "󰔄" 
-	property string ramString: Icons.ramIcon + String(ram).padStart(3, 0) + "%"
+	property string usageString: Icons.cpuIcon + String(SysInfo.usage).padStart(3, 0) + "%" 
+	property string tempString: Icons.getTempIcon(SysInfo.temp) + String(SysInfo.temp).padStart(3, 0) + "󰔄" 
+	property string ramString: Icons.ramIcon + String(SysInfo.ram).padStart(3, 0) + "%"
+
 	width: boxSize * cols
 	Layout.preferredHeight: parent.height
-	FileView {
-		id: cpuUsageFile
-		path: Qt.resolvedUrl("/proc/stat")
-		onTextChanged: calcCurrentCPUVals()
-	}
-	Process {
-		id: tempPathFinder
-		running: true
-		command: [
-			"sh",
-			"-c",
-			"find /sys/class/hwmon -maxdepth 1 -type l | while read d; do if [ \"$(cat \"$d/name\" 2>/dev/null)\" = acpitz ]; then echo \"$d\"; break; fi; done"
-		]
-		stdout: StdioCollector {
-			onStreamFinished: tempPath = this.text.trim()  + "/temp1_input"
-		}
-	}
-	FileView {
-		id: tempFile
-		path: tempPath
-		onTextChanged: {
-			temp = parseInt(text())/1000
-		}
-	}
-	FileView {
-		id: ramFile
-		property bool initialized: false
-		path: Qt.resolvedUrl("/proc/meminfo")
-		onTextChanged: calcRamUsage()
-		onLoaded: {
-			if (initialized)
-				return
-			initialized = true
-			maxRam = text().split("\n")[0].split(/\s+/)[1]
-		}
-	}
-	Timer {
-        interval: 3000; running: true; repeat: true
-        onTriggered: {
-			cpuUsageFile.reload()
-			tempFile.reload()
-			ramFile.reload()
-		}
-    }
-	function calcRamUsage(){
-		if(!ramFile.initialized)
-			return
-		let ramAvailable = ramFile.text().split("\n")[2].split(/\s+/)[1]
-		ram = Math.round((1 - ramAvailable/maxRam) * 100)
-	}
-	function calcCurrentCPUVals(){
-		let vals = cpuUsageFile.text().split("\n")[0].split(" ")
-		let currentTotalTime = 0
-		let currentIdleTime = parseInt(vals[5]) + parseInt(vals[6])
-		for(let i = 2; i < vals.length; i++){
-			if(!isNaN(vals[i])){
-				currentTotalTime += parseInt(vals[i])
-			}
-		}
-		
-		let delta_total = currentTotalTime - lastTotalTime
-		let delta_idle  = currentIdleTime - lastIdleTime
-		usage = Math.round((delta_total - delta_idle) / delta_total * 100)
-		lastIdleTime = currentIdleTime
-		lastTotalTime = currentTotalTime		
-	}
 	Grid{
 		id: grid
 		anchors.fill: parent
@@ -130,7 +57,7 @@ Item{
 					}
 					verticalAlignment: Text.AlignVCenter
 					horizontalAlignment: Text.AlignHCenter
-					font.family: "Symbols Nerd Font Mono"
+					font.family: Theme.fontIcon
 				}
 				Text{
 					text: modelData.slice(1)

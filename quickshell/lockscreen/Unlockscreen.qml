@@ -10,6 +10,7 @@ PanelWindow {
 	id: exitWindow
 	property int boxSize: screen.width/12
 	property int smallBoxSize: (screen.height - (7 * boxSize))/2
+	signal unlocked()
 	property var corners: [
 				{ top: true,  left: true  },
 				{ top: true,  left: false },
@@ -63,7 +64,7 @@ PanelWindow {
 		PauseAnimation{ duration: 1100 }
 		PropertyAction{ target: base; property: "hideLockReady"; value: true }
 		PauseAnimation{ duration: 200 }
-		ScriptAction{ script: root.shouldShowUnlockscreen = false}
+		ScriptAction{ script: unlocked() }
 	}
 	Rectangle{
 		id: base

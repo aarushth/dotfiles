@@ -5,12 +5,13 @@ import Quickshell.Wayland
 import Quickshell
 import Qt5Compat.GraphicalEffects
 import Quickshell.Io
-// import Quickshell.DBus
+
 import "../config"
 Item {
 	id: root
 	required property LockContext context
 	property string displayText: "SYSTEM LOCKED"
+	required property bool suspendable
 	Timer {
 		id: resetTimer
 		interval: 1000
@@ -27,14 +28,16 @@ Item {
 			}
 		}
 	}
-	property int timeout: 60	
+	property int timeout: 60
 	Timer {
         id: suspendTimer
         interval: timeout * 1000
-        running: true
+        running: suspendable
 		repeat: true
         onTriggered: {
-			suspend.startDetached();
+			if(suspendable){
+				suspend.startDetached()
+			}
 			countdown.restart()
 			context.restart()
         }
@@ -184,6 +187,7 @@ Item {
 			visible: context.responseRequired && !resetTimer.running
 			font.pixelSize: 50
 			horizontalAlignment: Text.AlignHCenter
+			verticalAlignment: Text.AlignVCenter
 			passwordCharacter: "*"
 			background: Rectangle{
 				color: "transparent"
@@ -287,6 +291,7 @@ Item {
 				left: parent.left
 				right: parent.right
 			}
+			visible: suspendable
 			horizontalAlignment: Text.AlignHCenter
 			font.family: Theme.fontFancy
 			text: "System Suspending in " + root.timer + " Seconds"
