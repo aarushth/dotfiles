@@ -28,8 +28,13 @@ Scope {
 	property bool volumeCalled: OsdData.volumeCalled
 	property bool brightnessCalled: OsdData.brightnessCalled
 	property bool initialized: false
-
-
+	Behavior on volume{
+		NumberAnimation{ duration: 200 }
+	}
+	
+	Behavior on brightness{
+		NumberAnimation{ duration: 200 }
+	}
 	onVolumeCalledChanged: if (initialized) showOsd(true)
 	onBrightnessCalledChanged: if (initialized) showOsd(false)
 	function showOsd(mode){
@@ -45,31 +50,16 @@ Scope {
 		}
 	}
 	property var boxes: []
-
-	function initVals() {
-		initialized = true
-		var temp = []
-        boxes = new Array(totalBoxes)
-		for (let x = 0; x < colNums; x++) {
-			for (let y = 0; y < rowNums; y++) {
-				let leftBias = (colNums - x) / colNums
-				let random = Math.random()
-
-				temp.push({
-					id: y * colNums + x,
-					score: leftBias * 0.80 + random * 0.20
-				})
-			}
-		}
-
-		temp.sort((a, b) => b.score - a.score)
-		for (let i = 0; i < temp.length; i++) {
-            boxes[temp[i].id] = i   
-        }
+	function biasFunc(index, score){
+		let col = index % colNums
+		let leftBias = (colNums - col) / colNums
+		return leftBias
 	}
 
 	Component.onCompleted: {
-		initVals()
+
+		boxes = Boxes.getBoxes(totalBoxes, biasFunc)
+		initialized = true
 	}
 
 	LazyLoader {

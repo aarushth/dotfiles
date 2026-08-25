@@ -10,8 +10,9 @@ import "../../config"
 
 ColumnLayout{
 	id: root
-	required property int boxSize
-	required property var boxes
+	property int boxSize: Boxes.boxSize
+	property var boxes: []
+	onColsChanged: boxes = Boxes.getBoxes( cols * 2 )
 	
 	property var currentDevice: null
 	readonly property var currentNetwork: {
@@ -52,7 +53,6 @@ ColumnLayout{
 	) + root.boxSize * 2
 	
 	property int cols: width/root.boxSize
-	property var slicedBoxes: boxes.slice(0, 2 * cols)
 
 	spacing: 0
 	Rectangle{
@@ -83,9 +83,9 @@ ColumnLayout{
 			font.family: Theme.fontTitle
 			font.pixelSize: 12
 			font.capitalization: Font.AllUppercase
+			font.styleName: "Black"
 			verticalAlignment: Text.AlignVCenter
 			text: bluetoothDevice?.connected ? bluetoothDevice.name : "Disconnected"
-			font.styleName: "Black"
 		}
 		Grid{
 			id: gridBluetooth
@@ -98,12 +98,12 @@ ColumnLayout{
 				NumberAnimation{ duration: 200 }
 			}
 			Repeater {
-				model: root.slicedBoxes.slice(0, gridBluetooth.rows * gridBluetooth.columns)
+				model: boxes.slice(0, gridBluetooth.rows * gridBluetooth.columns)
 				delegate: Rectangle {
 					required property int index
 					width: boxSize
 					height: boxSize
-					property int idx: slicedBoxes[index % slicedBoxes.length]
+					property int idx: boxes[index % boxes.length]
 					color: Theme.accentPurpleHover
 					opacity: (idx >= parent.revealInd) ? 0 : 1
 				}
@@ -189,12 +189,12 @@ ColumnLayout{
 				NumberAnimation { duration: 200 }
 			}
 			Repeater {
-				model: slicedBoxes
+				model: boxes
 				delegate: Rectangle {
 					required property int index
 					width: boxSize
 					height: boxSize
-					property int idx: slicedBoxes[index % slicedBoxes.length]
+					property int idx: boxes[index % boxes.length]
 					color: Theme.accentPurpleHover
 					opacity: (idx >= parent.revealInd) ? 0 : 1
 				}

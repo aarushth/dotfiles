@@ -11,31 +11,6 @@ import "../config"
 Scope {
     id: root
     property int boxSize: 12
-    property int maxColNums: 24
-    property int maxRowNums: 13
-	property int maxTotalBoxes: maxColNums * maxRowNums
-    property var boxes: []
-    
-    function initVals() {
-        var temp = []
-        boxes = new Array(maxTotalBoxes)
-        
-        for (let x = 0; x < maxColNums; x++) {
-            for (let y = 0; y < maxRowNums; y++) {
-                temp.push({
-                    id: y * maxColNums + x,
-                    score: Math.random()
-                })
-            }
-        }
-        temp.sort((a, b) => b.score - a.score)
-        for (let i = 0; i < temp.length; i++) {
-            boxes[temp[i].id] = i    
-        }
-        
-    }
-
-    Component.onCompleted: initVals()
 
     IpcHandler {
         target: "notifications"
@@ -93,7 +68,8 @@ Scope {
 			property int totalBoxes: rowNums * colNums
 			property int cardHeight: rowNums * root.boxSize
 			property int cardWidth: colNums * root.boxSize
-			property var boxes: root.boxes.slice(0, totalBoxes)
+			property var boxes: []
+			onRowNumsChanged: boxes = Boxes.getBoxes(totalBoxes)
 			property color cardColor: notificationData.urgency === NotificationUrgency.Critical ? Theme.urgencyCritical :
 								notificationData.urgency === NotificationUrgency.Low ? Theme.urgencyLow : Theme.urgencyNormal
 			
@@ -166,7 +142,7 @@ Scope {
 								NumberAnimation{
 									target: grid
 									property: "revealInd"
-									from: 0; to: root.maxTotalBoxes
+									from: 0; to: boxes.length
 									duration: 500
 									running: false
 								}
@@ -175,7 +151,7 @@ Scope {
 								NumberAnimation{
 									target: grid
 									property: "revealInd"
-									from: root.maxTotalBoxes; to: 0
+									from: boxes.length; to: 0
 									duration: 500
 									running: false
 								}

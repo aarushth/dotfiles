@@ -3,7 +3,7 @@
 -------------------
 
 hl.on("hyprland.start", function () 
-
+	hl.exec_cmd("awww-daemon --no-cache")
 	hl.exec_cmd("qs")
 	hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
 
@@ -12,13 +12,13 @@ hl.on("hyprland.start", function ()
 	hl.exec_cmd("systemctl --user start hyprland-session.target")
 
 	-- --   wallpaper daemon
-	hl.exec_cmd("awww-daemon &")
+	
 
 	-- clipoard history
 	hl.exec_cmd("clipse -listen")
 
 	hl.exec_cmd("hypridle")
-	hl.exec_cmd("hyrpexpo")
+	hl.exec_cmd("hyprpm reload")
 end)
 
 hl.on("hyprland.shutdown", function()

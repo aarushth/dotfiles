@@ -53,10 +53,15 @@ PanelWindow {
 		left: true
 		right: true
 	}
+	
+	
+
 	color: "transparent"
 	SequentialAnimation{
 		running: true
-		PauseAnimation{ duration: 800 }
+		PauseAnimation{ duration: 200 }
+		ScriptAction{ script: { Lockevents.unlockScreenUp() } }
+		PauseAnimation{ duration: 600 }
 		PropertyAction{ target: centerText; property: "text"; value: "SYSTEM UNLOCK" }
 		PropertyAction{ target: base; property: "unlocked"; value: true}
 		PauseAnimation{ duration: 200 }
@@ -74,6 +79,7 @@ PanelWindow {
 		property bool hideLockReady: false
 		property bool unlocking: false
 		property bool unlocked: false
+		// Component.onCompleted: 
 		GridLayout{
 			anchors{
 				horizontalCenter: parent.horizontalCenter

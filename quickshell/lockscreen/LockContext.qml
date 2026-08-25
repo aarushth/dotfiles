@@ -1,11 +1,11 @@
 import QtQuick
 import Quickshell
 import Quickshell.Services.Pam
+import "../config"
 
 Scope {
     id: root
 
-    signal unlocked()
 	signal failure()
     property alias message: pam.message
     property alias messageIsError: pam.messageIsError
@@ -16,18 +16,15 @@ Scope {
         onCompleted: (result) => {
             switch (result) {
 				case PamResult.Success:
-					root.unlocked()
+					Lockevents.unlocked()
 					break
 				case PamResult.Failed:
-					console.warn("Failure")
 					root.failure()
 					break
 				case PamResult.Error:
-					console.warn("error")
 					pam.restart()
 					break
 				case PamResult.MaxTries:
-					console.warn("max tries")
 					pam.restart()
 					break
             }

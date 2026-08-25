@@ -6,7 +6,7 @@ import "../../config"
 	
 Rectangle{
 	id: root
-	required property int boxSize
+	property int boxSize: Boxes.boxSize
 	Layout.preferredHeight: parent.height
 	SystemClock {
 		id: clock

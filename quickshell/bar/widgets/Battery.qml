@@ -6,10 +6,11 @@ import "../../config"
 
 Rectangle{
 	id: root
-	required property int boxSize
-	required property int cols
-	required property int rows
-	required property var boxes
+	property int boxSize: Boxes.boxSize
+	property int cols: 4
+	property int rows: 4
+	property var boxes: []
+	Component.onCompleted: boxes = Boxes.getBoxes(rows * cols)
 	property var battery: UPower.displayDevice
 	property string batteryPercentage: String(Math.round(battery.percentage * 100)).padStart(3, 0) + "%"
 	property string batteryIcon: battery.state == UPowerDeviceState.Charging ? Icons.batteryChargingIcons[Math.round(battery.percentage * 10)] : Icons.batteryIcons[Math.round(battery.percentage * 10)]

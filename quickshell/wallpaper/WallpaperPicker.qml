@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Controls
 import Quickshell.Wayland
 import Qt.labs.folderlistmodel
 import Quickshell
@@ -18,7 +17,7 @@ Item {
 	property real scrollThreshold: 150
 	property int scrollAccum: 0
 	property bool closing: false
-
+	
 	IpcHandler {
 		target: "wallpaper"
 		function toggle(){
@@ -28,6 +27,10 @@ Item {
 				closeTimer.start()
 			}
 		}
+		function close(){
+			closing = true
+			closeTimer.start()
+		}
 	}
 	Timer {
 		id: closeTimer
@@ -36,32 +39,42 @@ Item {
 		onTriggered: {root.shouldShowPicker = false}
 	}
 	property string url: ""
-    function applyWallpaper(fileUrl) {
-		switchAnim.running = true
-		root.url = fileUrl.toString().substring(7)
-    }
-    readonly property string srcDir: Quickshell.env("HOME") + "/Pictures/Wallpapers"
-	Process {
-		id: wallpaperLoader
-		running: true
-		command: ["cat", Quickshell.env("HOME") + "/.config/quickshell/config/current_wallpaper"]
-
-		stdout: SplitParser {
-			onRead: data => {
-				let path = data.trim()
-				if (path !== "") {
-					root.url = path
-				}
+	property int index: 0
+	FolderListModel {
+		id: srcModel
+		folder: "file://" + root.srcDir
+		nameFilters: ["*.jpg", "*.jpeg", "*.png", "*.webp", "*.gif"]
+		showDirs: false
+		onStatusChanged: {
+			if(status == FolderListModel.Ready){
+				root.index = Math.floor(Math.random() * srcModel.count)
+				root.url = srcModel.get(root.index, "filePath")
+				root.changeWallpaper()
 			}
 		}
 	}
+    function applyWallpaper(filePath) {
+		Quickshell.execDetached(["hyprctl", "eval", "switchToWallpaperWs()"])
+		root.url = filePath
+		switchAnim.running = true
+    }
+	function changeWallpaper(){
+		Quickshell.execDetached(["awww", "img", url, "--transition-type", "none"])
+	}
+    readonly property string srcDir: Quickshell.env("HOME") + "/Pictures/Wallpapers"
+
 	property bool animating: false
+	property bool gridVisible: false
 	SequentialAnimation{
 		id: switchAnim
 		running: false
+		PauseAnimation{
+			duration: 200
+		}
 		ScriptAction{
 			script: {
-				root.closing = true
+				closing = true
+				gridVisible = true
 				animating = true
 			}
 		}
@@ -69,19 +82,10 @@ Item {
 			duration: 1000
 		}
 		ScriptAction{ 
-			script: {
-				Quickshell.execDetached(["awww", "img", url, "--transition-type", "none"])
-				Quickshell.execDetached([
-					"sh",
-					"-c",
-					`printf '%s\n' "$1" > ~/.config/quickshell/config/current_wallpaper`,
-					"--",
-					url
-				])
-			}
+			script: root.changeWallpaper()
 		}
 		PauseAnimation{
-			duration: 400
+			duration: 300
 		}
 		ScriptAction{
 			script: animating = false
@@ -90,58 +94,47 @@ Item {
 			duration: 1000
 		}
 		ScriptAction{
-			script: root.shouldShowPicker = false
+			script: {
+				gridVisible = false
+				shouldShowPicker = false
+			}
 		}
 	}
     
 
-	FolderListModel {
-		id: srcModel
-		folder: "file://" + root.srcDir
-		nameFilters: ["*.jpg", "*.jpeg", "*.png", "*.webp", "*.gif"]
-		showDirs: false
-	}
+	
 	Loader {
 		id: loader
-		active: root.shouldShowPicker
+		active: switchAnim.running
 		Item{
 			FloatingWindow{
 				visible: root.shouldShowPicker
 				id: window
 				title: "quickshell-wallpaper-picker"
 				color: "transparent"
+				onVisibleChanged: view.currentIndex = root.index
 				ListView {
 					id: view
 					model: srcModel
 					width: Screen.width * 1.5
 					height: root.itemHeight
 					anchors.centerIn: parent
-
 					orientation: ListView.Horizontal
 
 					highlightRangeMode: ListView.StrictlyEnforceRange
 
-					preferredHighlightBegin: (width / 2) - ((root.itemWidth * 1.5) / 2)
-					preferredHighlightEnd: (width / 2) + ((root.itemWidth * 1.5 ) / 2)
+					readonly property real currentDelegateWidth: (root.itemWidth * 1.5) + extraSkew
+					readonly property real skewOffset: (root.skewFactor * root.itemHeight) / 2
+					preferredHighlightBegin: ((width - currentDelegateWidth) / 2) - skewOffset
+					preferredHighlightEnd: preferredHighlightBegin + currentDelegateWidth
 					property int extraSkew: root.itemWidth * skewFactor * 2 + root.spacing*2
 					highlightMoveDuration: 500
 					focus: true
 					spacing: -extraSkew + (root.spacing*2)
-
-					Component.onCompleted: {
-						let savedPath = root.url
-						for (let i = 0; i < srcModel.count; ++i) {
-							let filePath = srcModel.get(i, "filePath") // or fileUrl.toLocalFile()
-							if (filePath === savedPath) {
-								view.currentIndex = i
-								break
-							}
-						}
-					}
 					Keys.onPressed: (event)=> { 
 						if (event.key == Qt.Key_Return) {
-							let url = srcModel.get(view.currentIndex, "fileUrl")
-							root.applyWallpaper(url)
+							root.index = view.currentIndex
+							root.applyWallpaper(srcModel.get(view.currentIndex, "filePath"))
 						}
 					}
 					WheelHandler{
@@ -177,7 +170,7 @@ Item {
 						width: targetWidth + view.extraSkew
 						height: targetHeight
 						clip: true
-
+						anchors.leftMargin: 20
 						Behavior on targetWidth { enabled: true; NumberAnimation { duration: 500; easing.type: Easing.InOutQuad } }
 						Item{
 
@@ -198,7 +191,6 @@ Item {
 										duration: 200
 									}
 								}
-								// color: "transparent"
 								visible: true
 								
 								transform: Matrix4x4 {
@@ -217,7 +209,8 @@ Item {
 										if(view.currentIndex != index){
 											view.currentIndex = index
 										}else{
-											root.applyWallpaper(fileUrl)
+											root.index = view.currentIndex
+											root.applyWallpaper(filePath)
 										}
 									}
 								}
@@ -269,37 +262,23 @@ Item {
 					id: gridWindow
 					property var modelData
 					screen: modelData
-					visible: root.shouldShowPicker
+					visible: root.gridVisible
 					property int boxSize: 20
-					property int colNums: modelData.width/boxSize
-					property int rowNums: modelData.height/boxSize
+					property int colNums: screen.width/boxSize
+					property int rowNums: screen.height/boxSize
 					property int totalBoxes: colNums * rowNums
 					property int revealInd: root.animating ? totalBoxes : 0
-					Behavior on revealInd{
-						NumberAnimation{ duration: 1000 }
-					}
+					Behavior on revealInd{ NumberAnimation{ duration: 800 } }
 					property var gridRef: null
+
 					
-					property var boxes: {
-						var temp = []
-						let box = new Array(totalBoxes)
-						
-						for (let x = 0; x < colNums; x++) {
-							for (let y = 0; y < rowNums; y++) {
-								let bias = Math.abs(y - (rowNums / 2)) / rowNums
-								temp.push({
-									id: y * colNums + x,
-									score: Math.random() * 0.1 + bias * 0.9
-								})
-							}
-						}
-						temp.sort((a, b) => b.score - a.score)
-						for (let i = 0; i < temp.length; i++) {
-							box[temp[i].id] = i	
-						}
-						return box
+					property var boxes: []
+					onTotalBoxesChanged: boxes = Boxes.getBoxes(totalBoxes, biasFunc)
+					function biasFunc(index){
+						let row = index / colNums
+						let bias = Math.max(rowNums - row, row) / rowNums
+						return bias 
 					}
-					exclusionMode: ExclusionMode.Ignore
 					WlrLayershell.layer: WlrLayer.Overlay
 					WlrLayershell.keyboardFocus: WlrKeyboardFocus.None	
 					WlrLayershell.namespace: "quickshell-lockscreen"

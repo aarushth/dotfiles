@@ -3,10 +3,13 @@ import QtQuick
 
 QtObject {
 	function get(id) {
+		if(id == "" ){
+			return iconsMap.get("GlslViewer")
+		}
         return iconsMap.get(id)
     }
     readonly property var iconsMap: new Map([
-		["org.mozilla.firefox", "󰈹"], 
+		["firefox", "󰈹"], 
 		["kitty", ""],
         // outlook
         ["FFPWA-01KVW3DHW51HBQCX9WTGWBFPX5", "󰴢"], 
@@ -14,6 +17,8 @@ QtObject {
 		["FFPWA-01KWJ7TA62N89YFTVMET811XTV", "󰴢"],
 		//gmail
 		["FFPWA-01KWJ5SF3PJ0MSX3FGMTF1NQ2R", "󰊫"],
+		//ZOHO mail	
+		["FFPWA-01M0HDS63PJCZX3RZKN552N8TR", ""],
 		// whatsapp
 		["FFPWA-01KVW3KKWDT26QR2XQX414AM5Z", ""], 
 		//messages
@@ -37,7 +42,11 @@ QtObject {
 		["bluetui", "󰂯"],
 		["yazi", ""],
 		["mpv", ""],
-		["zoom", ""]
+		["zoom", ""],
+		["theseus", ""],
+		["bitwarden", "󰞀"],
+		["org.fedoraproject.MediaWriter", "󱊟"],
+		["GlslViewer", "󰋁"]
 		])
 	readonly property var brightnessIcons: [
 		"󰹐", 
@@ -126,4 +135,6 @@ QtObject {
 			return tempIcons[3];
 		return tempIcons[4]
 	}
+	readonly property string sleepIcon: ""
+	readonly property string wakeIcon: "󰛐"
 }

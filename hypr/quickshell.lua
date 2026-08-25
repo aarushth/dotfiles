@@ -60,14 +60,14 @@ hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("loginctl lock-session"))
 
 
 -- toggle wallpaper picker
-hl.bind(mainMod .. " + W", function()
-	hl.dispatch(hl.dsp.exec_cmd("qs ipc call wallpaper toggle"))
+hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("qs ipc call wallpaper toggle"))
+hl.bind(mainMod .. " + SHIFT + W", hl.dsp.focus({workspace = "name:wp", on_current_monitor = true}))
+function switchToWallpaperWs()
 	for _, monitor in ipairs(hl.get_monitors()) do
 		hl.dispatch(hl.dsp.focus({ monitor = monitor.name}))
 		hl.dispatch(hl.dsp.focus({ workspace = "name:wp" .. _, on_current_monitor = true}))
 	end
-end)
-
+end
 -- override window.close for wallpaper-picker so close animation plays cleanly
 hl.bind("ALT + f4", function ()
 	if not (hl.get_active_window() == null) and hl.get_active_window().title == "quickshell-wallpaper-picker" then

@@ -56,17 +56,7 @@ hl.window_rule({
     float = true,
 })
 
---clipse floating
-hl.window_rule({
-    match = {
-        class = "clipse",
-		
-    },
-    float = true,
-    size = "622 652",
-	border_size = 2,
-    
-})
+
 
 --btop
 hl.window_rule({
@@ -75,7 +65,27 @@ hl.window_rule({
 	},
     workspace = "name:btop",
 })
+hl.window_rule({
+	match = {
+		class = "spotify",
+	},
+    workspace = "empty",
+})
+for _, game in ipairs({"theseus", "alephone"}) do
+	hl.window_rule({
+		match = {
+			class = game,
+		},
+		tag = "+games"
+	})
+end
+hl.window_rule({
+	match = { tag= "games" },
+	fullscreen = true,
+	workspace = "empty"
+})
 
+-- emails
 hl.window_rule({
 	match = {
 		title = "Outlook uw",
@@ -100,31 +110,22 @@ hl.window_rule({
 	},
     workspace = "name:gmail",
 })
-
-
-
--- satty floating
 hl.window_rule({
-    match = {
-        title = "satty",
-		
-    },
-    float = true,
-    size = "600 400"
-    
+	match = {
+		title = "Zoho Mail",
+	},
+    workspace = "name:zoho",
 })
 
--- yazi floating as filepicker
+for _, className in ipairs({"clipse", "termfilechooser", "OneDriveGUI", "com.gabm.satty"}) do
+	hl.window_rule({
+		match = { class = className },
+		tag = "+float"
+	})
+end
+
 hl.window_rule({
-    match = {
-    	title = "termfilechooser",
-    },
-    float = true,
-    size = "622 652",
-	border_size = 2,
+  	match = { tag = "float" },
+  	float = true,
+	size = "625 650",
 })
-
-
-
--- notification blur
-

@@ -7,10 +7,11 @@ import "../../config"
 
 Item{
 	id: root 
-	required property int boxSize
-	required property int rows
-	required property int cols
-	required property var boxes
+	property int boxSize: Boxes.boxSize
+	property int rows: 4
+	property int cols: 5
+	property var boxes: []
+	Component.onCompleted: boxes = Boxes.getBoxes(rows * cols)
 	
 	property string usageString: Icons.cpuIcon + String(SysInfo.usage).padStart(3, 0) + "%" 
 	property string tempString: Icons.getTempIcon(SysInfo.temp) + String(SysInfo.temp).padStart(3, 0) + "󰔄" 

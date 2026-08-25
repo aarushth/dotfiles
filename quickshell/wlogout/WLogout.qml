@@ -14,6 +14,7 @@ Scope{
 	property int cols: 8
 	property int totalBoxes: rows * cols
 	property var boxes: []
+	Component.onCompleted: boxes = Boxes.getBoxes(totalBoxes)
 	property list<LogoutButton> buttons: [ 
 			LogoutButton {
 				command: "loginctl lock-session"
@@ -21,17 +22,17 @@ Scope{
 				icon: ""
 			},
 			LogoutButton {
-				command: "loginctl terminate-user $USER"
+				command: "hyprshutdown"
 				text: "Logout"
 				icon: "󰍃"
 			},
 			LogoutButton {
-				command: "systemctl poweroff"
+				command: "hyprshutdown -t 'Shutting down...' --post-cmd 'shutdown -P 0'"
 				text: "Shutdown"
 				icon: ""
 			},
 			LogoutButton {
-				command: "systemctl reboot"
+				command: "hyprshutdown -t 'Restarting...' --post-cmd 'reboot'"
 				text: "Reboot"
 				icon: "󰑐"
 			},
@@ -43,24 +44,6 @@ Scope{
 		function toggle() {
 			shouldShowWLogout = !shouldShowWLogout
 		}
-	}
-	Component.onCompleted: initVals()
-	function initVals(){
-        var temp = []
-        boxes = new Array(totalBoxes)
-        
-        for (let x = 0; x < cols; x++) {
-            for (let y = 0; y < rows; y++) {
-                temp.push({
-                    id: y * cols + x,
-                    score: Math.random()
-                })
-            }
-        }
-        temp.sort((a, b) => b.score - a.score)
-        for (let i = 0; i < temp.length; i++) {
-            boxes[temp[i].id] = i    
-        }
 	}
 	LazyLoader {
 		active: shouldShowWLogout
@@ -295,7 +278,7 @@ Scope{
 					
 				}
 			}
-			}
-			
 		}
+		
 	}
+}

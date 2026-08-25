@@ -14,20 +14,27 @@ path="$4"
 out="$5"
 
 cmd="yazi"
-termcmd="${TERMCMD:- kitty --title termfilechooser -o background_opacity=1.0}"
+termcmd="${TERMCMD:- kitty --class termfilechooser -o background_opacity=1.0}"
 
+
+# Only --chooser-file is used: yazi writes it when `open` fires (Enter), and
+# never on quit. --cwd-file is deliberately avoided, since yazi writes that on
+# *every* normal exit, which would turn `q` into a selection.
+chosen="$out".1
+rm -f "$chosen"
 
 if [ "$save" = "1" ]; then
     # save a file
-    set -- --chooser-file="$out" "$path"
+    set -- --chooser-file="$chosen" "$path"
 elif [ "$directory" = "1" ]; then
-    set -- --chooser-file="$out".1 --cwd-file="$out" "$path"
+    # pick a directory: Enter chooses the hovered entry, l/-> descends into it
+    set -- --chooser-file="$chosen" "$path"
 elif [ "$multiple" = "1" ]; then
     # upload multiple files
-    set -- --chooser-file="$out" "$path"
+    set -- --chooser-file="$chosen" "$path"
 else
     # upload only 1 file
-    set -- --chooser-file="$out" "$path"
+    set -- --chooser-file="$chosen" "$path"
 fi
 
 command="$termcmd $cmd"
@@ -39,13 +46,28 @@ for arg in "$@"; do
 done
 
 
-sh -c "$command"
+# A killed terminal (Alt+F4) exits non-zero; that is a cancel, not an error.
+sh -c "$command" || true
 
-
-
-if [ "$directory" = "1" ]; then
-    if [ -s "$out".1 ]; then
-        cat "$out".1 > "$out"
+# No Enter pressed -> nothing was written -> leave "$out" empty so the portal
+# reports a cancellation.
+if [ -s "$chosen" ]; then
+    if [ "$directory" = "1" ]; then
+        # Enter on a file in directory mode: hand back its parent directory.
+        # yazi writes the last entry without a trailing newline, hence the
+        # `|| [ -n "$entry" ]` guard, and the separator is emitted up front to
+        # keep the same shape on the way out.
+        sep=""
+        while IFS= read -r entry || [ -n "$entry" ]; do
+            [ -n "$entry" ] || continue
+            [ -d "$entry" ] || entry=$(dirname -- "$entry")
+            printf '%s%s' "$sep" "$entry"
+            sep="
+"
+        done < "$chosen" > "$out"
+    else
+        cat "$chosen" > "$out"
     fi
-    rm -f "$out".1
 fi
+
+rm -f "$chosen"

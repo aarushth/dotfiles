@@ -44,6 +44,7 @@ PanelWindow {
 			color: crossColor
 		}
 	}
+	focusable: true
 	exclusionMode: ExclusionMode.Ignore
 	WlrLayershell.layer: WlrLayer.Overlay
 	WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive	
@@ -95,11 +96,31 @@ PanelWindow {
 		PauseAnimation{ duration: 1300 }
 		PropertyAction{ target: base; property: "locked"; value: true}
 		PauseAnimation{ duration: 200 }
-		ScriptAction{ script: introWindow.locked() }
+		ScriptAction{ script: Lockevents.introCompleted() }
 	}
 	Rectangle{
 		id: base
 		anchors.fill: parent
+		Connections {
+			target: Lockevents
+			function onLockCancelled() {
+				base.opacity = 0
+			}
+		}
+		opacity: 1
+		Behavior on opacity {
+			SequentialAnimation{
+				NumberAnimation{ duration: 200 }
+				ScriptAction{ script: Lockevents.cancelCompleted() }
+			}
+		}
+		focus: true
+		Keys.onPressed: (event) => {
+			if(event.key == Qt.Key_Escape){
+				Lockevents.lockCancelled()
+			}
+			event.accepted = true
+		}
 		property real op: 0
 		color: Qt.rgba(0,0,0,op)
 		property bool revealEars: false

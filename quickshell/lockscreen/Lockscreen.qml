@@ -11,32 +11,127 @@ ShellRoot {
 	
 	LockContext {
 		id: lockContext
+	}
 
-		Timer{
-			id: unlockTimer
-			interval: 200
-			running: false
-			onTriggered: lock.locked = false
+	Timer {
+		id: resetTimer
+		interval: 1000
+		repeat: false
+		onTriggered: {
+			invert = false
+			if (lockContext.message === "Place your right index finger on the fingerprint reader"){
+				displayText = "SCAN 󰈷 FINGERPRINT"
+			}else if(lockContext.message === "Password: "){
+				displayText = ""
+			}else{
+				lockContext.restart()
+				invert = true
+				displayText = "SYSTEM LOCKED"
+			}
 		}
-		onUnlocked: {
-			root.shouldShowUnlockscreen = true
-			unlockTimer.restart()
+	}
+	property bool invert: false
+	property string displayText: "SYSTEM LOCKED"
+
+	Connections {
+		target: lockContext
+
+		function onMessageChanged() {
+			switch (lockContext.message) {
+				case "Failed to match fingerprint":
+					invert = true
+					resetTimer.restart()
+					displayText = "ACCESS DENIED"
+					break
+
+				case "Place your right index finger on the fingerprint reader":
+					if (!resetTimer.running){
+						invert = false
+						displayText = "SCAN 󰈷 FINGERPRINT"
+					}
+					break
+				case "Password: ":
+					if (!resetTimer.running){
+						invert = false
+						displayText = ""
+					}
+					break
+
+				default:
+					if (resetTimer.running && !lockContext.responseRequired){
+						displayText = "ACCESS DENIED"
+					}
+			}
+		}
+		function onFailure(){
+			displayText = "ACCESS DENIED"
+			resetTimer.restart()
 		}
 	}
 	property bool shouldShowLockscreen: false
 	property bool shouldShowUnlockscreen: false
 	property int screens: Quickshell.screens.length
-	
 	IpcHandler{
 		target: "lockscreen"
 		function lock(){
 			root.shouldShowLockscreen = true
 		}
 		function postsleep(){
-			lock.locked = true
-			lockContext.restart()
+			Lockevents.onIntroCompleted()
 		}
 	}
+	property int timer: 0
+	property int timeout: 60
+	NumberAnimation{
+		id: countdown
+		running: true
+		from: timeout
+		to: 0
+		duration: timeout*1000
+		target: root
+		property: "timer"
+	}
+	Timer {
+        id: suspendTimer
+        interval: timeout * 1000
+        running: lock.locked
+		repeat: true
+        onTriggered: {
+			suspend.startDetached()
+			countdown.restart()
+			lockContext.restart()
+        }
+    }
+
+	Connections{
+		target: Lockevents
+		function onCancelCompleted() {
+			root.shouldShowLockscreen = false
+		}
+		function onIntroCompleted() {
+			lock.locked = true
+			lockContext.restart()
+			Lockevents.resetTimer()
+			Qt.callLater(() => {root.shouldShowLockscreen = false})
+		}
+
+		function onResetTimer() {
+			suspendTimer.restart()	
+			countdown.restart()
+		}
+		function onUnlocked(){
+			root.shouldShowUnlockscreen = true
+		}
+		function onUnlockScreenUp(){
+			
+			lock.locked = false
+		}
+	}
+	readonly property var suspend: Process {
+		command: ["sh", "-c", "systemctl suspend"]
+	}
+
+	
 	Variants{
 		model: Quickshell.screens
 		delegate: Item {
@@ -47,18 +142,6 @@ ShellRoot {
 				active: shouldShowLockscreen
 				IntroLockscreen{
 					screen: modelData
-					Timer{
-						id: timer
-						interval: 100
-						running: false
-						onTriggered: shouldShowLockscreen = false
-					}
-					onLocked: {
-						lock.locked = true
-						lockContext.restart()
-						timer.restart()
-					}
-					
 				}
 			}
 			LazyLoader {
@@ -83,7 +166,10 @@ ShellRoot {
 					id: lockSurface
 					anchors.fill: parent
 					context: lockContext
-					suspendable: screens == 1
+					invert: root.invert
+					displayText: root.displayText
+					timer: root.timer
+					resetTimerRunning: resetTimer.running
 				}
 			}
 		}

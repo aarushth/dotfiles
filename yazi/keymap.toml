@@ -1,4 +1,7 @@
 [mgr]
 prepend_keymap = [
   { on = ["R"], run = "plugin recycle-bin", desc = "Open Recycle Bin menu" },
+  {on  = ["M"], run = "plugin mount"},
+  {on   = ["P"], run  = "plugin chmod", desc = "Chmod on selected files"}
 ]
+

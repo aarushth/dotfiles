@@ -10,91 +10,12 @@ import "../config"
 Item {
 	id: root
 	required property LockContext context
-	property string displayText: "SYSTEM LOCKED"
-	required property bool suspendable
-	Timer {
-		id: resetTimer
-		interval: 1000
-		repeat: false
-		onTriggered: {
-			opacityMask.invert = false
-			if (context.message === "Place your right index finger on the fingerprint reader"){
-				displayText = "SCAN 󰈷 FINGERPRINT"
-			}else if(context.message === "Password: "){
-				displayText = ""
-			}else{
-				context.restart()
-				displayText = "SYSTEM LOCKED"
-			}
-		}
-	}
-	property int timeout: 60
-	Timer {
-        id: suspendTimer
-        interval: timeout * 1000
-        running: suspendable
-		repeat: true
-        onTriggered: {
-			if(suspendable){
-				suspend.startDetached()
-			}
-			countdown.restart()
-			context.restart()
-        }
-    }
-	readonly property var suspend: Process {
-		command: ["sh", "-c", "systemctl suspend"]
-	}
-	property int timer: 0
+	required property bool invert
+	required property string displayText
+	required property int timer
+	required property bool resetTimerRunning
+	onInvertChanged: console.warn(invert, lockContext.message, displayText)
 	
-	NumberAnimation{
-		id: countdown
-		running: true
-		from: timeout
-		to: 0
-		duration: timeout*1000
-		target: root
-		property: "timer"
-	}
-	Connections {
-		target: context
-
-		function onMessageChanged() {
-			switch (context.message) {
-				case "Failed to match fingerprint":
-					opacityMask.invert = true
-					resetTimer.restart()
-					displayText = "ACCESS DENIED"
-					break
-				case "":
-					opacityMask.invert = true
-					resetTimer.restart()
-					displayText = "VERIFYING"
-					break
-
-				case "Place your right index finger on the fingerprint reader":
-					if (!resetTimer.running){
-						opacityMask.invert = false
-						displayText = "SCAN 󰈷 FINGERPRINT"
-					}
-					break
-				case "Password: ":
-					opacityMask.invert = false
-					displayText = ""
-					break
-
-				default:
-					console.warn(context.message)
-					if (resetTimer.running && !context.responseRequired){
-						displayText = "SYSTEM LOCKED"
-					}
-			}
-		}
-		function onFailure(){
-			root.displayText = "ACCESS DENIED"
-			resetTimer.restart()
-		}
-	}
 	property int boxSize: width > 0 ? width / 12 : 0
 	property int smallBoxSize: width > 0 && height > 0 ? (height - 7 * boxSize) / 2 : 0
 	component CrossSquare: Rectangle{
@@ -170,7 +91,7 @@ Item {
 			text: "ENTER PASSWORD"
 			font.family: Theme.fontFancy
 			font.pixelSize: 20
-			visible: context.responseRequired && !resetTimer.running && displayText !== "VERIFYING"
+			visible: context.responseRequired && !resetTimerRunning && displayText !== "VERIFYING"
 		}
 		TextField {
 			id: password
@@ -184,7 +105,7 @@ Item {
 			
 			echoMode: TextInput.Password
 
-			visible: context.responseRequired && !resetTimer.running
+			visible: context.responseRequired && !resetTimerRunning
 			font.pixelSize: 50
 			horizontalAlignment: Text.AlignHCenter
 			verticalAlignment: Text.AlignVCenter
@@ -192,16 +113,13 @@ Item {
 			background: Rectangle{
 				color: "transparent"
 			}
-			onTextEdited: {
-				countdown.restart()
-				suspendTimer.restart()
-			}
+			onTextEdited: Lockevents.resetTimer()
 			onVisibleChanged: if(visible) { forceActiveFocus() }
 			onAccepted: {
 				context.submit(text)
 				clear()
-				root.displayText = "VERIFYING"
-				opacityMask.invert = true
+				displayText = "VERIFYING"
+				invert = true
 			}
 		}
 		Text{
@@ -219,30 +137,12 @@ Item {
 			font.pixelSize: 45
 			minimumPixelSize: 20
 		}
-		SequentialAnimation {
-			id: flashAnim
-			loops: 1
-			running: true
-			PropertyAction {
-				target: opacityMask
-				property: "invert"
-				value: true
-			}
-			PauseAnimation { duration: 500 }
-
-			PropertyAction {
-				target: opacityMask
-				property: "invert"
-				value: false
-			}
-			PauseAnimation { duration: 500 }
-		}
 		OpacityMask{
 			id: opacityMask
 			anchors.fill: mask
 			maskSource: centerText
 			source: mask
-			invert: false
+			invert: root.invert
 		}					
 		Repeater{
 			model: [true, false]
@@ -291,10 +191,14 @@ Item {
 				left: parent.left
 				right: parent.right
 			}
-			visible: suspendable
 			horizontalAlignment: Text.AlignHCenter
 			font.family: Theme.fontFancy
 			text: "System Suspending in " + root.timer + " Seconds"
 		}
+	}
+	MouseArea{
+		anchors.fill: parent
+		hoverEnabled: true
+		onPositionChanged: Lockevents.resetTimer()
 	}
 }

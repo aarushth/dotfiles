@@ -6,11 +6,12 @@ import "../../config"
 ColumnLayout{	
 	id: root	
 	spacing: 0
-	required property int boxSize
-	required property var boxes
+	property int boxSize: Boxes.boxSize
+	property var boxes: []
+	Component.onCompleted: boxes = Boxes.getBoxes( rows * cols / 2)
 	Layout.preferredHeight: parent.height
-	required property int cols
-	required property int rows
+	property int cols: 5
+	property int rows: 4
 	width: boxSize * cols
 	property string volume: String(Math.round(OsdData.volume * 100))
 	property string brightness: String(Math.round(OsdData.brightness * 100))

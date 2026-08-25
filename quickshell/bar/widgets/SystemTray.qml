@@ -4,17 +4,24 @@ import Quickshell.Widgets
 import QtQuick.Layouts
 import QtQuick.Controls
 import Quickshell.Services.SystemTray
+import Quickshell.Hyprland
 import "../../config"
 
 Rectangle{
 	id: root
 	required property var window
-	required property var boxSize
+	property var boxSize: Boxes.boxSize
 	implicitWidth: grid.implicitWidth
     implicitHeight: parent.height
 	color: Theme.accentPurple
-	required property var boxes
-	Component.onCompleted: initVals()
+	property var boxes: []
+	Component.onCompleted: boxes = Boxes.getBoxes(4)
+	HyprlandFocusGrab {
+		id: grab
+		windows: [popup, root.window]
+		active: popup.visible
+		onCleared: popup.visible = false
+	}
 	GridLayout{
 		id: grid
 		anchors.fill:parent
@@ -33,9 +40,9 @@ Rectangle{
 
 			anchor {
 				window: root.window
-				edges: Edges.Top 
+				item: root
+				edges: Edges.Top
 				gravity: Edges.Top
-				rect.x: parentWindow.width
 			}
 			ColumnLayout {
 				id: menuColumn
@@ -91,6 +98,7 @@ Rectangle{
 			id: iconRepeater
 			model: SystemTray.items
 			delegate: Item{
+				id: trayItem
 				width: boxSize * 2
 				height: boxSize * 2
 				Grid{
@@ -130,6 +138,8 @@ Rectangle{
 						if (mouse.button === Qt.RightButton) {
 							if(menuOpener.menu != modelData.menu){
 								menuOpener.menu = modelData.menu
+								popup.visible = true
+							}else if(root.anchorItem !== trayItem){
 								popup.visible = true
 							}else{
 								popup.visible = !popup.visible

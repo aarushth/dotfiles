@@ -33,8 +33,8 @@ hl.gesture({
     action = "workspace",
 })
 
-mainMod = "SUPER" -- Sets "Windows" key as main modifier
 
+mainMod = "SUPER"
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + F", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + J", hl.dsp.window.float({ action = "toggle" }))
@@ -48,12 +48,17 @@ hl.bind("CTRL + ALT + Backspace", function ()
 	hl.dispatch(hl.dsp.exec_cmd("kitty --class btop -e btop"))
 end)
 hl.bind(mainMod .. " + period", hl.dsp.exec_cmd("rofimoji --action clipboard"))
+hl.bind("XF86Assistant", hl.dsp.exec_cmd(menu))
 hl.bind(mainMod .. " + SUPER_L", hl.dsp.exec_cmd(menu))
 hl.bind(mainMod .. " + P", hl.dsp.layout("togglesplit"))
-hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd("grim -g \"$(slurp)\" -t ppm - | satty -f - --copy-command wl-copy --output-filename ~/Pictures/Screenshots/satty-$(date '+%Y%m%d-%H:%M:%S').png"))
-hl.bind(mainMod .. " + SHIFT + P", hl.dsp.exec_cmd("hyprpicker -a"))
 
--- hl.bind("ALT + TAB", hl.dsp.exec_cmd("qs ipc call overview toggle"))
+--screenshot
+screenshotCmd = "grim -g \"$(slurp)\" -t ppm - | satty -f - --copy-command wl-copy --output-filename ~/Pictures/Screenshots/satty-$(date '+%Y%m%d-%H:%M:%S').png"
+hl.bind("XF86SelectiveScreenshot", hl.dsp.exec_cmd(screenshotCmd))
+hl.bind("XF86Launch5", hl.dsp.exec_cmd(screenshotCmd))
+hl.bind("Print", hl.dsp.exec_cmd("grim -o " .. hl.get_active_monitor().name .." - | satty -f - --copy-command wl-copy --output-filename ~/Pictures/Screenshots/satty-$(date '+%Y%m%d-%H:%M:%S').png"))
+
+--hyprexpo overview
 hl.bind("ALT + TAB", function()
     hl.plugin.hyprexpo.expo("toggle")
 end)
@@ -66,7 +71,7 @@ hl.define_submap("hyprexpo", function()
 	hl.bind("SHIFT + TAB", function() hl.plugin.hyprexpo.kb_focus("previous") end)
     hl.bind("return", function() hl.plugin.hyprexpo.kb_confirm() end)
     hl.bind("escape", function() hl.plugin.hyprexpo.expo("cancel") end)
-	hl.bind("ALT + TAB", function() hl.plugin.hyprexpo.expo("cancel") end)
+	hl.bind("ALT + TAB", function() hl.plugin.hyprexpo.kb_confirm() end)
 end)
 
 -- Move focus with mainMod + arrow keys
@@ -84,35 +89,39 @@ for i = 1, 10 do
     hl.bind(mainMod .. " + SHIFT + " .. key,     hl.dsp.window.move({ workspace = i }))
 end
 
-hl.bind(mainMod .. " + 1", 
-	function ()
-		for _, window in pairs(hl.get_windows()) do
-			if window.class == "org.mozilla.firefox" then
-				return hl.dispatch(hl.dsp.no_op())
-			end
+--browser
+function openFirefox()
+	hl.dispatch(hl.dsp.focus({ workspace = 1, on_current_monitor = true}))
+	for _, window in pairs(hl.get_windows()) do
+		if window.class == "firefox" then
+			return hl.dispatch(hl.dsp.no_op())
 		end
-		hl.dispatch(hl.dsp.exec_cmd("firefox"))
-	end)
-
-
--- Scroll through existing workspaces with mainMod + scroll
-hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1", on_current_monitor = true }))
-hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1", on_current_monitor = true}))
+	end
+	hl.dispatch(hl.dsp.exec_cmd("firefox"))
+end
+hl.bind(mainMod .. " + 1", openFirefox)
+hl.bind("XF86HomePage", openFirefox)
 
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
 
 -- Laptop multimedia keys for volume and LCD brightness
 hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ 0 & wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 2%+ & qs ipc call osd volume"), { locked = true, repeating = true })
-hl.bind("F3", 					hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ 0 & wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 2%+ & qs ipc call osd volume"), {  non_consuming = true, locked = true, repeating = true })
 hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ 0 & wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%- & qs ipc call osd volume"),      { locked = true, repeating = true })
-hl.bind("F2",					hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ 0 & wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%- & qs ipc call osd volume"),      { non_consuming = true, locked = true, repeating = true })
 hl.bind("XF86AudioMute",        hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle & qs ipc call osd volume"),     { locked = true, repeating = true })
-hl.bind("F1", 					hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle & qs ipc call osd volume"),     { non_consuming = true, locked = true, repeating = true })
-hl.bind("XF86AudioMicMute",     hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),   { locked = true, repeating = true })
+hl.bind("XF86AudioMicMute",     hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle & qs ipc call osd volume "),   { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessUp",  hl.dsp.exec_cmd("brightnessctl -q set 5%+ & qs ipc call osd brightness"),                  { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessDown",hl.dsp.exec_cmd("brightnessctl -q set 5%- & qs ipc call osd brightness"),                  { locked = true, repeating = true })
+hl.bind("XF86AudioPlay",        hl.dsp.exec_cmd("playerctl play-pause"))
 
 hl.bind(mainMod .. " + SHIFT + left", hl.dsp.window.move({ direction = "left"}))
 hl.bind(mainMod .. " + SHIFT + right", hl.dsp.window.move({ direction = "right"}))
 hl.bind(mainMod .. " + SHIFT + up", hl.dsp.window.move({ direction = "up"}))
 hl.bind(mainMod .. " + SHIFT + down", hl.dsp.window.move({ direction = "down"}))
+
+-- 
+resizeFactor = 20
+hl.bind(mainMod .. " + ALT + left", hl.dsp.window.resize({ x = -10, y = 0, relative = true}), {repeating = true})
+hl.bind(mainMod .. " + ALT + right", hl.dsp.window.resize({ x = 10, y = 0, relative = true}), {repeating = true})
+hl.bind(mainMod .. " + ALT + up", hl.dsp.window.resize({ x = 0, y = -10, relative = true}), {repeating = true})
+hl.bind(mainMod .. " + ALT + down", hl.dsp.window.resize({ x = 0, y = 10, relative = true}), {repeating = true})
+

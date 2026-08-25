@@ -9,10 +9,8 @@ import "../../config"
 
 RowLayout{
 	id: root
-	required property int boxSize
-	required property int maxRowNums
-	required property var boxes
-	required property int maxTotalBoxes
+	property int boxSize: Boxes.boxSize
+	property int rows: 4
 	required property int activeWsId
 	Layout.preferredHeight: parent.height
 	spacing: 0
@@ -23,12 +21,14 @@ RowLayout{
 			property var ws: modelData
 			property var cols: (ws.toplevels.values.length * 3) + 1
 			property var w: (cols) * root.boxSize
-			property var totalBoxes: cols * root.maxRowNums
+			property var totalBoxes: cols * 4
+			property var boxes: []
+			onTotalBoxesChanged: boxes = Boxes.getBoxes(totalBoxes)
 			Layout.preferredHeight: parent.height
 			Layout.preferredWidth: w
 			color: "transparent"
-			property int revealInd: activeWsId == ws.id ? 0 : root.maxTotalBoxes
-			property int mouseRevealInd: mouse.containsMouse ? 0 : root.maxTotalBoxes
+			property int revealInd: activeWsId == ws.id ? 0 : totalBoxes
+			property int mouseRevealInd: mouse.containsMouse ? 0 : totalBoxes
 			visible: ws.toplevels.values.length > 0
 			Behavior on revealInd {
 				NumberAnimation { duration: 200 }
@@ -51,15 +51,14 @@ RowLayout{
 				visible: false
 				anchors.fill: parent
 				columns: wsBound.cols
-				rows: root.maxRowNums
-				
+				rows: 4
 				Repeater {
 					model: wsBound.totalBoxes
 					delegate: Rectangle {
 						required property int index
 						width: root.boxSize
 						height: root.boxSize
-						property int idx: root.boxes[index % root.maxTotalBoxes]
+						property int idx: boxes[index] ?? 0
 						color: (idx < wsBound.mouseRevealInd) ? Theme.accentPurple : Theme.accentPurpleHover
 						opacity: (idx < wsBound.revealInd) ? 1 : 0
 					}
@@ -77,12 +76,12 @@ RowLayout{
 						right: parent.right
 					}
 					height: root.boxSize * 3
-					text: modelData.toplevels.values.map(toplevel => Icons.get(toplevel.wayland?.appId?? "" ) ?? Icons.get(toplevel.title) ?? "").join(" ")
+					text: modelData.toplevels.values.map(toplevel => Icons.get(toplevel.lastIpcObject.class?? toplevel.title ) ?? Icons.get(toplevel.wayland?.appId) ?? "").join(" ")
 					horizontalAlignment: Text.AlignHCenter
 					verticalAlignment: Text.AlignVCenter
 					font.pixelSize: root.boxSize * 2 - 2
 					color: Theme.accentPurple
-					font.family: "Symbols Nerd Font Mono"
+					font.family: Theme.fontIcon
 				}
 				Text{
 					anchors{
