@@ -15,7 +15,7 @@ Variants{
 		property var modelData
         screen: modelData
 		property var monitor: Hyprland.monitorFor(modelData)
-		property bool visible: !monitor.activeWorkspace?.name.startsWith("wp")
+		property bool visible: !monitor?.activeWorkspace?.name.startsWith("wp")
 		color: "transparent"
 		anchors{
 			bottom: true

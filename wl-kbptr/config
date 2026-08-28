@@ -1,0 +1,15 @@
+[general]
+modes=split,click
+cancellation_status_code=0
+
+[mode_split]
+pointer_size=20
+pointer_color=#e22d
+bg_color=#2226
+area_bg_color=#11111188
+vertical_color=#8888ffcc
+horizontal_color=#008800cc
+history_border_color=#3339
+
+[mode_click]
+button=left

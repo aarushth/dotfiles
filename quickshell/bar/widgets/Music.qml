@@ -9,12 +9,12 @@ Item{
 	id: root
 	property int boxSize: Boxes.boxSize
 	property var boxes: []
-	Component.onCompleted: boxes = Boxes.getBoxes( boxNums)
+	Component.onCompleted: boxes = Boxes.getBoxes(boxNums)
 	property int rows: 8
 	property int cols: 24
 	property int boxNums: rows*cols / 4
 	property int revealInd: base.hovered ? 0 : boxNums
-	property DesktopEntry spotify: DesktopEntries.heuristicLookup("spotify")
+
 	property var player: {
 		for(const player of Mpris.players.values){
 			if(player.desktopEntry == "spotify"){
@@ -213,7 +213,7 @@ Item{
 			}
 			MouseArea{
 				anchors.fill: parent
-				onClicked: spotify.execute()
+				onClicked: DesktopEntries.byId("com.spotify.Client").execute()
 			}
 		}
 	}

@@ -3,46 +3,48 @@
 -----------------------
 
 hl.config({
-    general = {
-        gaps_in  = 2,
-        gaps_out = 1,
+	general = {
+		gaps_in = 2,
+		gaps_out = 1,
 
-        border_size = 2,
+		border_size = 2,
 
-        col = {
-            active_border   = { colors = {"rgba(4B09F5ee)", "rgba(02C939ee)"}, angle = 45 },
-            inactive_border = "rgba(595959aa)",
-        },
+		col = {
+			active_border = { colors = { "rgba(4B09F5ee)", "rgba(02C939ee)" }, angle = 45 },
+			inactive_border = "rgba(595959aa)",
+		},
 
-        -- Set to true to enable resizing windows by clicking and dragging on borders and gaps
-        resize_on_border = true,
+		-- Set to true to enable resizing windows by clicking and dragging on borders and gaps
+		resize_on_border = true,
 
-        -- Please see https://wiki.hypr.land/Configuring/Advanced-and-Cool/Tearing/ before you turn this on
-        allow_tearing = false,
+		-- Please see https://wiki.hypr.land/Configuring/Advanced-and-Cool/Tearing/ before you turn this on
+		allow_tearing = false,
 
-        layout = "dwindle",
-		
-    },
+		layout = "dwindle",
+	},
 	dwindle = {
 		preserve_split = true,
 	},
-    xwayland = {
-        force_zero_scaling = true
-    },
-    decoration = {
-        rounding = 0,
-        shadow = {
-            enabled = false,
-        },
+	xwayland = {
+		force_zero_scaling = true,
+	},
+	decoration = {
+		rounding = 0,
+		shadow = {
+			enabled = false,
+		},
 		blur = {
 			enabled = true,
-		}
-    },
+		},
+	},
 
-    animations = {
-        enabled = true,
-    },
+	animations = {
+		enabled = true,
+	},
 })
-hl.on("monitor.added", function(monitor)
-    hl.exec_cmd("awww restore")
+hl.on("monitor.layout_changed", function()
+	hl.exec_cmd("awww restore")
+end)
+hl.on("config.reloaded", function()
+	hl.exec_cmd("sleep 0.2 && awww restore")
 end)

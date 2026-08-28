@@ -3,9 +3,10 @@ import QtQuick
 
 QtObject {
 	function get(id) {
-		if(id == "" ){
-			return iconsMap.get("GlslViewer")
-		}
+        if(id.substring(0, 4) == "Yazi"){
+            return iconsMap.get(id.substring(0, 4))
+        }
+        
         return iconsMap.get(id)
     }
     readonly property var iconsMap: new Map([
@@ -46,8 +47,14 @@ QtObject {
 		["theseus", ""],
 		["bitwarden", "󰞀"],
 		["org.fedoraproject.MediaWriter", "󱊟"],
-		["GlslViewer", "󰋁"]
-		])
+		["GlslViewer", "󰋁"],
+        ["glslViewer", "󰋁"],
+        ["slack", ""],
+        ["nvim", ""],
+        ["Yazi", "󰉋"],
+        ["clipse", ""],
+        ["hyprmoncfg", "󰍺"],
+    ])
 	readonly property var brightnessIcons: [
 		"󰹐", 
 		"󱩎", 
@@ -113,6 +120,7 @@ QtObject {
 	]
 	readonly property string ethernetIcon: ""
 	readonly property string wifiDisconnectedIcon: "󰤭"
+	readonly property string wifiLoadingIcon: ""
 	readonly property string bluetoothDisconnected: "󰂲"
 	readonly property string bluetoothConnected: "󰂱"
 	readonly property string cpuIcon: ""

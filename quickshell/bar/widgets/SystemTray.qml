@@ -8,7 +8,7 @@ import Quickshell.Hyprland
 import "../../config"
 
 Rectangle{
-	id: root
+	id: tray
 	required property var window
 	property var boxSize: Boxes.boxSize
 	implicitWidth: grid.implicitWidth
@@ -16,12 +16,7 @@ Rectangle{
 	color: Theme.accentPurple
 	property var boxes: []
 	Component.onCompleted: boxes = Boxes.getBoxes(4)
-	HyprlandFocusGrab {
-		id: grab
-		windows: [popup, root.window]
-		active: popup.visible
-		onCleared: popup.visible = false
-	}
+	
 	GridLayout{
 		id: grid
 		anchors.fill:parent
@@ -33,14 +28,20 @@ Rectangle{
 		QsMenuOpener{
 			id: menuOpener
 		}
+		HyprlandFocusGrab {
+			id: grab
+			windows: [popup]
+			active: popup.backingWindowVisible
+			onCleared: popup.visible = false
+		}
 		PopupWindow {
 			id: popup
 			implicitWidth: Math.max(menuColumn.implicitWidth, 1)
 			implicitHeight: Math.max(menuColumn.implicitHeight, 1)
 
 			anchor {
-				window: root.window
-				item: root
+				window: tray.window
+				item: tray
 				edges: Edges.Top
 				gravity: Edges.Top
 			}
@@ -106,7 +107,7 @@ Rectangle{
 					anchors.fill: parent
 					columns: 2
 					rows: 2
-					property int revealInd: mouse.containsMouse ? root.boxes.length : 0
+					property int revealInd: mouse.containsMouse ? boxes.length : 0
 					Behavior on revealInd {
 						NumberAnimation { duration: 200 }
 					}
@@ -114,9 +115,9 @@ Rectangle{
 						model: 4
 						delegate: Rectangle {
 							required property int index
-							width: root.boxSize
-							height: root.boxSize
-							property int idx: root.boxes[index]
+							width: boxSize
+							height: boxSize
+							property int idx: boxes[index]
 							color: (idx < grid.revealInd) ? Theme.accentPurpleHover : Theme.accentPurple
 						}
 					}
@@ -124,8 +125,8 @@ Rectangle{
 				Image { 
 					source: modelData.icon; 
 					anchors.centerIn: parent
-					width: root.boxSize * 1.2
-					height: root.boxSize * 1.2
+					width: boxSize * 1.2
+					height: boxSize * 1.2
 					asynchronous: true
 				}
 				MouseArea {
@@ -138,8 +139,6 @@ Rectangle{
 						if (mouse.button === Qt.RightButton) {
 							if(menuOpener.menu != modelData.menu){
 								menuOpener.menu = modelData.menu
-								popup.visible = true
-							}else if(root.anchorItem !== trayItem){
 								popup.visible = true
 							}else{
 								popup.visible = !popup.visible

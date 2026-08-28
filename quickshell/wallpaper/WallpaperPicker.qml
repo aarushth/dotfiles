@@ -273,11 +273,10 @@ Item {
 
 					
 					property var boxes: []
-					onTotalBoxesChanged: boxes = Boxes.getBoxes(totalBoxes, biasFunc)
+					onTotalBoxesChanged: boxes = Boxes.getBoxes(totalBoxes, biasFunc, "wallpaper")
 					function biasFunc(index){
 						let row = index / colNums
-						let bias = Math.max(rowNums - row, row) / rowNums
-						return bias 
+						return Math.max(rowNums - row, row) / rowNums 
 					}
 					WlrLayershell.layer: WlrLayer.Overlay
 					WlrLayershell.keyboardFocus: WlrKeyboardFocus.None	

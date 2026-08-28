@@ -50,15 +50,13 @@ Scope {
 		}
 	}
 	property var boxes: []
-	function biasFunc(index, score){
-		let col = index % colNums
-		let leftBias = (colNums - col) / colNums
-		return leftBias
+	function biasFunc(index){
+		return (colNums - index % colNums) / colNums
 	}
 
 	Component.onCompleted: {
 
-		boxes = Boxes.getBoxes(totalBoxes, biasFunc)
+		boxes = Boxes.getBoxes(totalBoxes, biasFunc, "osd")
 		initialized = true
 	}
 

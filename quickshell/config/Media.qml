@@ -3,7 +3,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-QtObject{
+Scope{
 	id: root
 	property var cavaVals: new Array(25)
 	

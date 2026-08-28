@@ -76,7 +76,7 @@ hl.bind("ALT + f4", function ()
 		hl.dispatch(hl.dsp.window.close())
 	end
 end)
-
+hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("qs ipc call main reload"))
 -- toggle wlogout
 hl.bind("CTRL + ALT + DELETE", hl.dsp.exec_cmd("qs ipc call wlogout toggle"))
 

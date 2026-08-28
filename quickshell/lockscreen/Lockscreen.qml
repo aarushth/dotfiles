@@ -123,9 +123,9 @@ ShellRoot {
 			root.shouldShowUnlockscreen = true
 		}
 		function onUnlockScreenUp(){
-			
-			lock.locked = false
-		}
+            lock.locked = false
+            suspendTimer.stop()
+        }
 	}
 	readonly property var suspend: Process {
 		command: ["sh", "-c", "systemctl suspend"]

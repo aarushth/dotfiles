@@ -29,8 +29,19 @@ ColumnLayout{
 	}
 	property string ipAddress: ""
 	onStatusChanged: ipGrab.running = true
-	property string wifiIcon: (currentNetwork?.device.type === DeviceType.Wifi) ? (status === ConnectionState.Connected ? Icons.wifiIcons[Math.round(currentNetwork.signalStrength * 4)] : status === ConnectionState.Disconnected ? Icons.wifiDisconnectedIcon : "") : Icons.ethernetIcon
-
+	property string wifiIcon: {
+		if(currentNetwork?.device.type === DeviceType.Wifi){
+			if(status === ConnectionState.Connected){
+				return Icons.wifiIcons[Math.round(currentNetwork.signalStrength * 3)]
+			}else if(status === ConnectionState.Disconnected){
+				return Icons.wifiDisconnectedIcon
+			}else{
+				return Icons.wifiLoadingIcon
+			}
+		}else {
+			return Icons.ethernetIcon
+		}
+	}
 	Process{
 		id: ipGrab
 		running: false

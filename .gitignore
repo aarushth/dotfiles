@@ -13,3 +13,9 @@
 !cava/**
 !yazi/
 !yazi/**
+!nvim/
+!nvim/**
+!hyprmoncfg/
+!hyprmoncfg/**
+!wl-kbptr/
+!wl-kbptr/**

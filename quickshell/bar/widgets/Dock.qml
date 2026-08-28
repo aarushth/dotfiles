@@ -19,7 +19,8 @@ RowLayout{
 		delegate: Rectangle{
 			id: wsBound
 			property var ws: modelData
-			property var cols: (ws.toplevels.values.length * 3) + 1
+			property var liveToplevels: ws.toplevels.values.filter(toplevel => toplevel.wayland !== null)
+			property var cols: (liveToplevels.length * 3) + 1
 			property var w: (cols) * root.boxSize
 			property var totalBoxes: cols * 4
 			property var boxes: []
@@ -29,7 +30,7 @@ RowLayout{
 			color: "transparent"
 			property int revealInd: activeWsId == ws.id ? 0 : totalBoxes
 			property int mouseRevealInd: mouse.containsMouse ? 0 : totalBoxes
-			visible: ws.toplevels.values.length > 0
+			visible: liveToplevels.length > 0
 			Behavior on revealInd {
 				NumberAnimation { duration: 200 }
 			}
@@ -76,7 +77,7 @@ RowLayout{
 						right: parent.right
 					}
 					height: root.boxSize * 3
-					text: modelData.toplevels.values.map(toplevel => Icons.get(toplevel.lastIpcObject.class?? toplevel.title ) ?? Icons.get(toplevel.wayland?.appId) ?? "").join(" ")
+					text: wsBound.liveToplevels.map(toplevel => Icons.get(toplevel.title) ?? Icons.get(toplevel.wayland?.appId) ?? "").join(" ")
 					horizontalAlignment: Text.AlignHCenter
 					verticalAlignment: Text.AlignVCenter
 					font.pixelSize: root.boxSize * 2 - 2

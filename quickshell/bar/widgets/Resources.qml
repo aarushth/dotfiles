@@ -79,15 +79,6 @@ Item{
 		id: mouse
 		anchors.fill: parent
 		hoverEnabled: true
-		onClicked: {
-			console.warn(Hyprland.toplevels.values)
-			for(const top of Hyprland.toplevels.values){
-				if(top.wayland.appId == "btop"){
-					Hyprland.dispatch("hl.dsp.focus({workspace = \"name:btop\"})")
-					return
-				}
-			}
-			Hyprland.dispatch("hl.dsp.exec_cmd(\"kitty --class btop -e btop\")")
-		}
+		onClicked: Quickshell.execDetached(["hyprctl", "eval", "openBtop()"])
 	}
 }

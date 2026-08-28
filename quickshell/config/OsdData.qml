@@ -13,7 +13,7 @@ Scope{
 	property bool volumeCalled: true
 	property bool brightnessCalled: true
 	PwObjectTracker {
-		objects: [ Pipewire.defaultAudioSink ]
+		objects	: [ Pipewire.defaultAudioSink ]
 	}
 	function showVolume(){
 		volumeCalled = !volumeCalled
