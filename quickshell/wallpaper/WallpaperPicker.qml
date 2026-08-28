@@ -54,7 +54,7 @@ Item {
 		}
 	}
     function applyWallpaper(filePath) {
-		Quickshell.execDetached(["hyprctl", "eval", "switchToWallpaperWs()"])
+		Quickshell.execDetached(["hyprctl", "eval", "SwitchToWallpaperWs()"])
 		root.url = filePath
 		switchAnim.running = true
     }

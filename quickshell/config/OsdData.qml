@@ -5,32 +5,35 @@ import Quickshell.Services.Pipewire
 import Quickshell.Io
 
 Scope{
-	id: root
+    id: root
+     
+    enum Mode {
+        Volume,
+        Brightness,
+        Mic
+    }
+    signal show(mode : int)
 	property bool muted: Pipewire.defaultAudioSink?.audio.muted ?? false
 	property real volume: Pipewire.defaultAudioSink?.audio.volume ?? 0
-	property real brightness: 1.0
-	property int maxBrightness: 1
-	property bool volumeCalled: true
-	property bool brightnessCalled: true
+    property bool micMuted: Pipewire.defaultAudioSource?.audio.muted ?? false
+    property real brightness: 1.0
+    property int maxBrightness: 1
 	PwObjectTracker {
-		objects	: [ Pipewire.defaultAudioSink ]
-	}
-	function showVolume(){
-		volumeCalled = !volumeCalled
-	}
-	function showBrightness(){
-		brightnessReadProc.running = true
-		brightnessCalled = !brightnessCalled
+        objects	: [ Pipewire.defaultAudioSink, Pipewire.defaultAudioSource]
 	}
 	IpcHandler {
 		target: "osd"
 
 		function volume() {
-			showVolume()
-		}
+            show(OsdData.Mode.Volume)
+        }
 		function brightness(){
-			showBrightness()
-		}
+			brightnessReadProc.running = true
+            show(OsdData.Mode.Brightness)
+        }
+        function mic(){
+            show(OsdData.Mode.Mic)
+        }
 	}
 	Process {
 		id: brightnessReadProc

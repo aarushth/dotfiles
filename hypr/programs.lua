@@ -3,7 +3,18 @@
 ---------------------
 
 -- Set programs that you use
-terminal    = "kitty"
-fileManager = "kitty -e yazi %u"
-menu        = "pkill rofi || rofi -show drun -show-icons"
-
+Terminal = "kitty"
+FileManager = "kitty -e yazi %u"
+Menu = "pkill rofi || rofi -show drun -show-icons"
+TaskManager = "btop"
+EmojiPicker = "rofimoji --action clipboard"
+ScreenshotDir = "~/Pictures/Screenshots/"
+SelectiveScreenshot = 'grim -g "$(slurp)" -t ppm - | satty -f - --copy-command wl-copy --output-filename '
+	.. ScreenshotDir
+	.. "satty-$(date '+%Y%m%d-%H:%M:%S').png"
+Screenshot = "grim -o \"$(hyprctl monitors -j | jq -r '.[] | select(.focused) | .name')\" - | satty -f - --copy-command wl-copy --output-filename "
+	.. ScreenshotDir
+	.. "test.png"
+ClipboardManager = "clipse"
+Browser = "firefox"
+MonitorManager = "hyprmoncfg"

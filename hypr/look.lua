@@ -48,3 +48,13 @@ end)
 hl.on("config.reloaded", function()
 	hl.exec_cmd("sleep 0.2 && awww restore")
 end)
+
+hl.config({
+	misc = {
+		force_default_wallpaper = 0,
+		disable_hyprland_logo = true,
+		disable_splash_rendering = true,
+		focus_on_activate = true,
+		enable_anr_dialog = false,
+	},
+})

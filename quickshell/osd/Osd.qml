@@ -10,38 +10,64 @@ import Quickshell.Io
 import "../config"
 Scope {
 	id: root
-	property bool volumeMode : true
+	property int mode : OsdData.Mode.Volume
 	property bool shouldShowOsd: false
 	property int colNums: 80
 	property int rowNums: 5
 	property int totalBoxes: colNums * rowNums
-	property bool muted: OsdData.muted
+    property bool muted: OsdData.muted
+    property bool micMuted: OsdData.micMuted
+    property real micVol: micMuted ? 0.0 : 1.0
 	property real volume: OsdData.volume
 	property real brightness: OsdData.brightness
-	property string labelText: (volumeMode ? "VOLUME:" : "BRIGHTNESS: ") + (volumeMode && muted ? "MUTED" : String(Math.round((volumeMode ? volume : brightness)*100)).padStart(3, "0")+ "%") 
-	
+    property string labelText: {
+        if(mode == OsdData.Mode.Volume){
+            return "VOLUME: " +  (muted ? "MUTED" : String(Math.round(volume*100)).padStart(3, "0")+ "%") 
+        } else if (mode == OsdData.Mode.Brightness){
+            return "BRIGHTNESS: " +  String(Math.round(brightness*100)).padStart(3, "0")+ "%"
+        } else if (mode == OsdData.Mode.Mic){
+            return "MIC: " + (micMuted ? "MUTED" : "UNMUTED")
+        }
+    }
 	property color strokeColor: Theme.textPrimary
-	property color fillColor: volumeMode ? (muted ? Theme.textMuted : Theme.accentPurple) : Theme.accentGreen
+    property color fillColor: {
+        if(mode == OsdData.Mode.Volume){
+            return (muted ? Theme.textMuted : Theme.accentPurple)
+        } else if (mode == OsdData.Mode.Brightness){
+            return Theme.accentGreen
+        }else if (mode == OsdData.Mode.Mic){
+            return (micMuted ? Theme.textMuted : Theme.accentOrange)
+        }
+    }
 	
-	property real percent: volumeMode ? volume : brightness
-	property int revealInd: percent * totalBoxes
-	property bool volumeCalled: OsdData.volumeCalled
-	property bool brightnessCalled: OsdData.brightnessCalled
+    property real percent: {
+        if(mode == OsdData.Mode.Volume){
+            return volume
+        }else if(mode == OsdData.Mode.Brightness){
+            return brightness
+        }else if(mode == OsdData.Mode.Mic){
+            return micVol    
+        }
+    }
+    property int revealInd: percent * totalBoxes
 	property bool initialized: false
-	Behavior on volume{
+    Behavior on volume{
 		NumberAnimation{ duration: 200 }
 	}
-	
+    Behavior on micVol{
+        NumberAnimation{ duration: 900 }
+    }
 	Behavior on brightness{
 		NumberAnimation{ duration: 200 }
 	}
-	onVolumeCalledChanged: if (initialized) showOsd(true)
-	onBrightnessCalledChanged: if (initialized) showOsd(false)
-	function showOsd(mode){
-		volumeMode = mode
-		shouldShowOsd = true
-		hideTimer.restart()
-	}
+    Connections{
+        target: OsdData
+        function onShow(m){
+            mode = m
+            shouldShowOsd = true
+            hideTimer.restart()
+        }  
+    }
 	Timer {
 		id: hideTimer
 		interval: 1500
