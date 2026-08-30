@@ -1,5 +1,5 @@
 *
-
+!.luarc.json
 !.gitignore
 !quickshell/
 !quickshell/**
@@ -21,7 +21,3 @@
 !wl-kbptr/**
 !xdg-desktop-portal/
 !xdg-desktop-portal/**
-!onedrive-gui/**
-!onedrive-gui/
-!onedrive/
-!onedrive-gui/**

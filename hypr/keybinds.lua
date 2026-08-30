@@ -45,6 +45,7 @@ end
 local function floatingTuiCmd(command)
 	return Terminal .. " -o background_opacity=1.0 --class float -e " .. command
 end
+
 hl.bind(MainMod .. " + Q", hl.dsp.exec_cmd(Terminal))
 hl.bind(MainMod .. " + F", hl.dsp.exec_cmd(FileManager))
 hl.bind(MainMod .. " + J", hl.dsp.window.float({ action = "toggle" }))

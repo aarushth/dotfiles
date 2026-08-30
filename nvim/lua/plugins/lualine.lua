@@ -1,12 +1,10 @@
 return {
 	"nvim-lualine/lualine.nvim",
-	dependencies = { "nvim-tree/nvim-web-devicons", "arkav/lualine-lsp-progress" },
+	dependencies = { "nvim-tree/nvim-web-devicons", "arkav/lualine-lsp-progress", "EdenEast/nightfox.nvim" },
 	config = function()
-		local line = require("lualine")
-		line.setup({
+		require("lualine").setup({
 			options = {
-				theme = "carbonfox",
-				disabled_filetypes = { "NvimTree" },
+				disabled_filetypes = { "NvimTree", "help" },
 			},
 			sections = {
 				lualine_a = { "mode" },

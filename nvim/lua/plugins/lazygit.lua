@@ -11,11 +11,7 @@ return {
 	keys = {
 		{
 			"<leader>lg",
-			function()
-				local root = require("config.root")
-				local dir = root.neotree()
-				require("lazygit").lazygit(root.git(dir) or dir)
-			end,
+			"<CMD>LazyGit<CR>",
 			desc = "LazyGit (neo-tree root)",
 		},
 	},

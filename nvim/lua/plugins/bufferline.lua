@@ -8,10 +8,8 @@ return {
 			options = {
 				mode = "buffers",
 				indicator = {
-					-- icon = '▎', -- this should be omitted if indicator style is not 'icon'
-					style = "underline",
+					style = "none",
 				},
-				-- style_preset = bufferline.style_preset.default,
 				themable = true,
 				offsets = {
 					{
@@ -19,8 +17,11 @@ return {
 						text = "File Explorer",
 						text_align = "center",
 						separator = true,
+						--explicitly define highlight group for transparency
+						highlight = "NvimTreeNormal",
 					},
 				},
+				separator_style = "thin",
 				custom_filter = function(buf_number)
 					-- filter out filetypes yo
 					if vim.fn.bufname(buf_number) ~= "" then
