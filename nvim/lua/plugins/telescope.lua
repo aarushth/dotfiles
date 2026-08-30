@@ -8,14 +8,13 @@ return {
 	},
 	config = function()
 		local builtin = require("telescope.builtin")
-		local root = require("config.root")
 
 		vim.keymap.set("n", "<leader>ff", function()
-			builtin.find_files({ cwd = root.neotree() })
+			builtin.find_files()
 		end, { desc = "Telescope find files" })
 
 		vim.keymap.set("n", "<leader>fg", function()
-			builtin.live_grep({ cwd = root.neotree() })
+			builtin.live_grep()
 		end, { desc = "Telescope grep in files" })
 	end,
 }

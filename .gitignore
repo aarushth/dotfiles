@@ -19,3 +19,9 @@
 !hyprmoncfg/**
 !wl-kbptr/
 !wl-kbptr/**
+!xdg-desktop-portal/
+!xdg-desktop-portal/**
+!onedrive-gui/**
+!onedrive-gui/
+!onedrive/
+!onedrive-gui/**

@@ -9,10 +9,10 @@ Menu = "pkill rofi || rofi -show drun -show-icons"
 TaskManager = "btop"
 EmojiPicker = "rofimoji --action clipboard"
 ScreenshotDir = "~/Pictures/Screenshots/"
-SelectiveScreenshot = 'grim -g "$(slurp)" -t ppm - | satty -f - --copy-command wl-copy --output-filename '
+SelectiveScreenshot = 'grim -g "$(slurp)" -t ppm - | satty -f - --actions-on-enter save-to-clipboard,exit --copy-command wl-copy --output-filename '
 	.. ScreenshotDir
 	.. "satty-$(date '+%Y%m%d-%H:%M:%S').png"
-Screenshot = "grim -o \"$(hyprctl monitors -j | jq -r '.[] | select(.focused) | .name')\" - | satty -f - --copy-command wl-copy --output-filename "
+Screenshot = "grim -o \"$(hyprctl monitors -j | jq -r '.[] | select(.focused) | .name')\" - | satty -f - --actions-on-enter save-to-clipboard,exit --copy-command wl-copy --output-filename "
 	.. ScreenshotDir
 	.. "test.png"
 ClipboardManager = "clipse"

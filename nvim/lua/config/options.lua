@@ -39,3 +39,7 @@ vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHo
 	pattern = "*",
 	command = "if mode() != 'c' && getcmdwintype() == '' | silent! checktime | endif",
 })
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "help",
+	command = "wincmd L",
+})
