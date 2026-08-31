@@ -80,5 +80,4 @@ hl.bind(MainMod .. " + R", hl.dsp.exec_cmd("qs ipc call main reload"))
 hl.bind("CTRL + ALT + DELETE", hl.dsp.exec_cmd("qs ipc call wlogout toggle"))
 
 --notifications
-hl.bind(MainMod .. " + X", hl.dsp.exec_cmd("qs ipc call notifications dismiss_hovered"))
-hl.bind(MainMod .. " + SHIFT + X", hl.dsp.exec_cmd("qs ipc call notifications dismiss_all"))
+hl.bind(MainMod .. " + X", hl.dsp.exec_cmd("qs ipc call notifications dismiss_all"))

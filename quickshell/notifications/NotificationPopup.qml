@@ -22,14 +22,7 @@ Scope {
         function dnd_toggle(){
             NotificationService.doNotDisturb = !NotificationService.doNotDisturb;
         }
-		function dismiss_hovered(){
-			for(let i = 0; i < NotificationService.notifications.length; i++){
-				if(NotificationService.notifications[i].hovered){
-					NotificationService.notifications[i].dismiss()
-					return;
-				}
-			}
-		}
+		
     }
 	Item {
 		id: notifRepeaterHost
@@ -405,7 +398,7 @@ Scope {
 								opacity: 1
 							}
 							Rectangle{
-								id: xIcon
+								id: supIcon
 								width: 14
 								height: 14
 								anchors{
@@ -425,9 +418,35 @@ Scope {
 									verticalAlignment: Text.AlignVCenter
 									
 									color: Theme.textSecondary
-									text: "󰅖"
-									font.family: Theme.fontNormal
+                                    text: ""
+                                    font.pixelSize: 6
+									font.family: Theme.fontIcon
 								}
+							}Rectangle{
+								id: xIcon
+								width: 14
+								height: 14
+								anchors{
+									verticalCenter: progressBar.verticalCenter
+									left: supIcon.right
+									leftMargin: boxSize/4
+								}
+								color: Theme.bgBase
+								border.color: Theme.textSecondary
+								radius: 3
+								Text{
+									anchors.centerIn: parent
+									width: parent.width
+									height: parent.height
+
+									horizontalAlignment: Text.AlignHCenter
+									verticalAlignment: Text.AlignVCenter
+									
+									color: Theme.textSecondary
+									text: "󰅖"
+									font.family: Theme.fontIcon
+                                    font.pixelSize: 6
+                                }
 							}
 							Text{
 								anchors{

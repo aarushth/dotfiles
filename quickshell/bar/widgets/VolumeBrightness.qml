@@ -1,11 +1,13 @@
 import Quickshell
 import QtQuick
 import QtQuick.Layouts
+import Quickshell.Hyprland
 import "../../config"
 
 ColumnLayout{	
 	id: root	
-	spacing: 0
+    spacing: 0
+    required property var window
 	property int boxSize: Boxes.boxSize
 	property var boxes: []
 	Component.onCompleted: boxes = Boxes.getBoxes( rows * cols / 2)
@@ -17,7 +19,63 @@ ColumnLayout{
 	property string brightness: String(Math.round(OsdData.brightness * 100))
 	property string volumeText: Icons.getVolumeIcon(volume, OsdData.muted) + " " + volume.padStart(3, "0") + "%"
 	property string brightnessText:  Icons.brightnessIcons[Math.ceil(brightness / 10)] + " " + brightness.padStart(3, "0") + "%"
-	Repeater{
+    HyprlandFocusGrab {
+        id: grab
+        windows: [popup]
+        active: popup.backingWindowVisible
+        onCleared: popup.visible = false
+	}   
+    PopupWindow {
+        id: popup
+        implicitWidth: Math.max(menuColumn.implicitWidth, 1)
+        implicitHeight: Math.max(menuColumn.implicitHeight, 1)
+
+        anchor {
+            window: root.window
+            item: root
+            edges: Edges.Top
+            gravity: Edges.Top
+        }
+        ColumnLayout {
+            id: menuColumn
+            anchors.fill: parent
+            spacing: 0
+
+            Repeater {
+                model: OsdData.sinkNodes
+                delegate: Rectangle {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: label.contentWidth + 20 // add padding
+                    Layout.preferredHeight: 25
+
+                    color: (actionHover.containsMouse ? Theme.bgButton : Theme.bgButtonHover)
+                    Text{
+                        anchors{
+                            verticalCenter: parent.verticalCenter
+                            left: parent.left
+                            leftMargin: 10
+                        }
+                    
+                        id: label
+                        color: modelData == OsdData.defaultAudioSink ? Theme.textSecondary : Theme.textMuted
+                        opacity:  1
+                        text: modelData.description
+                        font.pixelSize: 12
+                        font.family: Theme.fontNormal
+                    }
+                
+                    MouseArea {
+                        id: actionHover
+                        anchors.fill: parent
+                        hoverEnabled: true 
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: OsdData.setPreferredSink(modelData) 
+                    }
+                }
+            }
+        }
+    }
+    Repeater{
 		model:[root.volumeText, root.brightnessText]
 		delegate: Rectangle{
 			Layout.fillWidth: true
@@ -45,8 +103,18 @@ ColumnLayout{
 			MouseArea{
 				id: mouse
 				anchors.fill: parent
-				hoverEnabled: true
-				onClicked: index == 0 ? OsdData.showVolume() : OsdData.showBrightness()
+                hoverEnabled: true
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                onClicked: (mouse)=> {
+                    if (mouse.button == Qt.RightButton){
+                        if(index == 0){
+                            popup.visible = !popup.visible 
+                        }
+                    }
+                    else{
+                        Quickshell.execDetached(["qs", "ipc", "call", "osd", index == 0 ? "volume" : "brightness"])
+                    }
+                }
 			}
 			Text{
 				anchors.fill: parent

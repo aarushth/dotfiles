@@ -13,13 +13,15 @@ Scope{
         Mic
     }
     signal show(mode : int)
-	property bool muted: Pipewire.defaultAudioSink?.audio.muted ?? false
-	property real volume: Pipewire.defaultAudioSink?.audio.volume ?? 0
+	property bool muted: defaultAudioSink?.audio.muted ?? false
+	property real volume: defaultAudioSink?.audio.volume ?? 0
     property bool micMuted: Pipewire.defaultAudioSource?.audio.muted ?? false
     property real brightness: 1.0
     property int maxBrightness: 1
+    property var defaultAudioSink: Pipewire.defaultAudioSink
+    property var sinkNodes: Pipewire.nodes.values.filter((node) => node.isSink && !node.isStream)
 	PwObjectTracker {
-        objects	: [ Pipewire.defaultAudioSink, Pipewire.defaultAudioSource]
+        objects	: [ Pipewire.defaultAudioSink, Pipewire.defaultAudioSource, Pipewire.nodes, Pipewire.preferredAudioSink]
 	}
 	IpcHandler {
 		target: "osd"
@@ -62,5 +64,9 @@ Scope{
 				}
 			}
 		}
-	}
+    }
+    function setPreferredSink(node) {
+        console.warn("here")    
+        Pipewire.preferredDefaultAudioSink = node
+    }
 }

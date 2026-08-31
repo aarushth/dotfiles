@@ -78,7 +78,9 @@ Variants{
 				}
 				Resources{}
 				Battery{}
-				VolumeBrightness{}
+				VolumeBrightness{
+                    window: root
+                }
 				Clock{}
 				
 			}
