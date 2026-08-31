@@ -3,9 +3,9 @@ import QtQuick
 
 QtObject {
 	function get(id) {
-        if(id.substring(0, 4) == "Yazi"){
-            return iconsMap.get(id.substring(0, 4))
-        }
+        // if(id.substring(0, 4) == "Yazi"){
+        //     return iconsMap.get(id.substring(0, 4))
+        // }
         
         return iconsMap.get(id)
     }
@@ -25,9 +25,9 @@ QtObject {
 		//messages
 		["FFPWA-01KWTPJ0SZWBKKY4X7BSV5RWRN", "󰵅"],
 		["code", ""],
-		["obsidian", ""], 
+		["md.obsidian.Obsidian", ""], 
 		["proton.vpn.app.gtk", "󰌘"],
-		["spotify", ""],
+        ["spotify", ""],
 		["com.discordapp.Discord", ""],
 		["steam", "󰓓"],
 		//marathon game

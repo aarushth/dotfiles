@@ -18,7 +18,7 @@ return {
 						text_align = "center",
 						separator = true,
 						--explicitly define highlight group for transparency
-						highlight = "NvimTreeNormal",
+						highlight = "BufferLineFill",
 					},
 				},
 				separator_style = "thin",

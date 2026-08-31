@@ -16,8 +16,8 @@ Item{
 	property int revealInd: base.hovered ? 0 : boxNums
 
 	property var player: {
-		for(const player of Mpris.players.values){
-			if(player.desktopEntry == "spotify"){
+        for(const player of Mpris.players.values){
+            if(player.desktopEntry == "spotify"){
 				return player
 			}
 		}
