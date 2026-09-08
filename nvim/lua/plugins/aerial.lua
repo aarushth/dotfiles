@@ -4,6 +4,17 @@ return {
 		layout = {
 			width = 25,
 		},
+		filter_kind = {
+			"Class",
+			"Constructor",
+			"Enum",
+			"Function",
+			"Interface",
+			"Object",
+			"Module",
+			"Method",
+			"Struct",
+		},
 	},
 	keys = {
 		{ "<leader>a", "<cmd>AerialToggle!<CR>", desc = "Toggle Aerial" },

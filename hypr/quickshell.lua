@@ -72,7 +72,12 @@ hl.bind("ALT + f4", function()
 	if not (hl.get_active_window() == "null") and hl.get_active_window().title == "quickshell-wallpaper-picker" then
 		hl.dispatch(hl.dsp.exec_cmd("qs ipc call wallpaper close"))
 	else
-		hl.plugin.feedloss.close()
+		-- if pcall(function()
+		-- 	hl.plugin.feedloss.close()
+		-- end) then
+		-- 	return
+		-- end
+		hl.dispatch(hl.dsp.window.close())
 	end
 end)
 hl.bind(MainMod .. " + R", hl.dsp.exec_cmd("qs ipc call main reload"))

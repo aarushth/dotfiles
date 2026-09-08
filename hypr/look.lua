@@ -43,10 +43,7 @@ hl.config({
 	},
 })
 hl.on("monitor.layout_changed", function()
-	hl.exec_cmd("awww restore")
-end)
-hl.on("config.reloaded", function()
-	hl.exec_cmd("sleep 0.2 && awww restore")
+	hl.exec_cmd("sleep 2 && awww restore")
 end)
 
 hl.config({
@@ -58,28 +55,28 @@ hl.config({
 		enable_anr_dialog = false,
 	},
 })
-hl.config({
-	plugin = {
-		["3la_feed_loss"] = {
-			duration = 100,
-			fade = 100,
-			close_at = 1.0,
-
-			static_alpha = 0.0,
-			glitch = 5,
-
-			text = "",
-
-			["col.fringe1"] = "#4B09F5ee",
-			["col.fringe2"] = "#02C939ee",
-
-			min_size = 80,
-			ignore_children = 1,
-
-			-- Regex (C++ std::regex, NOT a Lua pattern) of window classes to never
-			ignore_class = "^(xdg-desktop-portal.*)$",
-
-			ignore_title = "",
-		},
-	},
-})
+-- hl.config({
+-- 	plugin = {
+-- 		["3la_feed_loss"] = {
+-- 			duration = 100,
+-- 			fade = 100,
+-- 			close_at = 1.0,
+--
+-- 			static_alpha = 0.0,
+-- 			glitch = 5,
+--
+-- 			text = "",
+--
+-- 			["col.fringe1"] = "#4B09F5ee",
+-- 			["col.fringe2"] = "#02C939ee",
+--
+-- 			min_size = 80,
+-- 			ignore_children = 1,
+--
+-- 			-- Regex (C++ std::regex, NOT a Lua pattern) of window classes to never
+-- 			ignore_class = "^(xdg-desktop-portal.*)$",
+--
+-- 			ignore_title = "",
+-- 		},
+-- 	},
+-- })

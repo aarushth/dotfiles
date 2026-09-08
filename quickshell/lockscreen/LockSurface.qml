@@ -118,7 +118,7 @@ Item {
 			onAccepted: {
 				context.submit(text)
 				clear()
-				displayText = "VERIFYING"
+				root.displayText = "VERIFYING"
 				invert = true
 			}
 		}
