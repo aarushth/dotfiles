@@ -4,8 +4,9 @@
 
 -- Set programs that you use
 Terminal = "kitty"
-FileManager = "kitty -e yazi %u"
-Menu = "pkill rofi || rofi -show drun -show-icons"
+FileManager = "yazi"
+Menu = "qs ipc call start toggle"
+-- Menu = "pkill rofi || rofi -show drun -show-icons"
 TaskManager = "btop"
 EmojiPicker = "rofimoji --action clipboard"
 ScreenshotDir = "~/Pictures/Screenshots/"
@@ -18,3 +19,6 @@ Screenshot = "grim -o \"$(hyprctl monitors -j | jq -r '.[] | select(.focused) | 
 ClipboardManager = "clipse"
 Browser = "firefox"
 MonitorManager = "hyprmoncfg"
+Lock = "loginctl lock-session"
+WallpaperSwitcher = "qs ipc call wallpaper open"
+WLogout = "qs ipc call wlogout toggle"

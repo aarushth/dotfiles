@@ -5,3 +5,4 @@ singleton SysInfo SysInfo.qml
 singleton Media Media.qml
 singleton Boxes Boxes.qml
 singleton Lockevents Lockevents.qml
+singleton Arcs Arcs.qml

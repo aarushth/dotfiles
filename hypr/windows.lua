@@ -54,18 +54,23 @@ hl.window_rule({
 -- --btop
 hl.window_rule({
 	match = {
+		class = "firefox",
+	},
+	workspace = "1",
+})
+hl.window_rule({
+	match = {
 		class = "btop",
 	},
 	workspace = "name:btop",
 })
-hl.workspace_rule({ workspace = "name:btop", on_created_empty = "kitty --class btop -e btop" })
 hl.window_rule({
 	match = {
 		class = "spotify",
 	},
 	workspace = "empty",
 })
-for _, game in ipairs({ "theseus", "alephone" }) do
+for _, game in ipairs({ "theseus", "^(steam_app_.*)$" }) do
 	hl.window_rule({
 		match = {
 			class = game,
@@ -110,23 +115,47 @@ hl.window_rule({
 	},
 	workspace = "name:zoho",
 })
---zoom stuff
-hl.window_rule({
-	match = {
-		title = "annotate_toolbar",
-	},
-	float = true,
-})
 
-for _, className in ipairs({ "float", "OneDriveGUI", "com.gabm.satty" }) do
+for _, className in ipairs({
+	"float",
+	"OneDriveGUI",
+	"com.gabm.satty",
+	"warp-taskbar",
+	"hyprland-share-picker",
+	"bitwarden",
+	"zoom",
+}) do
 	hl.window_rule({
 		match = { class = className },
 		tag = "+float",
 	})
 end
+for _, className in ipairs({
+	"float",
+	"OneDriveGUI",
+}) do
+	hl.window_rule({
+		match = { class = className },
+		size = "625 650",
+	})
+end
+local handled = {}
+hl.on("window.title", function(w)
+	if handled[w.address] then
+		return
+	end
+	for _, pat in ipairs({ "Extension" }) do
+		if w.title:find(pat, 1, true) then
+			handled[w.address] = true
+			hl.dispatch(hl.dsp.window.float({ action = "enable", window = w }))
+			hl.dispatch(hl.dsp.window.center({ window = w }))
+			return
+		end
+	end
+end)
 
 hl.window_rule({
 	match = { tag = "float" },
 	float = true,
-	size = "625 650",
+	center = true,
 })

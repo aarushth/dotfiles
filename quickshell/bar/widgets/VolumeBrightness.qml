@@ -126,7 +126,7 @@ ColumnLayout {
                 text: modelData
                 font.family: Theme.fontNormal || Theme.fontIcon
                 font.pixelSize: 14
-                color: OsdData.muted && index == 0 ? Theme.textMuted : Theme.bgBase
+                color: Theme.bgBase
             }
         }
     }

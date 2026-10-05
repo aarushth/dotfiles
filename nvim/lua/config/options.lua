@@ -44,3 +44,9 @@ vim.api.nvim_create_autocmd("FileType", {
 	pattern = "help",
 	command = "wincmd L",
 })
+vim.api.nvim_create_user_command("W", function()
+	vim.cmd("w")
+end, { desc = "binds :W to w" })
+vim.api.nvim_create_user_command("Q", function()
+	vim.cmd("q")
+end, { desc = "binds :Q to q" })

@@ -2,28 +2,24 @@
 ---- AUTOSTART ----
 -------------------
 
-hl.on("hyprland.start", function () 
+hl.on("hyprland.start", function()
 	hl.exec_cmd("awww-daemon --no-cache")
 	hl.exec_cmd("qs")
 	hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
 
 	hl.exec_cmd("onedrive-gui")
+	-- hl.exec_cmd("flatpak run com.bitwarden.desktop")
 	--desktop portal for screenshare
 	hl.exec_cmd("systemctl --user start hyprland-session.target")
-
-	-- --   wallpaper daemon
-	
 
 	-- clipoard history
 	hl.exec_cmd("clipse -listen")
 
 	hl.exec_cmd("hypridle")
+	hl.exec_cmd("hyprpm update")
 	hl.exec_cmd("hyprpm reload")
 end)
 
 hl.on("hyprland.shutdown", function()
-    os.execute("systemctl --user stop hyprland-session.target && sleep 0.1")
-    -- uses a blocking exec function and sleeps a bit to give things time to close
-    -- you might also want to kill troublesome/crashing non-systemd background services here:
-    -- os.execute("pkill wallpaperthing; systemctl --user stop hyprland-session.target && sleep 0.1")
+	os.execute("systemctl --user stop hyprland-session.target && sleep 0.1")
 end)

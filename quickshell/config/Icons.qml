@@ -3,10 +3,6 @@ import QtQuick
 
 QtObject {
     function get(id) {
-        // if(id.substring(0, 4) == "Yazi"){
-        //     return iconsMap.get(id.substring(0, 4))
-        // }
-
         return iconsMap.get(id);
     }
     readonly property var iconsMap: new Map([["firefox", "󰈹"], ["kitty", ""],
@@ -19,14 +15,17 @@ QtObject {
         // whatsapp
         ["FFPWA-01KVW3KKWDT26QR2XQX414AM5Z", ""],
         //messages
-        ["FFPWA-01KWTPJ0SZWBKKY4X7BSV5RWRN", "󰵅"], ["code", ""], ["md.obsidian.Obsidian", ""], ["proton.vpn.app.gtk", "󰌘"], ["spotify", ""], ["discord", ""], ["steam", "󰓓"],
-        //marathon game
-        ["alephone", "󰊴"], ["qdirstat", ""], ["localsend", "󱒃"], ["btop", ""], ["quickshell-wallpaper-picker", "󰸉"], ["satty", "󱇣"], ["OneDriveGUI", "󰏊"], ["com.obsproject.Studio", "󰄄"], ["wifitui", ""], ["bluetui", "󰂯"], ["yazi", ""], ["mpv", ""], ["zoom", ""], ["theseus", ""], ["bitwarden", "󰞀"], ["org.fedoraproject.MediaWriter", "󱊟"], ["GlslViewer", "󰋁"], ["glslViewer", "󰋁"], ["slack", ""], ["nvim", ""], ["Yazi", "󰉋"], ["clipse", ""], ["hyprmoncfg", "󰍺"],])
+        ["FFPWA-01KWTPJ0SZWBKKY4X7BSV5RWRN", "󰵅"], ["codium", ""], ["md.obsidian.Obsidian", ""], ["proton.vpn.app.gtk", "󰌘"], ["spotify", ""], ["discord", ""], ["steam", "󰓓"], ["warp-taskbar", ""], ["Claude", ""],
+        //games
+        ["alephone", gameIcon], ["Hades", gameIcon], ["Classic Marathon", gameIcon], ["Watch_Dogs", gameIcon],
+        //other
+        ["wl-kbptr", ""], ["qdirstat", ""], ["Problem Reporting", "󰞏"], ["sun-tools-jconsole-JConsole", ""], ["LocalSend", "󱒃"], ["btop", ""], ["quickshell-wallpaper-picker", "󰸉"], ["satty", "󱇣"], ["OneDriveGUI", "󰏊"], ["com.obsproject.Studio", "󰄄"], ["wifitui", ""], ["bluetui", "󰂯"], ["Yazi", ""], ["mpv", ""], ["zoom", ""], ["theseus", ""], ["Bitwarden", "󰞀"], ["org.fedoraproject.MediaWriter", "󱊟"], ["GlslViewer", "󰋁"], ["glslViewer", "󰋁"], ["slack", ""], ["nvim", ""], ["clipse", ""], ["hyprmoncfg", "󰍺"],])
     readonly property var brightnessIcons: ["󰹐", "󱩎", "󱩏", "󱩐", "󱩑", "󱩒", "󱩓", "󱩔", "󱩕", "󱩖", "󰛨"]
     readonly property string volumeOff: "󰖁"
     readonly property string volumeLow: "󰕿"
     readonly property string volumeMedium: "󰖀"
     readonly property string volumeHigh: "󰕾"
+    readonly property string gameIcon: "󰊴"
     function getVolumeIcon(volume, muted) {
         if (muted || volume === 0)
             return volumeOff;

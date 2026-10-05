@@ -20,11 +20,8 @@ hl.config({
 })
 hl.device({
 	name = "tpps/2-elan-trackpoint",
-	sensitivity = -0.5,
-})
-hl.device({
-	name = "sinowealth-game-mouse",
-	sensitivity = -1,
+	sensitivity = -0.75,
+	scroll_factor = 0.2,
 })
 hl.gesture({
 	fingers = 3,
@@ -34,7 +31,7 @@ hl.gesture({
 
 MainMod = "SUPER"
 
-local function openInCustomWorkspace(program, command, ws)
+function OpenInCustomWorkspace(program, command, ws)
 	for _, window in pairs(hl.get_windows()) do
 		if window.class == program then
 			return hl.dispatch(hl.dsp.focus({ workspace = ws, on_current_monitor = true }))
@@ -47,20 +44,30 @@ local function floatingTuiCmd(command)
 end
 
 hl.bind(MainMod .. " + Q", hl.dsp.exec_cmd(Terminal))
-hl.bind(MainMod .. " + F", hl.dsp.exec_cmd(FileManager))
+hl.bind(MainMod .. " + F", hl.dsp.window.fullscreen_state({ action = "toggle", internal = 2, client = -1 }))
 hl.bind(MainMod .. " + J", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(MainMod .. " + P", hl.dsp.layout("togglesplit"))
+hl.bind(MainMod .. " + L", hl.dsp.exec_cmd(Lock))
+hl.bind("ALT + f4", hl.dsp.window.close())
 
---TUIS
+hl.bind(MainMod .. " + W", function()
+	hl.exec_cmd(WallpaperSwitcher)
+	hl.dispatch(hl.dsp.focus({ workspace = "name:wp1", on_current_monitor = true }))
+end)
+hl.bind(MainMod .. " + E", hl.dsp.exec_cmd(Terminal .. " --hold bash -ci " .. FileManager))
 hl.bind(MainMod .. " + V", hl.dsp.exec_cmd(floatingTuiCmd(ClipboardManager)))
 hl.bind(MainMod .. " + M", hl.dsp.exec_cmd(floatingTuiCmd(MonitorManager)))
 hl.bind("CTRL + ALT + Backspace", function()
-	openInCustomWorkspace(TaskManager, Terminal .. " --class " .. TaskManager .. " -e " .. TaskManager, "name:btop")
+	OpenInCustomWorkspace(
+		TaskManager,
+		Terminal .. " --class " .. TaskManager .. " -e " .. TaskManager,
+		"name:" .. TaskManager
+	)
 end)
+hl.bind("CTRL + ALT + DELETE", hl.dsp.exec_cmd(WLogout))
 
 hl.bind(MainMod .. " + period", hl.dsp.exec_cmd(EmojiPicker))
 hl.bind(MainMod .. " + SUPER_L", hl.dsp.exec_cmd(Menu))
-
 hl.bind("XF86SelectiveScreenshot", hl.dsp.exec_cmd(SelectiveScreenshot))
 hl.bind("XF86Launch5", hl.dsp.exec_cmd(SelectiveScreenshot))
 hl.bind("Print", hl.dsp.exec_cmd(Screenshot))
@@ -84,10 +91,10 @@ for i = 1, 10 do
 end
 
 hl.bind(MainMod .. " + 1", function()
-	openInCustomWorkspace(Browser, Browser, "1")
+	OpenInCustomWorkspace(Browser, Browser, "1")
 end)
 hl.bind("XF86HomePage", function()
-	openInCustomWorkspace(Browser, Browser, "1")
+	OpenInCustomWorkspace(Browser, Browser, "1")
 end)
 
 hl.bind(MainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })

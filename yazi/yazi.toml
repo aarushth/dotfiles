@@ -1,13 +1,3 @@
 [mgr]
 show_hidden = true
 
-[opener]
-edit = [
-    { run = 'nvim "$@"', block = true, desc = "Neovim" }
-]
-
-# If you specifically want directories to open in Neovim:
-[open]
-prepend_rules = [
-    { mime = "inode/directory", use = "edit" }
-]

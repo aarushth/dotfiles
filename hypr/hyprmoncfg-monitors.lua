@@ -3,17 +3,8 @@
 hl.monitor({
   output = "desc:Lenovo Group Limited 0x403A",
   mode = "1920x1200@60.00",
-  position = "3200x32",
+  position = "0x0",
   scale = 1.5,
-  sdr_min_luminance = 0.2,
-  sdr_max_luminance = 80,
-})
-
-hl.monitor({
-  output = "desc:Samsung Electric Company S27R65x H4TR501058",
-  mode = "1920x1080@60.00",
-  position = "1280x0",
-  scale = 1,
   sdr_min_luminance = 0.2,
   sdr_max_luminance = 80,
 })

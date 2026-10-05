@@ -27,39 +27,30 @@ hl.config({
 		},
 	},
 })
--- make sure reveal animation for notification card is ontop of actual card
-hl.layer_rule({
-	match = {
-		namespace = "quickshell-notification-card",
-	},
-	order = 1,
-})
-
--- all these other overlay layers need to be below lockscreen
-hl.layer_rule({
-	match = {
-		namespace = "quickshell-osd",
-	},
-	order = 1,
-})
-hl.layer_rule({
-	match = {
-		namespace = "quickshell-wlogout",
-	},
-	order = 1,
-})
+for _, name in ipairs({ "quickshell-notification-card", "quickshell-osd", "quickshell-wlogout", "quickshell-start" }) do
+	hl.layer_rule({
+		match = {
+			namespace = name,
+		},
+		order = 1,
+	})
+end
 hl.layer_rule({
 	match = {
 		namespace = "quickshell-lockscreen",
 	},
 	order = 0,
 })
-
--- loginctl lock-session is set to 'qs ipc call lockscreen lock' in my hypridle.conf
-hl.bind(MainMod .. " + L", hl.dsp.exec_cmd("loginctl lock-session"))
+-- no fade-in, otherwise the desktop shows through when the session lock drops
+hl.layer_rule({
+	match = {
+		namespace = "quickshell-unlockscreen",
+	},
+	order = 0,
+	no_anim = true,
+})
 
 -- toggle wallpaper picker
-hl.bind(MainMod .. " + W", hl.dsp.exec_cmd("qs ipc call wallpaper toggle"))
 hl.bind(MainMod .. " + SHIFT + W", hl.dsp.focus({ workspace = "name:wp", on_current_monitor = true }))
 function SwitchToWallpaperWs()
 	for _, monitor in ipairs(hl.get_monitors()) do
@@ -67,22 +58,8 @@ function SwitchToWallpaperWs()
 		hl.dispatch(hl.dsp.focus({ workspace = "name:wp" .. _, on_current_monitor = true }))
 	end
 end
--- override window.close for wallpaper-picker so close animation plays cleanly
-hl.bind("ALT + f4", function()
-	if not (hl.get_active_window() == "null") and hl.get_active_window().title == "quickshell-wallpaper-picker" then
-		hl.dispatch(hl.dsp.exec_cmd("qs ipc call wallpaper close"))
-	else
-		-- if pcall(function()
-		-- 	hl.plugin.feedloss.close()
-		-- end) then
-		-- 	return
-		-- end
-		hl.dispatch(hl.dsp.window.close())
-	end
-end)
 hl.bind(MainMod .. " + R", hl.dsp.exec_cmd("qs ipc call main reload"))
--- toggle wlogout
-hl.bind("CTRL + ALT + DELETE", hl.dsp.exec_cmd("qs ipc call wlogout toggle"))
 
+hl.bind(MainMod .. " + I", hl.dsp.exec_cmd("qs ipc call idle toggle"))
 --notifications
 hl.bind(MainMod .. " + X", hl.dsp.exec_cmd("qs ipc call notifications dismiss_all"))

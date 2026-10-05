@@ -4,7 +4,17 @@ return {
 	config = function()
 		require("lualine").setup({
 			options = {
-				disabled_filetypes = { "NvimTree", "help" },
+				disabled_filetypes = {
+					"NvimTree",
+					"aerial",
+					"help",
+					"dapui_scopes",
+					"dapui_breakpoints",
+					"dapui_stacks",
+					"dapui_watches",
+					"dapui_console",
+					"dap-repl",
+				},
 			},
 			sections = {
 				lualine_a = { "mode" },
@@ -21,7 +31,7 @@ return {
 				},
 				lualine_y = { "filetype" },
 				lualine_z = {
-					{ "location", padding = { left = 0 } },
+					{ "location", padding = { right = 1 } },
 				},
 			},
 			inactive_sections = {
