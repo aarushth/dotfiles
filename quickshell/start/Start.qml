@@ -41,7 +41,7 @@ Scope {
             contentItem {
                 Keys.onPressed: event => {
                     if (event.key == Qt.Key_Return) {
-                        filteredEntries[entryIcons.selectedIndex % entryIcons.numItems].execute();
+                        filteredEntries[(entryIcons.selectedIndex % entryIcons.numItems) % entryIcons.visibleItems].execute();
                         root.shouldShowStart = false;
                         event.accepted = true;
                     } else if (event.key >= 65 && event.key <= 90) {
@@ -112,31 +112,21 @@ Scope {
                     model: arcsList
                     delegate: ArcItem {
                         required property var modelData
-                        property int speed: Math.random() * 15000
+                        property int time: (Math.random() + 1) * 5000
+                        property real rotation: 0.0
+                        NumberAnimation on rotation {
+                            from: 0.0
+                            to: 360.0
+                            duration: time
+                            loops: Animation.Infinite
+                        }
                         anchors.centerIn: parent
                         width: modelData.radius
                         height: width
                         fillColor: "#00ffffff"
-                        begin: modelData.begin
-                        end: modelData.end
+                        begin: modelData.begin + rotation
+                        end: modelData.end + rotation
                         strokeWidth: modelData.strokeWidth
-                        Component.onCompleted: {
-                            let random = (Math.random() - 0.5) * 360;
-                            begin = begin + random;
-                            end = end + random;
-                        }
-                        Behavior on end {
-                            NumberAnimation {
-                                duration: speed
-                                easing.type: Easing.OutQuad
-                            }
-                        }
-                        Behavior on begin {
-                            NumberAnimation {
-                                duration: speed
-                                easing.type: Easing.OutQuad
-                            }
-                        }
                     }
                 }
             }

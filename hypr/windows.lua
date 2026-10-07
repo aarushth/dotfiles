@@ -70,7 +70,7 @@ hl.window_rule({
 	},
 	workspace = "empty",
 })
-for _, game in ipairs({ "theseus", "^(steam_app_.*)$" }) do
+for _, game in ipairs({ "theseus", "steam", "^(steam_app_.*)$" }) do
 	hl.window_rule({
 		match = {
 			class = game,
