@@ -43,6 +43,10 @@ return {
 			junit_jar = require("config.javatest").junit_jar(),
 			-- The "update available" prompt is about moving to JUnit 6.
 			disable_update_notifications = true,
+			-- Which classes count as tests (both for finding test files and for
+			-- JUnit's --include-classname). The defaults plus *Testing, which
+			-- course projects use (e.g. Testing.java).
+			test_classname_patterns = { "^.*Tests?$", "^.*IT$", "^.*Spec$", "^.*Testing$" },
 		})
 
 		-- neotest-java can only run a folder that sits inside one module, and

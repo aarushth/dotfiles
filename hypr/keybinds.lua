@@ -30,7 +30,6 @@ hl.gesture({
 })
 
 MainMod = "SUPER"
-
 function OpenInCustomWorkspace(program, command, ws)
 	for _, window in pairs(hl.get_windows()) do
 		if window.class == program then
@@ -66,7 +65,6 @@ hl.bind("CTRL + ALT + Backspace", function()
 end)
 hl.bind("CTRL + ALT + DELETE", hl.dsp.exec_cmd(WLogout))
 
-hl.bind(MainMod .. " + period", hl.dsp.exec_cmd(EmojiPicker))
 hl.bind(MainMod .. " + SUPER_L", hl.dsp.exec_cmd(Menu))
 hl.bind("XF86SelectiveScreenshot", hl.dsp.exec_cmd(SelectiveScreenshot))
 hl.bind("XF86Launch5", hl.dsp.exec_cmd(SelectiveScreenshot))

@@ -41,7 +41,8 @@ Scope {
             contentItem {
                 Keys.onPressed: event => {
                     if (event.key == Qt.Key_Return) {
-                        filteredEntries[(entryIcons.selectedIndex % entryIcons.numItems) % entryIcons.visibleItems].execute();
+                        let entry = filteredEntries[(entryIcons.selectedIndex % entryIcons.numItems) % entryIcons.visibleItems];
+                        entry.execute();
                         root.shouldShowStart = false;
                         event.accepted = true;
                     } else if (event.key >= 65 && event.key <= 90) {

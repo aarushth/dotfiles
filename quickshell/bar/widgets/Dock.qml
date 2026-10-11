@@ -1,7 +1,5 @@
 import QtQuick
 import QtQuick.Layouts
-import Quickshell
-import Quickshell.Widgets
 import Quickshell.Hyprland
 import Quickshell.Io
 import Qt5Compat.GraphicalEffects
@@ -16,7 +14,7 @@ RowLayout {
     spacing: 0
     Repeater {
         model: Hyprland.workspaces
-        delegate: Rectangle {
+        delegate: Item {
             id: wsBound
             property var ws: modelData
             property var liveToplevels: ws.toplevels.values.filter(toplevel => toplevel.wayland !== null)
@@ -27,7 +25,6 @@ RowLayout {
             onTotalBoxesChanged: boxes = Boxes.getBoxes(totalBoxes)
             Layout.preferredHeight: parent.height
             Layout.preferredWidth: w
-            color: "transparent"
             property int revealInd: activeWsId == ws.id ? 0 : totalBoxes
             property int mouseRevealInd: mouse.containsMouse ? 0 : totalBoxes
             visible: liveToplevels.length > 0

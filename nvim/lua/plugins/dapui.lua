@@ -33,6 +33,40 @@ return {
 		dap.listeners.before.launch.dapui_config = function()
 			dapui.open()
 		end
+		-- The console terminal can be taller than its panel, leaving the
+		-- program's output above the visible rows. Whenever it changes, scroll
+		-- the panel so the last non-empty line sits at the bottom (unless the
+		-- cursor is in the console, so manual scrolling isn't fought).
+		local function scroll_to_output(buf)
+			for _, win in ipairs(vim.fn.win_findbuf(buf)) do
+				if win ~= vim.api.nvim_get_current_win() then
+					local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+					local last = #lines
+					while last > 1 and not lines[last]:match("%S") do
+						last = last - 1
+					end
+					vim.api.nvim_win_call(win, function()
+						vim.api.nvim_win_set_cursor(win, { last, 0 })
+						vim.cmd("normal! zb")
+					end)
+				end
+			end
+		end
+		vim.api.nvim_create_autocmd("FileType", {
+			pattern = "dapui_console",
+			callback = function(args)
+				vim.api.nvim_buf_attach(args.buf, false, {
+					on_lines = function(_, buf)
+						vim.schedule(function()
+							if vim.api.nvim_buf_is_valid(buf) then
+								scroll_to_output(buf)
+							end
+						end)
+					end,
+				})
+			end,
+		})
+
 		-- Deliberately not closing on event_terminated/event_exited so the
 		-- console output stays visible after the program ends; <leader>du closes it.
 	end,

@@ -3,23 +3,23 @@ import QtQuick
 
 QtObject {
     function get(id) {
-        return iconsMap.get(id);
+        return iconsMap.get(id.toUpperCase());
     }
-    readonly property var iconsMap: new Map([["firefox", "󰈹"], ["kitty", ""],
-        // outlook
-        ["FFPWA-01KVW3DHW51HBQCX9WTGWBFPX5", "󰴢"], ["FFPWA-01KWDA5RWGQGKY90K5ASC92HKS", "󰴢"], ["FFPWA-01KWJ7TA62N89YFTVMET811XTV", "󰴢"],
-        //gmail
-        ["FFPWA-01KWJ5SF3PJ0MSX3FGMTF1NQ2R", "󰊫"],
-        //ZOHO mail
-        ["FFPWA-01M0HDS63PJCZX3RZKN552N8TR", ""],
-        // whatsapp
-        ["FFPWA-01KVW3KKWDT26QR2XQX414AM5Z", ""],
-        //messages
-        ["FFPWA-01KWTPJ0SZWBKKY4X7BSV5RWRN", "󰵅"], ["codium", ""], ["md.obsidian.Obsidian", ""], ["proton.vpn.app.gtk", "󰌘"], ["spotify", ""], ["discord", ""], ["steam", "󰓓"], ["warp-taskbar", ""], ["Claude", ""],
+    readonly property var iconsMap: new Map([
+        // email
+        ["FFPWA-01KVW3DHW51HBQCX9WTGWBFPX5", "󰴢"], ["FFPWA-01KWDA5RWGQGKY90K5ASC92HKS", "󰴢"], ["FFPWA-01KWJ7TA62N89YFTVMET811XTV", "󰴢"], ["FFPWA-01KWJ5SF3PJ0MSX3FGMTF1NQ2R", "󰊫"], ["FFPWA-01M0HDS63PJCZX3RZKN552N8TR", ""],
+        // messaging
+        ["FFPWA-01KVW3KKWDT26QR2XQX414AM5Z", ""], ["FFPWA-01KWTPJ0SZWBKKY4X7BSV5RWRN", "󰵅"], ["DISCORD", ""], ["SLACK", ""],
+        //coding
+        ["KITTY", ""], ["CODIUM", ""], ["SUN-TOOLS-JCONSOLE-JCONSOLE", ""], ["NVIM", ""],
+        //apps
+        ["FIREFOX", "󰈹"], ["MD.OBSIDIAN.OBSIDIAN", ""], ["SPOTIFY", ""], ["WARP-TASKBAR", ""], ["LOCALSEND", "󱒃"], ["SATTY", "󱇣"], ["ONEDRIVEGUI", "󰏊"], ["COM.OBSPROJECT.STUDIO", "󰄄"], ["MPV", ""], ["BITWARDEN", "󰞀"], ["GLSLVIEWER", "󰋁"],
+        //tui
+        ["BTOP", ""], ["WIFITUI", ""], ["BLUETUI", "󰂯"], ["YAZI", ""], ["CLAUDE", ""], ["CLIPSE", ""], ["HYPRMONCFG", "󰍺"],
         //games
-        ["alephone", gameIcon], ["Hades", gameIcon], ["Classic Marathon", gameIcon], ["Watch_Dogs", gameIcon],
-        //other
-        ["wl-kbptr", ""], ["qdirstat", ""], ["Problem Reporting", "󰞏"], ["sun-tools-jconsole-JConsole", ""], ["LocalSend", "󱒃"], ["btop", ""], ["quickshell-wallpaper-picker", "󰸉"], ["satty", "󱇣"], ["OneDriveGUI", "󰏊"], ["com.obsproject.Studio", "󰄄"], ["wifitui", ""], ["bluetui", "󰂯"], ["Yazi", ""], ["mpv", ""], ["zoom", ""], ["theseus", ""], ["Bitwarden", "󰞀"], ["org.fedoraproject.MediaWriter", "󱊟"], ["GlslViewer", "󰋁"], ["glslViewer", "󰋁"], ["slack", ""], ["nvim", ""], ["clipse", ""], ["hyprmoncfg", "󰍺"],])
+        ["ALEPHONE", gameIcon], ["HADES", gameIcon], ["CLASSIC MARATHON", gameIcon], ["WATCH_DOGS", gameIcon], ["COM.MOJANG.MINECRAFT", "󰍳"], ["ORG.PRISMLAUNCHER.PRISMLAUNCHER", ""], ["STEAM", "󰓓"], ["THESEUS", ""],
+        //system apps
+        ["WL-KBPTR", ""], ["QDIRSTAT", ""], ["PROBLEM REPORTING", "󰞏"], ["QUICKSHELL-WALLPAPER-PICKER", "󰸉"], ["ZOOM", ""], ["ORG.FEDORAPROJECT.MEDIAWRITER", "󱊟"],])
     readonly property var brightnessIcons: ["󰹐", "󱩎", "󱩏", "󱩐", "󱩑", "󱩒", "󱩓", "󱩔", "󱩕", "󱩖", "󰛨"]
     readonly property string volumeOff: "󰖁"
     readonly property string volumeLow: "󰕿"

@@ -3,37 +3,37 @@ import QtQuick.Layouts
 import Quickshell
 import Qt5Compat.GraphicalEffects
 import "../../config"
-	
-Rectangle{
-	id: root
-	property int boxSize: Boxes.boxSize
-	Layout.preferredHeight: parent.height
-	SystemClock {
-		id: clock
-		precision: SystemClock.Minutes
-	}
-	color: Theme.accentPurple
-	width: root.boxSize * 7
-	ColumnLayout{
-		id: column
-		anchors.fill: parent
-		spacing: 0
-		Text {
-			Layout.preferredWidth: parent.width
-			color: Theme.bgBase
-			text: Qt.formatTime(clock.date, "hh:mm")
-			horizontalAlignment: Text.AlignHCenter
-			font.pixelSize: 20
-			font.family: Theme.fontNormal
-			font.bold: true
-		}
-		Text {
-			Layout.preferredWidth: parent.width
-			color: Theme.bgBase
-			text: Qt.formatDate(clock.date, "MMM·dd·yyyy")
-			horizontalAlignment: Text.AlignHCenter
-			font.pixelSize: 10
-			font.family: Theme.fontFancy
-		}
-	}
+
+Rectangle {
+    id: root
+    property int boxSize: Boxes.boxSize
+    Layout.preferredHeight: parent.height
+    SystemClock {
+        id: clock
+        precision: SystemClock.Seconds
+    }
+    color: Theme.accentPurple
+    width: root.boxSize * 7
+    ColumnLayout {
+        id: column
+        anchors.fill: parent
+        spacing: 0
+        Text {
+            Layout.preferredWidth: parent.width
+            color: Theme.bgBase
+            text: Qt.formatTime(clock.date, "hh:mm")
+            horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: 20
+            font.family: Theme.fontNormal
+            font.bold: true
+        }
+        Text {
+            Layout.preferredWidth: parent.width
+            color: Theme.bgBase
+            text: Qt.formatDate(clock.date, "MMM·dd·yyyy")
+            horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: 10
+            font.family: Theme.fontFancy
+        }
+    }
 }

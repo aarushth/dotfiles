@@ -70,7 +70,7 @@ hl.window_rule({
 	},
 	workspace = "empty",
 })
-for _, game in ipairs({ "theseus", "steam", "^(steam_app_.*)$" }) do
+for _, game in ipairs({ "theseus", "steam", "^(steam_app_.*)$", "^(.*minecraft.*)$", "^(.*Minecraft.*)$" }) do
 	hl.window_rule({
 		match = {
 			class = game,
@@ -81,6 +81,7 @@ end
 hl.window_rule({
 	match = { tag = "games" },
 	fullscreen = true,
+	immediate = true,
 	workspace = "empty",
 })
 
@@ -144,8 +145,8 @@ hl.on("window.title", function(w)
 	if handled[w.address] then
 		return
 	end
-	for _, pat in ipairs({ "Extension" }) do
-		if w.title:find(pat, 1, true) then
+	for _, pat in ipairs({ "Extension:" }) do
+		if (w.title:sub(1, #pat)):find(pat, 1, true) then
 			handled[w.address] = true
 			hl.dispatch(hl.dsp.window.float({ action = "enable", window = w }))
 			hl.dispatch(hl.dsp.window.center({ window = w }))
