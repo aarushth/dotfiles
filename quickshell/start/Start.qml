@@ -170,9 +170,10 @@ Scope {
                                 duration: 150
                             }
                         }
+                        Component.onCompleted: console.warn(modelData.id, modelData.startupClass, modelData.command)
                         x: entryIcons.size / 2 + Math.round(entryIcons.size / 2 * Math.cos(angle)) - implicitWidth / 2
                         y: entryIcons.size / 2 + Math.round(entryIcons.size / 2 * Math.sin(angle)) - implicitHeight / 2
-                        text: Icons.get(modelData.id) ?? Icons.get(modelData.startupClass) ?? Icons.get(modelData.name) ?? "x"
+                        text: Icons.get(modelData.id) ?? Icons.get(modelData.startupClass) ?? Icons.get(modelData.name) ?? Icons.get(modelData.command.join()) ?? "x"
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignHCenter
                         font.family: Theme.fontIcon

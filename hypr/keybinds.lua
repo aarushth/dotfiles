@@ -23,6 +23,11 @@ hl.device({
 	sensitivity = -0.75,
 	scroll_factor = 0.2,
 })
+hl.device({
+	name = "elan0678:00-04f3:3195-touchpad",
+	enabled = true,
+})
+
 hl.gesture({
 	fingers = 3,
 	direction = "horizontal",
