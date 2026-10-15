@@ -11,7 +11,7 @@ QtObject {
         // messaging
         ["FFPWA-01KVW3KKWDT26QR2XQX414AM5Z", ""], ["FFPWA-01KWTPJ0SZWBKKY4X7BSV5RWRN", "󰵅"], ["DISCORD", ""], ["SLACK", ""],
         //coding
-        ["KITTY", ""], ["CODIUM", ""], ["SUN-TOOLS-JCONSOLE-JCONSOLE", ""], ["NVIM", ""], ["STM32CUBEIDE", "󰆦"], ["STM33CUBEIDE-2.2.0", "󰆦"], ["COM-ST-MICROXPLORER-MAINGUI-STM32CUBEMX", "󰻟"], ["COM.ST.STM32CUBEMX", "󰻟"], ["KICAD", ""], ["GERBVIEW", "󱤓"], ["PCB_CALCULATOR", ""], ["PCBNEW", ""], ["EESCHEMA", "󱢒"], ["BITMAP2COMPONENT", "󱔽"], ["OPENCASCADE-DRAW", "󰮄"], ["DRAW", "󰮄"], ["GLSLVIEWER", "󰋁"],
+        ["KITTY", ""], ["VSCODIUM", ""], ["SUN-TOOLS-JCONSOLE-JCONSOLE", ""], ["NVIM", ""], ["STM32CUBEIDE", "󰆦"], ["STM32CUBEIDE-2.2.0", "󰆦"], ["COM-ST-MICROXPLORER-MAINGUI-STM32CUBEMX", "󰻟"], ["COM.ST.STM32CUBEMX", "󰻟"], ["KICAD", ""], ["GERBVIEW", "󱤓"], ["PCB_CALCULATOR", ""], ["PCBNEW", ""], ["EESCHEMA", "󱢒"], ["BITMAP2COMPONENT", "󱔽"], ["OPENCASCADE-DRAW", "󰮄"], ["DRAW", "󰮄"], ["GLSLVIEWER", "󰋁"],
         //apps
         ["FIREFOX", "󰈹"], ["MD.OBSIDIAN.OBSIDIAN", ""], ["SPOTIFY", ""], ["WARP-TASKBAR", ""], ["LOCALSEND", "󱒃"], ["SATTY", "󱇣"], ["ONEDRIVEGUI", "󰏊"], ["COM.OBSPROJECT.STUDIO", "󰄄"], ["MPV", ""], ["BITWARDEN", "󰞀"],
         //tui

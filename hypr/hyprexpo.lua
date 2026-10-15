@@ -2,7 +2,7 @@ hl.config({
 	plugin = {
 		hyprexpo = {
 			gaps_in = 3,
-			gaps_out = 0,
+			gaps_out = 3,
 			bg_col = "rgb(111111)",
 			gesture_distance = 200,
 			show_cursor = 1,
@@ -23,16 +23,28 @@ hl.bind("ALT + SHIFT + TAB", function()
 end, { non_consuming = true })
 
 hl.define_submap("hyprexpo", function()
-	hl.bind("left", function()
+	hl.bind("ALT + h", function()
 		hl.plugin.hyprexpo.kb_focus("left")
 	end)
-	hl.bind("right", function()
+	hl.bind("ALT + l", function()
 		hl.plugin.hyprexpo.kb_focus("right")
 	end)
-	hl.bind("up", function()
+	hl.bind("ALT + k", function()
 		hl.plugin.hyprexpo.kb_focus("up")
 	end)
-	hl.bind("down", function()
+	hl.bind("ALT + j", function()
+		hl.plugin.hyprexpo.kb_focus("down")
+	end)
+	hl.bind("ALT + left", function()
+		hl.plugin.hyprexpo.kb_focus("left")
+	end)
+	hl.bind("ALT + right", function()
+		hl.plugin.hyprexpo.kb_focus("right")
+	end)
+	hl.bind("ALT + up", function()
+		hl.plugin.hyprexpo.kb_focus("up")
+	end)
+	hl.bind("ALT + down", function()
 		hl.plugin.hyprexpo.kb_focus("down")
 	end)
 	hl.bind("ALT + TAB", function()
