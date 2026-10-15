@@ -1,6 +1,7 @@
 [general]
 modes=split,click
 cancellation_status_code=0
+home_row_keys=hslfjkl;iuo
 
 [mode_split]
 pointer_size=20

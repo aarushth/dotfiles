@@ -91,6 +91,7 @@ Item {
             horizontalAlignment: Text.AlignHCenter
             text: "ENTER PASSWORD"
             font.pixelSize: 20
+            font.family: Theme.fontFancy
             visible: context.responseRequired && !resetTimerRunning && displayText !== "VERIFYING"
         }
         TextField {

@@ -49,10 +49,11 @@ end
 
 hl.bind(MainMod .. " + Q", hl.dsp.exec_cmd(Terminal))
 hl.bind(MainMod .. " + F", hl.dsp.window.fullscreen_state({ action = "toggle", internal = 2, client = -1 }))
-hl.bind(MainMod .. " + J", hl.dsp.window.float({ action = "toggle" }))
+hl.bind(MainMod .. " + SHIFT + F", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(MainMod .. " + P", hl.dsp.layout("togglesplit"))
-hl.bind(MainMod .. " + L", hl.dsp.exec_cmd(Lock))
-hl.bind("ALT + f4", hl.dsp.window.close())
+hl.bind(MainMod .. " + S", hl.dsp.exec_cmd(Lock))
+-- hl.bind("ALT + f4", hl.dsp.window.close())
+hl.bind(MainMod .. " + C", hl.dsp.window.close())
 
 hl.bind(MainMod .. " + W", function()
 	hl.exec_cmd(WallpaperSwitcher)
@@ -84,6 +85,10 @@ hl.bind(MainMod .. " + left", hl.dsp.focus({ direction = "left" }))
 hl.bind(MainMod .. " + right", hl.dsp.focus({ direction = "right" }))
 hl.bind(MainMod .. " + up", hl.dsp.focus({ direction = "up" }))
 hl.bind(MainMod .. " + down", hl.dsp.focus({ direction = "down" }))
+hl.bind(MainMod .. " + H", hl.dsp.focus({ direction = "left" }))
+hl.bind(MainMod .. " + L", hl.dsp.focus({ direction = "right" }))
+hl.bind(MainMod .. " + K", hl.dsp.focus({ direction = "up" }))
+hl.bind(MainMod .. " + J", hl.dsp.focus({ direction = "down" }))
 
 -- Switch workspaces with MainMod + [0-9]
 -- Move active window to a workspace with MainMod + SHIFT + [0-9]
@@ -158,11 +163,31 @@ hl.bind(
 )
 hl.bind(
 	MainMod .. " + ALT + up",
-	hl.dsp.window.resize({ x = 0, y = -resizeFactor, relative = true }),
+	hl.dsp.window.resize({ x = 0, y = resizeFactor, relative = true }),
 	{ repeating = true }
 )
 hl.bind(
 	MainMod .. " + ALT + down",
+	hl.dsp.window.resize({ x = 0, y = -resizeFactor, relative = true }),
+	{ repeating = true }
+)
+hl.bind(
+	MainMod .. " + ALT + L",
+	hl.dsp.window.resize({ x = -resizeFactor, y = 0, relative = true }),
+	{ repeating = true }
+)
+hl.bind(
+	MainMod .. " + ALT + H",
+	hl.dsp.window.resize({ x = resizeFactor, y = 0, relative = true }),
+	{ repeating = true }
+)
+hl.bind(
+	MainMod .. " + ALT + K",
 	hl.dsp.window.resize({ x = 0, y = resizeFactor, relative = true }),
+	{ repeating = true }
+)
+hl.bind(
+	MainMod .. " + ALT + J",
+	hl.dsp.window.resize({ x = 0, y = -resizeFactor, relative = true }),
 	{ repeating = true }
 )

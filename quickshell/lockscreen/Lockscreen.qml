@@ -25,7 +25,6 @@ ShellRoot {
                 displayText = "";
             } else {
                 lockContext.restart();
-                invert = true;
                 displayText = "SCAN  FACE";
             }
         }
@@ -79,8 +78,14 @@ ShellRoot {
         function lock() {
             root.shouldShowLockscreen = true;
         }
-        function postsleep() {
+        function presleep() {
             Lockevents.onIntroCompleted();
+        }
+        function postsleep() {
+            if (lock.locked) {
+                lockContext.restart();
+                displayText = "SCAN  FACE";
+            }
         }
     }
     property int timer: 0
