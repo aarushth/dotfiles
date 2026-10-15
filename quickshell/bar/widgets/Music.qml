@@ -18,7 +18,7 @@ Item {
 
     property var player: {
         for (const player of Mpris.players.values) {
-            if (player.desktopEntry == "spotify") {
+            if (player.desktopEntry == "spotatui") {
                 return player;
             }
         }
@@ -241,6 +241,6 @@ Item {
         id: base
     }
     TapHandler {
-        onTapped: DesktopEntries.byId("com.spotify.Client").execute()
+        onTapped: DesktopEntries.byId("spotify").execute()
     }
 }

@@ -11,7 +11,7 @@ Scope {
     property alias messageIsError: pam.messageIsError
     property alias responseRequired: pam.responseRequired
     property alias responseVisible: pam.responseVisible
-    onMessageChanged: console.warn(message)
+    // onMessageChanged: console.warn(message)
     PamContext {
         id: pam
         config: "login"

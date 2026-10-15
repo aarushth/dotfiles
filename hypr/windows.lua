@@ -66,7 +66,7 @@ hl.window_rule({
 })
 hl.window_rule({
 	match = {
-		class = "spotify",
+		class = "spotatui",
 	},
 	workspace = "empty",
 })
