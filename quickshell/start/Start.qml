@@ -43,6 +43,7 @@ Scope {
                     if (event.key == Qt.Key_Return) {
                         let entry = filteredEntries[(entryIcons.selectedIndex % entryIcons.numItems) % entryIcons.visibleItems];
                         entry.execute();
+                        console.warn(entry.id, entry.command);
                         root.shouldShowStart = false;
                         event.accepted = true;
                     } else if (event.key >= 65 && event.key <= 90) {

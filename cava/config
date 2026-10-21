@@ -1,25 +1,26 @@
 ## Configuration file for CAVA.
 
+# Lines starting with ; show config parameters and default values.
+
 # Remove the ; to change parameters.
 
 [general]
 
-# Smoothing mode. Can be 'normal', 'scientific' or 'waves'. DEPRECATED as of 0.6.0
+# Auto reload config if the configuration file has changed. 1 = on, 0 = off.
 
-; mode = normal
+; live-config = 0
 
 # Accepts only non-negative values.
 
-framerate = 30
+; framerate = 60
 
-# 'autosens' will attempt to decrease sensitivity if the bars peak. 1 = on, 0 = off
+# 'autosens' will attempt to decrease sensitivity if the bars peak and increase slowly as
 
-# new as of 0.6.0 autosens of low values (dynamic range)
+# long as the bars don't peak. 0 = off, 1 = normal, 2..n = more aggressive.
 
-# 'overshoot' allows bars to overshoot (in % of terminal height) without initiating autosens. DEPRECATED as of 0.6.0
+# increase to make sensitivity increase even faster.
 
 ; autosens = 1
-; overshoot = 20
 
 # Manual sensitivity in %. If autosens is enabled, this will only be the initial value.
 
@@ -31,7 +32,7 @@ framerate = 30
 
 # Bars' width and space between bars in number of characters.
 
-bars = 24
+; bars = 0
 ; bar_width = 2
 ; bar_spacing = 1
 
@@ -44,10 +45,18 @@ bars = 24
 ; bar_width = 20
 ; bar_spacing = 5
 
-# sdl_glsl have these default values, they are only used to calulate max number of bars.
+# sdl_glsl have these default values, they are only used to calculate max number of bars.
 
 ; bar_width = 1
 ; bar_spacing = 0
+
+# center bars in terminal, if there is space.
+
+; center_align = 1
+
+# max height of bars in terminal, in percent of terminal height.
+
+; max_height = 100
 
 # Lower and higher cutoff frequencies for lowest and highest bars
 
@@ -55,7 +64,7 @@ bars = 24
 
 # Note: there is a minimum total bandwidth of 43Mhz x number of bars.
 
-# Cava will automatically increase the higher cutoff if a too low band is specified.
+# Cava will automatically increase the higher cutoff frequency if needed to satisfy the minimum bandwidth.
 
 ; lower_cutoff_freq = 50
 ; higher_cutoff_freq = 10000
@@ -64,21 +73,21 @@ bars = 24
 
 # only check for input once per second. Cava will wake up once input is detected. 0 = disable.
 
-sleep_timer = 1
+; sleep_timer = 0
 
 [input]
 
-# Audio capturing method. Possible methods are: 'fifo', 'portaudio', 'pipewire', 'alsa', 'pulse', 'sndio', 'oss', 'jack' or 'shmem'
+# Audio capturing method. Possible methods are: 'fifo', 'portaudio', 'coreaudio', 'pipewire', 'alsa', 'pulse', 'sndio', 'oss', 'jack' or 'shmem'
 
-# Defaults to 'oss', 'pipewire', 'sndio', 'jack', 'pulse', 'alsa', 'portaudio' or 'fifo', in that order, dependent on what support cava was built with.
+# Defaults to 'oss', 'pipewire', 'sndio', 'jack', 'pulse', 'coreaudio', 'alsa', 'portaudio' or 'fifo', in that order, dependent on what support cava was built with.
 
-# On Mac it defaults to 'portaudio' or 'fifo'
+# On Mac it defaults to 'coreaudio', 'portaudio' or 'fifo'
 
-# On windows this is automatic and no input settings are needed.
+# On Windows this is automatic and no input settings are needed.
 
 #
 
-# All input methods uses the same config variable 'source'
+# Each input method uses the same config variable 'source'
 
 # to define where it should get the audio.
 
@@ -92,7 +101,7 @@ sleep_timer = 1
 
 # For pipewire 'source' will be the object name or object.serial of the device to capture from.
 
-# Both input and output devices are supported.
+# Both input and output devices are supported. To capture the monitor source of a sink node, append '.monitor' to the sink's object name.
 
 #
 
@@ -101,6 +110,22 @@ sleep_timer = 1
 # For fifo 'source' will be the path to fifo-file.
 
 # For shmem 'source' will be /squeezelite-AA:BB:CC:DD:EE:FF where 'AA:BB:CC:DD:EE:FF' will be squeezelite's MAC address
+
+#
+
+# For coreaudio 'source' can be:
+
+# 'auto' (default output device), 'auto_input' (default input device), 'list',
+
+# a 1-based device index from 'list', or an exact device name.
+
+#
+
+# On macOS 14.2+ with tap support compiled in, coreaudio can capture system output
+
+# without a loopback interface using:
+
+# 'tap' (stereo system mix) or 'tap_mono' (mono system mix)
 
 #
 
@@ -140,6 +165,9 @@ sleep_timer = 1
 ; method = portaudio
 ; source = auto
 
+; method = coreaudio
+; source = auto
+
 ; method = sndio
 ; source = default
 
@@ -161,6 +189,8 @@ sleep_timer = 1
 
 # Other methods ignore these settings.
 
+# For pipewire, sample_rate will default to 48000, for all other input methods, sample_rate will default to 44100.
+
 #
 
 # For 'sndio' and 'oss' they are only preferred values, i.e. if the values are not supported
@@ -173,10 +203,25 @@ sleep_timer = 1
 
 #
 
+#
+
+# The 'pipewire' input method has three options to control linking and mixing:
+
+# active: Force the node to always process. Useful for monitoring sources when no other application is active.
+
+# remix: Allow pipewire to remix audio channels to match cava's channel count. Useful for surround sound.
+
+# virtual: Set the node to virtual, to avoid recording notifications from the DE.
+
+#
+
 ; sample_rate = 44100
 ; sample_bits = 16
 ; channels = 2
 ; autoconnect = 2
+; active = 1
+; remix = 1
+; virtual = 1
 
 [output]
 
@@ -196,7 +241,7 @@ sleep_timer = 1
 
 # stream of the bar heights that can be used to send to other applications.
 
-# 'raw' defaults to 200 bars, which can be adjusted in the 'bars' option above.
+# 'raw' defaults to 1024 bars stereo (512 bars mono), which can be adjusted in the 'bars' option above.
 
 #
 
@@ -212,15 +257,19 @@ sleep_timer = 1
 
 # use one of the predefined ones.
 
-method = raw
+; method = noncurses
 
-# Orientation of the visualization. Can be 'bottom', 'top', 'left' or 'right'.
+# Orientation of the visualization. Can be 'bottom', 'top', 'left', 'right' or
 
-# Default is 'bottom'. Other orientations are only supported on sdl and ncruses
+# 'horizontal'. Default is 'bottom'. 'left and 'right' are only supported on sdl
 
-# output. Note: many fonts have weird glyphs for 'top' and 'right' characters,
+# and ncurses output. 'horizontal' (bars go up and down from center) is only supported
 
-# which can make ncurses not look right.
+# on noncurses output.
+
+# Note: many fonts have weird or missing glyphs for characters used in orientations
+
+# other than 'bottom', which can make output not look right.
 
 ; orientation = bottom
 
@@ -235,26 +284,39 @@ method = raw
 # set 'reverse' to 1 to display frequencies the other way around.
 
 channels = mono
-mono_option = average
+; mono_option = average
 ; reverse = 0
 
-# Raw output target. A fifo will be created if target does not exist.
+# Only valid if orientation is set to 'horizontal'.
+
+# Set 'horizontal_stereo' to 1 to have left channel bars at top and right channel at bottom.
+
+# Set 'left_bottom' to 0 to have right channel at top and left channel at bottom.
+
+; horizontal_stereo = 0
+; left_bottom = 1
+
+# Raw output target.
+
+# On Linux, a fifo will be created if target does not exist.
+
+# On Windows, a named pipe will be created if target does not exist.
 
 ; raw_target = /dev/stdout
 
 # Raw data format. Can be 'binary' or 'ascii'.
 
-data_format = ascii
+; data_format = binary
 
 # Binary bit format, can be '8bit' (0-255) or '16bit' (0-65530).
 
-; bit_format = 8bit
+; bit_format = 16bit
 
 # Ascii max value. In 'ascii' mode range will run from 0 to value specified here
 
-ascii_max_range = 8
+; ascii_max_range = 1000
 
-# Ascii delimiters. In ascii format each bar and frame is separated by a delimiters.
+# Ascii delimiters. In ascii format each bar and frame is separated by a delimiter.
 
 # Use decimal value in ascii table (i.e. 59 = ';' and 10 = '\n' (line feed)).
 
@@ -263,8 +325,8 @@ ascii_max_range = 8
 
 # sdl window size and position. -1,-1 is centered.
 
-; sdl_width = 1000
-; sdl_height = 500
+; sdl_width = 1024
+; sdl_height = 512
 ; sdl_x = -1
 ; sdl_y= -1
 ; sdl_full_screen = 0
@@ -277,23 +339,62 @@ ascii_max_range = 8
 
 ; xaxis = none
 
-# enable alacritty synchronized updates. 1 = on, 0 = off
+# enable synchronized sync. 1 = on, 0 = off
 
 # removes flickering in alacritty terminal emulator.
 
 # defaults to off since the behaviour in other terminal emulators is unknown
 
-; alacritty_sync = 0
+; synchronized_sync = 0
 
 # Shaders for sdl_glsl, located in $HOME/.config/cava/shaders
 
 ; vertex_shader = pass_through.vert
+
+# Default spectrum shader
+
+# default value: bar_spectrum.frag
+
 ; fragment_shader = bar_spectrum.frag
 
-; for glsl output mode, keep rendering even if no audio
+# other styles shaders
+
+; fragment_shader = eye_of_phi.frag
+; fragment_shader = northern_lights.frag
+; fragment_shader = spectrogram.frag
+; fragment_shader = winamp_line_style_spectrum.frag
+
+# Orion shaders (use with: method = sdl_glsl)
+
+# Static Orion
+
+; fragment_shader = orion_circle.frag
+
+# Rotating Orion
+
+; fragment_shader = orion_circle_rotate.frag
+
+# Orion saturn subring
+
+; fragment_shader = orion_saturn_subring.frag
+
+# Orion saturn core
+
+; fragment_shader = orion_saturn_core.frag
+
+# For glsl output mode, keep rendering even if no audio. 1 = on, 0 = off. Default: 0
+
+# Enable for animated shaders so time-based effects keep updating.
+
 ; continuous_rendering = 0
 
-# disable console blank (screen saver) in tty
+# SDL_GLSL only: gain applied to bar amplitudes before sending to shaders, in percent. Default: 100
+
+# 0 = mute, 100 = unchanged, >100 = amplify (shader input is clamped to the [0..1] range).
+
+; sdl_glsl_gain = 100
+
+# disable console blank (screen saver) in tty. 1 = on, 0 = off. Default: 0
 
 # (Not supported on FreeBSD)
 
@@ -311,7 +412,7 @@ ascii_max_range = 8
 
 # Colors can be one of seven predefined: black, blue, cyan, green, magenta, red, white, yellow.
 
-# Or defined by hex code '#xxxxxx' (hex code must be within ''). User defined colors requires
+# Or defined by hex code '#xxxxxx' (hex code must be within ''). User defined colors require
 
 # a terminal that can change color definitions such as Gnome-terminal or rxvt.
 
@@ -329,10 +430,9 @@ ascii_max_range = 8
 
 # background must also be defined in hex or remain commented out. 1 = on, 0 = off.
 
-# You can define as many as 8 different colors. They range from bottom to top of screen
+# You can define as many as 8 different colors. They range from bottom to top of the screen
 
 ; gradient = 0
-; gradient_count = 8
 ; gradient_color_1 = '#59cc33'
 ; gradient_color_2 = '#80cc33'
 ; gradient_color_3 = '#a6cc33'
@@ -342,34 +442,42 @@ ascii_max_range = 8
 ; gradient_color_7 = '#cc5933'
 ; gradient_color_8 = '#cc3333'
 
+# Horizontal is only supported on noncurses output.
+
+# Only one color will be calculated per bar.
+
+; horizontal_gradient = 0
+; horizontal_gradient_color_1 = '#c45161'
+; horizontal_gradient_color_2 = '#e094a0'
+; horizontal_gradient_color_3 = '#f2b6c0'
+; horizontal_gradient_color_4 = '#f2dde1'
+; horizontal_gradient_color_5 = '#cbc7d8'
+; horizontal_gradient_color_6 = '#8db7d2'
+; horizontal_gradient_color_7 = '#5e62a9'
+; horizontal_gradient_color_8 = '#434279'
+
+# If both vertical and horizontal gradients are enabled, the vertical one will be blended in this direction.
+
+# Can be 'up', 'down', 'left' or 'right'. 'up' means the vertical gradient will be blended in from
+
+# bottom to top. I.e. the bottom will only be the horizontal
+
+# and top will only be the vertical color of the gradient.
+
+; blend_direction = 'up'
+
+# use theme file instead of defining colors in this file
+
+# themes are located in $HOME/.config/cava/themes
+
+; theme = 'none'
+
 [smoothing]
-
-# Percentage value for integral smoothing. Takes values from 0 - 100.
-
-# Higher values means smoother, but less precise. 0 to disable.
-
-# DEPRECATED as of 0.8.0, use noise_reduction instead
-
-; integral = 77
 
 # Disables or enables the so-called "Monstercat smoothing" with or without "waves". Set to 0 to disable.
 
 ; monstercat = 0
 ; waves = 0
-
-# Set gravity percentage for "drop off". Higher values means bars will drop faster.
-
-# Accepts only non-negative values. 50 means half gravity, 200 means double. Set to 0 to disable "drop off".
-
-# DEPRECATED as of 0.8.0, use noise_reduction instead
-
-; gravity = 100
-
-# In bar height, bars that would have been lower that this will not be drawn.
-
-# DEPRECATED as of 0.8.0
-
-; ignore = 0
 
 # Noise reduction, int 0 - 100. default 77
 
@@ -381,7 +489,7 @@ ascii_max_range = 8
 
 [eq]
 
-# This one is tricky. You can have as much keys as you want.
+# This one is tricky. You can have as many keys as you want.
 
 # Remember to uncomment more than one key! More keys = more precision.
 

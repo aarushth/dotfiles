@@ -31,6 +31,40 @@ return {
 						or vim.fs.dirname(vim.api.nvim_buf_get_name(bufnr))
 				)
 			end,
+			-- Plain folders (no build tool) only get jars from lib/ next to
+			-- them. Also give every project the shared JUnit 5 jar, so tests
+			-- compile and run without copying JUnit into each folder.
+			settings = {
+				java = {
+					project = {
+						referencedLibraries = { "lib/**/*.jar", require("config.javatest").junit_jar() },
+					},
+				},
+			},
+		})
+
+		-- nvim only briefly waits for servers on exit, so a slow one (jdtls)
+		-- can outlive it. Ask every server to stop, give them a second, then
+		-- kill whatever is still running.
+		vim.api.nvim_create_autocmd("VimLeavePre", {
+			callback = function()
+				local clients = vim.lsp.get_clients()
+				for _, client in ipairs(clients) do
+					client:stop()
+				end
+				local all_stopped = vim.wait(1000, function()
+					return vim.iter(clients):all(function(c)
+						return c:is_stopped()
+					end)
+				end, 50)
+				if not all_stopped then
+					for _, client in ipairs(clients) do
+						if not client:is_stopped() then
+							client:stop(true)
+						end
+					end
+				end
+			end,
 		})
 
 		vim.api.nvim_create_autocmd("LspAttach", {
@@ -45,6 +79,40 @@ return {
 				-- it disables that provider and only looks once, at attach, when
 				-- jdtls often hasn't imported the project yet.
 				jdtls.setup_dap({ hotcodereplace = "auto" })
+
+				-- jdtls's own test runner (what LazyVim uses), for running tests
+				-- without the neotest panel. Tests always run under the debugger,
+				-- so breakpoints hit; results go to the dap-repl, failures to the
+				-- quickfix list.
+				local test = require("jdtls.dap")
+				for _, map in ipairs({
+					{ "<leader>tt", test.test_class, "Test: Run Class" },
+					{ "<leader>tr", test.test_nearest_method, "Test: Run Nearest" },
+					{ "<leader>tT", test.pick_test, "Test: Pick and Run" },
+				}) do
+					vim.keymap.set("n", map[1], function()
+						map[2]()
+					end, { buffer = args.buf, desc = map[3] })
+				end
+
+				-- The adapter fills in mainClass/javaExec/classpaths for every
+				-- session by looking the project up. neotest-java's debug runs
+				-- *attach* to a JVM it already started, which needs none of that,
+				-- and the lookup can fail ("Could not resolve java executable").
+				-- Skip it for attach. (neotest.lua sets the right projectName.)
+				local dap = require("dap")
+				if not vim.g.jdtls_attach_wrapped then
+					vim.g.jdtls_attach_wrapped = true
+					local start_adapter = dap.adapters.java
+					dap.adapters.java = function(callback, config)
+						start_adapter(function(adapter)
+							if config.request == "attach" then
+								adapter.enrich_config = nil
+							end
+							callback(adapter)
+						end, config)
+					end
+				end
 			end,
 		})
 

@@ -81,7 +81,7 @@ end
 hl.window_rule({
 	match = { tag = "games" },
 	fullscreen = true,
-	immediate = true,
+	-- immediate = true,
 	workspace = "empty",
 })
 
