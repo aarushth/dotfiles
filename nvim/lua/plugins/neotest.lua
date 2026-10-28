@@ -102,42 +102,48 @@ return {
 
 		local nio = require("nio")
 
-		--- The initialized jdtls whose root holds `dir` (the deepest one).
+		--- The initialized jdtls with a workspace folder holding `dir` (the
+		--- deepest one). Plain folders share one jdtls (see lsp.lua).
 		local function find_jdtls(dir)
-			return vim.iter(vim.lsp.get_clients({ name = "jdtls" })):fold(nil, function(best, c)
-				local root = c.config.root_dir
-				if
-					c.initialized
-					and root
-					and (dir == root or vim.startswith(dir, root .. "/"))
-					and (not best or #root > #best.config.root_dir)
-				then
-					return c
+			local best, best_len = nil, 0
+			for _, c in ipairs(vim.lsp.get_clients({ name = "jdtls" })) do
+				for _, folder in ipairs(c.initialized and c.workspace_folders or {}) do
+					local root = folder.name
+					if (dir == root or vim.startswith(dir, root .. "/")) and #root > best_len then
+						best, best_len = c, #root
+					end
 				end
-				return best
-			end)
+			end
+			return best
 		end
 
-		--- Whether jdtls has imported `dir` into a project yet.
+		local junit_jar = require("config.javatest").junit_jar()
+
+		--- Whether jdtls has imported `dir` into a project yet. A plain folder's
+		--- project exists a moment before jdtls adds the shared JUnit jar to it
+		--- (see lsp.lua), and tests compiled before then have no tests to run.
 		local function imported(client, dir)
+			local plain = not default_root_finder.find_root(dir)
 			local future = nio.control.future()
 			vim.schedule(function()
 				client:request("workspace/executeCommand", {
 					command = "java.project.getClasspaths",
 					arguments = { vim.uri_from_fname(dir), vim.json.encode({ scope = "test" }) },
-				}, function(err)
-					future.set(not err)
+				}, function(err, res)
+					future.set(not err and (not plain or vim.tbl_contains(res.classpaths or {}, junit_jar)))
 				end)
 			end)
 			return future.wait()
 		end
 
 		-- neotest-java's own client provider reuses whichever jdtls it found
-		-- first, but each plain folder gets its own jdtls (see lsp.lua), so in a
-		-- multi-folder project the other folders' requests hang. Pick the jdtls
-		-- for the folder instead, starting it (by loading one of its .java files)
-		-- and waiting for the import if it isn't running yet.
+		-- first, and asks it about folders it may not serve yet (a problem
+		-- folder whose files were never opened), so those requests hang. Pick
+		-- the jdtls for the folder instead, adding the folder (by loading one of
+		-- its .java files) and waiting for the import if it isn't served yet.
 		local ready = {}
+		-- Folders compiled at least once, by client id .. path (see lsp_compiler).
+		local built = {}
 		local function client_provider(dir_path)
 			local dir = dir_path:to_string()
 			local client = find_jdtls(dir)
@@ -182,10 +188,29 @@ return {
 		}, {
 			root_finder = root_finder,
 			client_provider = client_provider,
-			-- Built with neotest-java's provider by default, so swap it too.
-			lsp_compiler = require("neotest-java.core.spec_builder.compiler.lsp_compiler")({
-				client_provider = client_provider,
-			}),
+			-- neotest-java's compiler uses its own client provider and doesn't
+			-- wait for the build (its java/buildWorkspace parameter isn't even
+			-- one jdtls answers), so JUnit can start before jdtls has compiled a
+			-- folder it just added, and finds no tests. Build the folder's own
+			-- project instead, in full the first time, and wait for it.
+			lsp_compiler = {
+				compile = function(args)
+					local dir = args.base_dir:to_string()
+					local client = client_provider(args.base_dir)
+					local full = args.compile_mode == "full" or not built[client.id .. dir]
+					local future = nio.control.future()
+					vim.schedule(function()
+						client:request("java/buildProjects", {
+							identifiers = { { uri = vim.uri_from_fname(dir) } },
+							isFullBuild = full,
+						}, function()
+							future.set()
+						end)
+					end)
+					future.wait()
+					built[client.id .. dir] = true
+				end,
+			},
 			build_tool_getter = function(project_type)
 				return project_type == "unknown" and plain_build_tool or build_tools.get(project_type)
 			end,

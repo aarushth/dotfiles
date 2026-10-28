@@ -19,17 +19,63 @@ return {
 				table.insert(bundles, jar)
 			end
 		end
+		-- Roots that are just a folder of .java files (see root_dir below).
+		local plain_roots = {}
+		-- Workspace folders added to a jdtls before it finished initializing,
+		-- by client id; servers ignore notifications sent before that.
+		local pending_folders = {}
+
+		local function add_workspace_folders(client, folders)
+			client:notify("workspace/didChangeWorkspaceFolders", { event = { added = folders, removed = {} } })
+		end
+
 		vim.lsp.config("jdtls", {
 			init_options = { bundles = bundles },
 			-- lspconfig only starts jdtls under a build file or .git, so plain
 			-- folders of .java files (class projects) got no LSP or debugging.
 			-- Fall back to the file's own directory, like VS Code does.
 			root_dir = function(bufnr, on_dir)
-				on_dir(
-					vim.fs.root(bufnr, { "mvnw", "gradlew", "settings.gradle", "settings.gradle.kts", ".git" })
-						or vim.fs.root(bufnr, { "build.xml", "pom.xml", "build.gradle", "build.gradle.kts" })
-						or vim.fs.dirname(vim.api.nvim_buf_get_name(bufnr))
-				)
+				local root = vim.fs.root(bufnr, { "mvnw", "gradlew", "settings.gradle", "settings.gradle.kts", ".git" })
+					or vim.fs.root(bufnr, { "build.xml", "pom.xml", "build.gradle", "build.gradle.kts" })
+				if not root then
+					root = vim.fs.dirname(vim.api.nvim_buf_get_name(bufnr))
+					plain_roots[root] = true
+				end
+				on_dir(root)
+			end,
+			-- Each plain folder is its own project, so problem folders can reuse
+			-- class names, but a jdtls per folder is a 1GB+ JVM each. Serve them
+			-- all from one jdtls instead: it makes each workspace folder its own
+			-- project.
+			reuse_client = function(client, config)
+				if client.name ~= config.name or client:is_stopped() then
+					return false
+				end
+				local folder = { uri = vim.uri_from_fname(config.root_dir), name = config.root_dir }
+				client.workspace_folders = client.workspace_folders or {}
+				if vim.iter(client.workspace_folders):any(function(f)
+					return f.uri == folder.uri
+				end) then
+					return true
+				end
+				if not (plain_roots[config.root_dir] and plain_roots[client.config.root_dir]) then
+					return false
+				end
+				table.insert(client.workspace_folders, folder)
+				if client.initialized then
+					add_workspace_folders(client, { folder })
+				else
+					pending_folders[client.id] = pending_folders[client.id] or {}
+					table.insert(pending_folders[client.id], folder)
+				end
+				return true
+			end,
+			on_init = function(client)
+				local folders = pending_folders[client.id]
+				pending_folders[client.id] = nil
+				if folders then
+					add_workspace_folders(client, folders)
+				end
 			end,
 			-- Plain folders (no build tool) only get jars from lib/ next to
 			-- them. Also give every project the shared JUnit 5 jar, so tests
@@ -45,7 +91,7 @@ return {
 
 		-- nvim only briefly waits for servers on exit, so a slow one (jdtls)
 		-- can outlive it. Ask every server to stop, give them a second, then
-		-- kill whatever is still running.
+		-- force-stop whatever is still running.
 		vim.api.nvim_create_autocmd("VimLeavePre", {
 			callback = function()
 				local clients = vim.lsp.get_clients()
@@ -63,6 +109,28 @@ return {
 							client:stop(true)
 						end
 					end
+				end
+				-- A stopped client only means the connection is closed: a jdtls JVM
+				-- still shutting down (or starting up) can outlive nvim and keep
+				-- using CPU, and stop(true) does nothing once a client is closing.
+				-- Give those a second to exit, then kill them.
+				local function jdtls_pids()
+					return vim.iter(vim.api.nvim_get_proc_children(vim.fn.getpid()))
+						:filter(function(pid)
+							local f = io.open("/proc/" .. pid .. "/cmdline")
+							local cmdline = f and f:read("*a")
+							if f then
+								f:close()
+							end
+							return cmdline ~= nil and cmdline:find("org.eclipse.jdt.ls", 1, true) ~= nil
+						end)
+						:totable()
+				end
+				vim.wait(1000, function()
+					return #jdtls_pids() == 0
+				end, 50)
+				for _, pid in ipairs(jdtls_pids()) do
+					vim.uv.kill(pid, "sigkill")
 				end
 			end,
 		})

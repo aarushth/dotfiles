@@ -70,7 +70,7 @@ hl.window_rule({
 	},
 	workspace = "empty",
 })
-for _, game in ipairs({ "theseus", "steam", "^(steam_app_.*)$", "^(.*minecraft.*)$", "^(.*Minecraft.*)$" }) do
+for _, game in ipairs({ "theseus", "gamescope", "^(.*minecraft.*)$", "^(.*Minecraft.*)$" }) do
 	hl.window_rule({
 		match = {
 			class = game,
@@ -112,7 +112,7 @@ hl.window_rule({
 })
 hl.window_rule({
 	match = {
-		title = "Zoho Mail",
+		class = "Zoho Mail - Desktop",
 	},
 	workspace = "name:zoho",
 })
