@@ -9,6 +9,11 @@ keybindings:
   jump_to_start: ctrl-a
   jump_to_end: ctrl-e
   jump_to_album: a
+  dj_open: ctrl-j
+  dj_toggle_auto_queue: ctrl-t
+  dj_vibe_shift: ctrl-y
+  dj_toggle_fresh_only: ctrl-o
+  dj_pick_model: ctrl-g
   jump_to_artist_album: A
   jump_to_context: o
   manage_devices: d
@@ -40,6 +45,7 @@ keybindings:
   like_track: F
   generate_recap: R
 behavior:
+  language: auto
   seek_milliseconds: 5000
   volume_increment: 10
   tick_rate_milliseconds: 250
@@ -66,6 +72,7 @@ behavior:
   paused_icon: ⏸
   set_window_title: false
   visualizer_style: Cava
+  player_bar_visualizer: spectrum
   relay_server_url: wss://spotatui-party.spotatui.workers.dev/ws
   stop_after_current_track: false
   startup_behavior: continue
@@ -78,6 +85,21 @@ behavior:
   cover_art_dither: false
   cover_art_dither_algorithm: stucki
   cover_art_dither_pixel_scale: 1
+  mcp_enabled: false
+  dj_backend: agent_cli
+  dj_agent_command:
+  - claude
+  - -p
+  dj_agent_prompt_via: null
+  dj_agent_timeout_secs: 90
+  dj_agent_model: null
+  dj_model: null
+  dj_base_url: null
+  dj_api_key: null
+  dj_batch_size: 6
+  dj_history_period: 30d
+  dj_avoid_library: false
+  dj_configured: null
   keepawake_enabled: true
   enable_media_keys: true
   enable_streaming: true
@@ -91,6 +113,9 @@ behavior:
   subsonic_username: null
   subsonic_password: null
   ytdlp_path: null
+  playback_engine: librespot
+  soloist_path: null
+  soloist_audio_quality: lossless
   qobuz_quality: 6
   gauge_filled_icon: ⣿
   gauge_unfilled_icon: ⣉
@@ -105,7 +130,7 @@ behavior:
   table_scroll_padding: 5
   like_animation_frames: 10
   startup_route: home
-  default_sort_playlist_tracks: date_added
+  default_sort_playlist_tracks: default
   default_sort_saved_albums: default
   default_sort_saved_artists: default
   default_sort_recently_played: name

@@ -38,9 +38,10 @@ return {
 	},
 	config = function()
 		-- Which classes count as tests (both for finding test files and for
-		-- JUnit's --include-classname). The defaults plus *Testing, which
-		-- course projects use (e.g. Testing.java).
-		local test_patterns = { "^.*Tests?$", "^.*IT$", "^.*Spec$", "^.*Testing$" }
+		-- JUnit's --include-classname): any whose name contains "test", in any
+		-- case (FooTest, TestFoo, Testing). Valid as a Lua pattern and a Java
+		-- regex.
+		local test_patterns = { "^.*[Tt][Ee][Ss][Tt].*$" }
 
 		-- neotest-java only recognizes Maven/Gradle (or .git) projects, but it
 		-- compiles and gets classpaths through jdtls, so plain folders of .java
@@ -239,6 +240,24 @@ return {
 			end
 			return Tree.from_list(map_list(tree:to_list()), function(pos)
 				return pos.id
+			end)
+		end
+
+		-- neotest-java skips folders whose path merely contains one of these
+		-- names, so "Combine Strings" (com-bin-e) was never searched. Match
+		-- whole folder names instead, still searching anything under a test
+		-- folder (src/test/resources).
+		local skipped_dirs = { target = true, build = true, out = true, bin = true, resources = true, main = true }
+		skipped_dirs[PLAIN_BUILD_DIR] = true
+		java.filter_dir = function(_, rel_path)
+			local segments = vim.split(rel_path, "/", { plain = true })
+			if vim.iter(segments):any(function(s)
+				return s:find("test", 1, true) ~= nil
+			end) then
+				return true
+			end
+			return not vim.iter(segments):any(function(s)
+				return skipped_dirs[s]
 			end)
 		end
 

@@ -11,6 +11,9 @@ import "../config/"
 Scope {
     id: root
     property bool shouldShowStart: false
+    property int outerCircleRadius: 500
+    property int iconCircleRadius: 360
+    property int innerCircleRadius: 230
     property var arcsList: {
         let val = [];
         for (let i = 0; i < Arcs.beginList.length; i++) {
@@ -43,7 +46,7 @@ Scope {
                     if (event.key == Qt.Key_Return) {
                         let entry = filteredEntries[(entryIcons.selectedIndex % entryIcons.numItems) % entryIcons.visibleItems];
                         entry.execute();
-                        console.warn(entry.id, entry.command);
+                        // console.warn(entry.id, entry.command);
                         root.shouldShowStart = false;
                         event.accepted = true;
                     } else if (event.key >= 65 && event.key <= 90) {
@@ -79,8 +82,8 @@ Scope {
                 visible: false
                 Rectangle {
                     anchors.centerIn: parent
-                    width: 500
-                    height: 500
+                    width: outerCircleRadius
+                    height: outerCircleRadius
                     radius: width / 2
                     color: Theme.accentBlue
                 }
@@ -149,7 +152,7 @@ Scope {
             Item {
                 id: entryIcons
                 anchors.centerIn: parent
-                property int size: 360
+                property int size: iconCircleRadius
                 width: size
                 height: size
                 property int numItems: 12
@@ -195,6 +198,28 @@ Scope {
                         strokeColor: Theme.accentYellow
                         strokeWidth: 1
                     }
+                }
+            }
+            Item {
+                anchors.centerIn: parent
+                width: innerCircleRadius
+                height: innerCircleRadius
+                Image {
+                    id: cool
+                    anchors {
+                        top: parent.top
+                        bottom: parent.bottom
+                        right: parent.right
+                        rightMargin: 10
+                    }
+                    fillMode: Image.PreserveAspectFit
+                    source: "cool.svg"
+                }
+                Rectangle {
+                    visible: false
+                    anchors.fill: cool
+                    topRightRadius: 20
+                    bottomRightRadius: 20
                 }
             }
         }

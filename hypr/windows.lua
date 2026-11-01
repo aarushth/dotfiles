@@ -54,7 +54,7 @@ hl.window_rule({
 -- --btop
 hl.window_rule({
 	match = {
-		class = "firefox",
+		class = Browser,
 	},
 	workspace = "1",
 })
@@ -64,12 +64,15 @@ hl.window_rule({
 	},
 	workspace = "name:btop",
 })
-hl.window_rule({
-	match = {
-		class = "spotatui",
-	},
-	workspace = "empty",
-})
+
+for _, app in ipairs({ "spotatui" }) do
+	hl.window_rule({
+		match = {
+			class = app,
+		},
+		workspace = "empty",
+	})
+end
 for _, game in ipairs({ "theseus", "gamescope", "^(.*minecraft.*)$", "^(.*Minecraft.*)$" }) do
 	hl.window_rule({
 		match = {
@@ -81,42 +84,8 @@ end
 hl.window_rule({
 	match = { tag = "games" },
 	fullscreen = true,
-	-- immediate = true,
 	workspace = "empty",
 })
-
--- emails
-hl.window_rule({
-	match = {
-		title = "Outlook uw",
-	},
-	workspace = "name:uw",
-})
-hl.window_rule({
-	match = {
-		title = "Outlook personal",
-	},
-	workspace = "name:mail",
-})
-hl.window_rule({
-	match = {
-		title = "Outlook cse",
-	},
-	workspace = "name:cse",
-})
-hl.window_rule({
-	match = {
-		title = "gmail",
-	},
-	workspace = "name:gmail",
-})
-hl.window_rule({
-	match = {
-		class = "Zoho Mail - Desktop",
-	},
-	workspace = "name:zoho",
-})
-
 for _, className in ipairs({
 	"float",
 	"OneDriveGUI",
@@ -133,28 +102,52 @@ for _, className in ipairs({
 end
 for _, className in ipairs({
 	"float",
-	"OneDriveGUI",
 }) do
 	hl.window_rule({
 		match = { class = className },
 		size = "625 650",
 	})
 end
-local handled = {}
-hl.on("window.title", function(w)
-	if handled[w.address] then
+hl.on("window.open", function(w)
+	if w.class ~= Browser then
 		return
 	end
-	for _, pat in ipairs({ "Extension:" }) do
-		if (w.title:sub(1, #pat)):find(pat, 1, true) then
-			handled[w.address] = true
-			hl.dispatch(hl.dsp.window.float({ action = "enable", window = w }))
-			hl.dispatch(hl.dsp.window.center({ window = w }))
+	if w.initial_title ~= "Mozilla Firefox" then
+		return
+	end
+
+	local ff_windows = hl.get_windows({ class = Browser })
+	if #ff_windows <= 1 then
+		return
+	end
+
+	hl.dispatch(hl.dsp.window.float({ action = "set", window = w }))
+
+	local sub
+	sub = hl.on("window.title", function(tw)
+		if tw.address ~= w.address then
 			return
 		end
-	end
-end)
+		if
+			tw.title == ""
+			or tw.title == "Mozilla Firefox"
+			or tw.title == "about:blank"
+			or tw.title:match("^about:.*Mozilla Firefox$")
+		then
+			return
+		end
 
+		sub:remove()
+
+		if tw.title:match("^Extension:") then
+			hl.dispatch(hl.dsp.window.resize({ x = 800, y = 600, window = tw }))
+			hl.dispatch(hl.dsp.window.center({ window = tw }))
+			hl.dispatch(hl.dsp.focus({ window = tw }))
+		else
+			hl.dispatch(hl.dsp.window.float({ action = "unset", window = tw }))
+		end
+	end)
+end)
 hl.window_rule({
 	match = { tag = "float" },
 	float = true,

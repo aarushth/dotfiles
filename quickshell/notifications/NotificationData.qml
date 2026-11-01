@@ -2,7 +2,7 @@ import QtQuick
 import Quickshell.Services.Notifications
 import Quickshell
 
-Scope{
+Scope {
     id: notificationData
 
     property Notification notification: null
@@ -16,12 +16,8 @@ Scope{
     property string appIcon: notification.appIcon || ""
     property string appName: notification.appName || ""
     property string image: notification.image || ""
-    property var actions: notification.actions.map(function (a) {
-            return {
-                identifier: a.identifier,
-                text: a.text
-            };
-        });
+    property var actions: notification.actions
+    onActionsChanged: console.warn(actions)
     property int urgency: notification.urgency
     property real expireTimeout: notification.expireTimeout > 0 ? notification.expireTimeout : defaultTimeout
     property int rowNums: 11 + (actions.length > 0 ? 2 : 0)
@@ -29,7 +25,7 @@ Scope{
     property int yPos: 800
     property bool hovered: false
     readonly property bool timerPaused: notificationData.triggerClose || notificationData.hovered
-    readonly property int defaultTimeout: 5000  
+    readonly property int defaultTimeout: 5000
     readonly property Connections _conn: Connections {
         target: notificationData.notification
 
@@ -82,20 +78,20 @@ Scope{
             });
         }
     }
-	property int timerValue: expireTimeout
-	property var timer: SequentialAnimation {
-		id: timer
-		paused: running && timerPaused
-		NumberAnimation {
-			target: notificationData
-			property: "timerValue"
-			to: 0
-			duration: notificationData.expireTimeout
-		}
-		ScriptAction{
-			script: notificationData.dismiss()
-		}
-	}
+    property int timerValue: expireTimeout
+    property var timer: SequentialAnimation {
+        id: timer
+        paused: running && timerPaused
+        NumberAnimation {
+            target: notificationData
+            property: "timerValue"
+            to: 0
+            duration: notificationData.expireTimeout
+        }
+        ScriptAction {
+            script: notificationData.dismiss()
+        }
+    }
     function dismiss(): void {
         triggerClose = true;
     }

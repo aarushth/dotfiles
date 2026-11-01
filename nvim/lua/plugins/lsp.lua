@@ -5,6 +5,8 @@ return {
 		local qmlls = vim.fn.executable("/usr/bin/qmlls") == 1 and "/usr/bin/qmlls" or "qmlls"
 		vim.lsp.config("qmlls", { cmd = { qmlls } })
 
+		vim.lsp.config("clangd", { cmd = { "clangd", "--query-driver=/usr/bin/gcc" } })
+
 		-- jdtls only speaks DAP through the java-debug (and java-test) plugins,
 		-- which have to be handed to it as bundles at startup.
 		local mason = vim.fn.stdpath("data") .. "/mason/packages/"

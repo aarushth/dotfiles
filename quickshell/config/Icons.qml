@@ -7,19 +7,19 @@ QtObject {
     }
     readonly property var iconsMap: new Map([
         // email
-        ["FFPWA-01KVW3DHW51HBQCX9WTGWBFPX5", "󰴢"], ["FFPWA-01KWDA5RWGQGKY90K5ASC92HKS", "󰴢"], ["FFPWA-01KWJ7TA62N89YFTVMET811XTV", "󰴢"], ["FFPWA-01KWJ5SF3PJ0MSX3FGMTF1NQ2R", "󰊫"], ["ZOHO MAIL - DESKTOP", ""],
+        ["NET.THUNDERBIRD.THUNDERBIRD", ""], ["ZOHO MAIL - DESKTOP", ""],
         // messaging
-        ["FFPWA-01KVW3KKWDT26QR2XQX414AM5Z", ""], ["FFPWA-01KWTPJ0SZWBKKY4X7BSV5RWRN", "󰵅"], ["DISCORD", ""], ["SLACK", ""],
+        ["ZAPFAST", ""], ["ORG.KDE.KDECONNECT.SMS", "󰵅"], ["DISCORD", ""], ["SLACK", ""],
         //coding
-        ["KITTY", ""], ["VSCODIUM", ""], ["SUN-TOOLS-JCONSOLE-JCONSOLE", ""], ["NVIM", ""], ["STM32CUBEIDE", "󰆦"], ["STM32CUBEIDE-2.2.0", "󰆦"], ["COM-ST-MICROXPLORER-MAINGUI-STM32CUBEMX", "󰻟"], ["COM.ST.STM32CUBEMX", "󰻟"], ["KICAD", ""], ["GLSLVIEWER", "󰋁"], ["ARDUINO IDE", ""],
+        ["KITTY", ""], ["COM.VISUALSTUDIO.CODEOSS", ""], ["SUN-TOOLS-JCONSOLE-JCONSOLE", ""], ["NVIM", ""], ["STM32CUBEIDE", "󰆦"], ["STM32CUBEIDE-2.2.0", "󰆦"], ["COM-ST-MICROXPLORER-MAINGUI-STM32CUBEMX", "󰻟"], ["COM.ST.STM32CUBEMX", "󰻟"], ["KICAD", ""], ["GLSLVIEWER", "󰋁"], ["ARDUINO IDE", ""], ["MMS", "󱇷"],
         //apps
-        ["FIREFOX", "󰈹"], ["MD.OBSIDIAN.OBSIDIAN", ""], ["SPOTATUI", ""], ["SPOTIFY", ""], ["WARP-TASKBAR", ""], ["LOCALSEND", "󱒃"], ["SATTY", "󱇣"], ["ONEDRIVEGUI", "󰏊"], ["COM.OBSPROJECT.STUDIO", "󰄄"], ["MPV", ""], ["BITWARDEN", "󰞀"], ["COM.BLACKMAGICDESIGN.RESOLVE", "󱄢"], ["RESOLVE", "󱄢"], ["RESOLVEINSTALLER", "󱜓"], ["COM.BLACKMAGICDESIGN.RESOLVE-INSTALLER", "󱜓"],
+        ["FIREFOX", "󰈹"], ["MD.OBSIDIAN.OBSIDIAN", ""], ["SPOTATUI", ""], ["SPOTIFY", ""], ["WARP-TASKBAR", ""], ["SATTY", "󱇣"], ["ONEDRIVEGUI", "󰏊"], ["COM.OBSPROJECT.STUDIO", "󰄄"], ["MPV", ""], ["BITWARDEN", "󰞀"], ["ORG.KDE.KDENLIVE", "󱄢"], ["ORG.INKSCAPE.INKSCAPE", ""],
         //tui
         ["BTOP", ""], ["WIFITUI", ""], ["BLUETUI", "󰂯"], ["YAZI", ""], ["CLAUDE", ""], ["CLIPSE", ""], ["HYPRMONCFG", "󰍺"],
         //games
         ["ALEPHONE", gameIcon], ["HADES", gameIcon], ["CLASSIC MARATHON", gameIcon], ["WATCH_DOGS", gameIcon], ["GAMESCOPE", gameIcon], ["BATMAN ARKHAM ASYLUM GOTY EDITION", gameIcon], ["COM.MOJANG.MINECRAFT", "󰍳"], ["ORG.PRISMLAUNCHER.PRISMLAUNCHER", ""], ["STEAM", "󰓓"], ["THESEUS", ""],
         //system apps
-        ["WL-KBPTR", ""], ["PROBLEM REPORTING", "󰞏"], ["QUICKSHELL-WALLPAPER-PICKER", "󰸉"], ["ZOOM", ""], ["ORG.FEDORAPROJECT.MEDIAWRITER", "󱊟"], ["HYPRPOLKITAGENT", "󰈷"]])
+        ["WL-KBPTR", ""], ["QUICKSHELL-WALLPAPER-PICKER", "󰸉"], ["ZOOM", ""], ["ORG.FEDORAPROJECT.MEDIAWRITER", "󱊟"], ["HYPRPOLKITAGENT", "󰈷"], ["ORG.KDE.KDECONNECT.APP", ""]])
     readonly property var brightnessIcons: ["󰹐", "󱩎", "󱩏", "󱩐", "󱩑", "󱩒", "󱩓", "󱩔", "󱩕", "󱩖", "󰛨"]
     readonly property string volumeOff: "󰖁"
     readonly property string volumeLow: "󰕿"

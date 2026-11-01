@@ -9,7 +9,7 @@ RowLayout {
     id: root
     property int boxSize: Boxes.boxSize
     property int rows: 4
-    required property int activeWsId
+    required property string activeWsName
     Layout.preferredHeight: parent.height
     spacing: 0
     Repeater {
@@ -25,7 +25,7 @@ RowLayout {
             onTotalBoxesChanged: boxes = Boxes.getBoxes(totalBoxes)
             Layout.preferredHeight: parent.height
             Layout.preferredWidth: w
-            property int revealInd: activeWsId == ws.id ? 0 : totalBoxes
+            property int revealInd: activeWsName == ws.name ? 0 : totalBoxes
             property int mouseRevealInd: mouse.containsMouse ? 0 : totalBoxes
             visible: liveToplevels.length > 0
             Behavior on revealInd {
@@ -43,7 +43,7 @@ RowLayout {
                 anchors.fill: parent
                 hoverEnabled: true
                 readonly property var process: Process {
-                    command: ["hyprctl", "dispatch", `hl.dsp.focus({ workspace = "name:${ws.name}", on_current_monitor = true})`]
+                    command: ["hyprctl", "dispatch", `hl.dsp.focus({ workspace = "${ws.name}", on_current_monitor = true})`]
                 }
                 onClicked: process.startDetached()
             }
@@ -93,7 +93,7 @@ RowLayout {
                         bottomMargin: 1
                     }
                     color: Theme.accentPurple
-                    text: modelData.name ?? modelData.id
+                    text: modelData.name
                     font.family: Theme.fontFancy
                     font.bold: true
                     font.pixelSize: 14

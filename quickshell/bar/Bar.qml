@@ -67,7 +67,8 @@ Scope {
                     Music {}
                 }
                 Dock {
-                    activeWsId: (Hyprland.monitorFor(modelData)).activeWorkspace?.id ?? 0
+                    property var activeWs: (Hyprland.monitorFor(modelData)).activeWorkspace
+                    activeWsName: activeWs?.name ?? 0
                     anchors {
                         horizontalCenter: parent.horizontalCenter
                         top: parent.top

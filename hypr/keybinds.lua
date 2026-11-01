@@ -71,7 +71,7 @@ hl.bind("CTRL + ALT + Backspace", function()
 end)
 hl.bind("CTRL + ALT + DELETE", hl.dsp.exec_cmd(WLogout))
 
-hl.bind(MainMod .. " + SUPER_L", hl.dsp.exec_cmd(Menu))
+hl.bind("SUPER_L", hl.dsp.exec_cmd(Menu), { release = true })
 hl.bind("XF86SelectiveScreenshot", hl.dsp.exec_cmd(SelectiveScreenshot))
 hl.bind("XF86Launch5", hl.dsp.exec_cmd(SelectiveScreenshot))
 hl.bind("Print", hl.dsp.exec_cmd(Screenshot))
@@ -149,6 +149,10 @@ hl.bind(MainMod .. " + SHIFT + right", hl.dsp.window.move({ direction = "right" 
 hl.bind(MainMod .. " + SHIFT + up", hl.dsp.window.move({ direction = "up" }))
 hl.bind(MainMod .. " + SHIFT + down", hl.dsp.window.move({ direction = "down" }))
 
+hl.bind(MainMod .. " + SHIFT + H", hl.dsp.window.move({ direction = "left" }))
+hl.bind(MainMod .. " + SHIFT + L", hl.dsp.window.move({ direction = "right" }))
+hl.bind(MainMod .. " + SHIFT + K", hl.dsp.window.move({ direction = "up" }))
+hl.bind(MainMod .. " + SHIFT + J", hl.dsp.window.move({ direction = "down" }))
 --
 local resizeFactor = 20
 hl.bind(
@@ -183,11 +187,41 @@ hl.bind(
 )
 hl.bind(
 	MainMod .. " + ALT + K",
-	hl.dsp.window.resize({ x = 0, y = resizeFactor, relative = true }),
+	hl.dsp.window.resize({ x = 0, y = -resizeFactor, relative = true }),
 	{ repeating = true }
 )
 hl.bind(
 	MainMod .. " + ALT + J",
-	hl.dsp.window.resize({ x = 0, y = -resizeFactor, relative = true }),
+	hl.dsp.window.resize({ x = 0, y = resizeFactor, relative = true }),
 	{ repeating = true }
 )
+hl.bind("SUPER + space", function()
+	local window = hl.get_active_window()
+	if not window then
+		return
+	end
+	hl.dispatch(hl.dsp.window.cycle_next({
+		floating = not window.floating,
+		tiled = window.floating,
+	}))
+end, { description = "Switch focus between tiled and floating windows" })
+
+local function moveWindowsCurrentWorkspace(ws, f)
+	local cws = hl.get_active_workspace()
+	local windows = hl.get_windows({ workspace = cws })
+
+	for _, w in pairs(windows) do
+		hl.dispatch(hl.dsp.window.move({
+			window = w,
+			workspace = ws,
+			follow = f,
+		}))
+	end
+end
+
+for i = 1, 10 do
+	local key = i % 10
+	hl.bind("SUPER+SHIFT+ALT+" .. key, function()
+		moveWindowsCurrentWorkspace(i, true)
+	end)
+end

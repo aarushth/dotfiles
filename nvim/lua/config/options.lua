@@ -5,7 +5,7 @@ vim.opt.wrap = false
 
 vim.opt.expandtab = true
 vim.opt.tabstop = 4
-vim.opt.shiftwidth = 4
+vim.opt.shiftwidth = 2
 
 vim.opt.clipboard = "unnamedplus"
 
@@ -45,6 +45,13 @@ vim.api.nvim_create_autocmd("FileType", {
 	command = "wincmd L",
 })
 vim.keymap.set("n", "<leader>wr", "<CMD>set wrap!<CR>")
+-- Delete and change don't touch the clipboard, unless given a register ("add).
+for _, key in ipairs({ "c", "d", "C", "D" }) do
+	vim.keymap.set({ "n", "x" }, key, function()
+		local default = vim.v.register == "+" or vim.v.register == '"'
+		return default and '"_' .. key or key
+	end, { expr = true })
+end
 vim.api.nvim_create_user_command("W", function()
 	vim.cmd("w")
 end, { desc = "binds :W to w" })
