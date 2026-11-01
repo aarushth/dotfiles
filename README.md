@@ -18,7 +18,6 @@ Includes:
 - kitty, neovim, and yazi
 - xdg-desktop-portal-termfilechooser: to set yazi as my system file chooser
 - hyprmoncfg for monitor management
-- custom spicetify theme + snippets to clean up.
 
 # Basic setup
 You will need these fonts:
