@@ -1,16 +1,15 @@
 import Quickshell
 import Quickshell.Wayland
-import Quickshell.Widgets
 import Quickshell.Io
 import Quickshell.Services.Notifications
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Effects
 import "../config"
 
 Scope {
     id: root
     property int boxSize: 12
+    property int colNums: 24
 
     IpcHandler {
         target: "notifications"
@@ -23,99 +22,129 @@ Scope {
             NotificationService.doNotDisturb = !NotificationService.doNotDisturb;
         }
     }
-    Item {
-        id: notifRepeaterHost
-        Repeater {
-            id: notifRepeater
-            model: ScriptModel {
-                values: NotificationService.notifications
-                objectProp: "seqId"
-            }
-            property var heights: []
-            onItemAdded: function (index, item) {
-                if (heights.length == 0) {
-                    heights.push(0);
-                } else {
-                    heights.push(heights[index - 1] + notifRepeater.itemAt(index - 1).notificationData.cardHeight);
-                }
-                item.notificationData.yPos = heights[index] + (index + 1) * 10;
-            }
-            onItemRemoved: function (index, item) {
-                heights.splice(index, 1);
-                for (let i = index; i < heights.length; i++) {
-                    heights[i] = heights[i] - item.cardHeight;
-                    notifRepeater.itemAt(i).notificationData.yPos = heights[i] + (i + 1) * 10;
-                }
-            }
-            delegate: Item {
-                id: notifCard
-                required property NotificationData modelData
-                property NotificationData notificationData: modelData
-                required property int index
-                property var triggerClose: notificationData.triggerClose
-                property bool closing: false
-                property bool isImage: notificationData.image !== "" && notifImage.status === Image.Ready
-                property int rowNums: 11 + (notificationData.actions.length > 0 ? 2 : 0)
-                property int colNums: 24
-                property int totalBoxes: rowNums * colNums
-                property int cardHeight: rowNums * root.boxSize
-                property int cardWidth: colNums * root.boxSize
-                property var boxes: []
-                onRowNumsChanged: boxes = Boxes.getBoxes(totalBoxes)
-                property color cardColor: notificationData.urgency === NotificationUrgency.Critical ? Theme.urgencyCritical : notificationData.urgency === NotificationUrgency.Low ? Theme.urgencyLow : Theme.urgencyNormal
 
-                onTriggerCloseChanged: {
-                    if (triggerClose && !closing) {
-                        for (const item of variants.instances) {
-                            item.beginCloseAnim();
-                        }
-                        closing = true;
+    Variants {
+        id: variants
+        model: Quickshell.screens
+        delegate: PanelWindow {
+            id: windowRoot
+            required property var modelData
+            screen: modelData
+            exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.namespace: "quickshell-notifications"
+            WlrLayershell.layer: WlrLayer.Overlay
+            WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+
+            anchors {
+                top: true
+                right: true
+                bottom: true
+                left: true
+            }
+            margins {
+                top: 10
+                right: 10
+            }
+            color: "transparent"
+            implicitWidth: root.colNums * root.boxSize
+            implicitHeight: layout.implicitHeight
+
+            Region {
+                id: cardsRegion
+                regions: {
+                    notifRepeater.count;
+                    return Array.from({
+                        length: notifRepeater.count
+                    }, (_, i) => notifRepeater.itemAt(i)).filter(c => c && c.shown).map(c => c.region);
+                }
+            }
+
+            mask: cardsRegion
+            BackgroundEffect.blurRegion: cardsRegion
+
+            Column {
+                id: layout
+                spacing: 10
+                anchors {
+                    top: parent.top
+                    right: parent.right
+                }
+
+                move: Transition {
+                    NumberAnimation {
+                        properties: "x,y"
+                        duration: 250
+                        easing.type: Easing.OutCubic
                     }
                 }
+                add: Transition {
+                    NumberAnimation {
+                        property: "opacity"
+                        from: 0
+                        to: 1
+                        duration: 200
+                    }
+                }
+                Repeater {
+                    id: notifRepeater
+                    model: ScriptModel {
+                        values: NotificationService.notifications
+                        objectProp: "seqId"
+                    }
 
-                Variants {
-                    id: variants
-                    model: Quickshell.screens
                     delegate: Item {
-                        required property var modelData
-                        function beginCloseAnim() {
-                            grid.entryAnim.restart();
+                        id: notifCard
+                        required property NotificationData modelData
+                        property NotificationData notificationData: modelData
+                        property bool closing: false
+                        property bool isImage: notificationData.image !== "" && notifImage.status === Image.Ready
+                        property int rowNums: 11 + (notificationData.actions.length > 0 ? 2 : 0)
+                        property int totalBoxes: rowNums * colNums
+                        property int cardHeight: rowNums * root.boxSize
+                        property int cardWidth: colNums * root.boxSize
+                        property var boxes: Boxes.getBoxes(totalBoxes)
+                        property color cardColor: notificationData.urgency === NotificationUrgency.Critical ? Theme.urgencyCritical : notificationData.urgency === NotificationUrgency.Low ? Theme.urgencyLow : Theme.urgencyNormal
+                        readonly property bool shown: notifWindow.visible
+                        readonly property Region region: Region {
+                            item: notifWindow      // was: notifCard
+                        }
+                        Layout.rightMargin: cardHover.hovered ? 20 : 0
+                        Connections {
+                            target: notificationData
+                            function onDismiss() {
+                                closing = true;
+                                entryAnim.start();
+                            }
+                        }
+                        HoverHandler {
+                            id: cardHover
+                            onHoveredChanged: {
+                                if (hovered) {
+                                    if (notificationData.timer.running) {
+                                        notificationData.timer.pause();
+                                    }
+                                } else {
+                                    notificationData.timer.resume();
+                                }
+                            }
+                            blocking: false
                         }
 
-                        PanelWindow {
-                            id: squares
-                            screen: modelData
-                            focusable: false
-                            color: "transparent"
-                            WlrLayershell.namespace: "quickshell-notification-card"
-                            WlrLayershell.layer: WlrLayer.Overlay
-                            WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-                            anchors {
-                                top: true
-                                right: true
-                            }
+                        implicitWidth: notifCard.cardWidth + 20
+                        implicitHeight: notifCard.cardHeight
+                        Component.onCompleted: entryAnim.start()
 
-                            margins {
-                                right: notifCard.notificationData.hovered ? 30 : 10
-                                top: notifCard.notificationData.yPos ?? 0
+                        Rectangle {
+                            id: squares
+                            z: 1
+                            color: "transparent"
+                            anchors {
+                                top: parent.top
+                                right: parent.right
+                                rightMargin: cardHover.hovered ? 20 : 0
+                                bottom: parent.bottom
                             }
-                            implicitWidth: notifCard.cardWidth
-                            implicitHeight: notifCard.cardHeight
-                            Behavior on margins.right {
-                                NumberAnimation {
-                                    duration: 100
-                                }
-                            }
-                            Behavior on margins.top {
-                                NumberAnimation {
-                                    duration: 400
-                                    easing.type: Easing.InQuad
-                                }
-                            }
-                            HoverHandler {
-                                id: cardGridHover
-                                onHoveredChanged: notifCard.notificationData.hovered = hovered
-                            }
+                            width: notifCard.cardWidth
 
                             Item {
                                 id: grid
@@ -143,7 +172,7 @@ Scope {
                                     }
                                     ScriptAction {
                                         script: {
-                                            notifWindow.visible = !notifCard.closing;
+                                            notifWindow.visible = !notifWindow.visible;
                                         }
                                     }
                                     NumberAnimation {
@@ -166,60 +195,36 @@ Scope {
                                         }
                                     }
                                 }
-                                Component.onCompleted: entryAnim.start()
-                                Repeater {
-                                    model: notifCard.totalBoxes
-
-                                    delegate: Rectangle {
-                                        x: (index % notifCard.colNums) * root.boxSize
-                                        y: Math.floor(index / notifCard.colNums) * root.boxSize
-                                        width: root.boxSize
-                                        height: root.boxSize
-                                        property int idx: notifCard.boxes[index]
-                                        color: notifCard.cardColor
-                                        opacity: (idx < grid.revealInd) ? 1 : 0
+                                GridLayout {
+                                    columns: root.colNums
+                                    columnSpacing: 0
+                                    rowSpacing: 0
+                                    Repeater {
+                                        model: totalBoxes
+                                        delegate: Rectangle {
+                                            required property int index
+                                            width: root.boxSize
+                                            height: root.boxSize
+                                            property int idx: notifCard.boxes[index]
+                                            color: notifCard.cardColor
+                                            opacity: (idx < grid.revealInd) ? 1 : 0
+                                        }
                                     }
                                 }
                             }
                         }
-                        PanelWindow {
+                        Rectangle {
                             id: notifWindow
-                            screen: modelData
+                            z: 0
                             visible: false
-                            focusable: false
                             color: "transparent"
-                            WlrLayershell.namespace: "quickshell-notification-card-blur"
-                            WlrLayershell.layer: WlrLayer.Overlay
-                            WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-                            exclusionMode: ExclusionMode.Ignore
                             anchors {
-                                top: true
-                                right: true
+                                top: parent.top
+                                right: parent.right
+                                rightMargin: cardHover.hovered ? 20 : 0
+                                bottom: parent.bottom
                             }
-                            implicitWidth: notifCard.cardWidth
-                            implicitHeight: notifCard.cardHeight
-                            margins {
-                                right: notifCard.notificationData.hovered ? 30 : 10
-                                top: notifCard.notificationData.yPos
-                            }
-                            Behavior on margins.right {
-                                NumberAnimation {
-                                    duration: 100
-                                }
-                            }
-                            Behavior on margins.top {
-                                NumberAnimation {
-                                    duration: 400
-                                    easing.type: Easing.InQuad
-                                }
-                            }
-                            HoverHandler {
-                                id: cardHover
-                                onHoveredChanged: {
-                                    notifCard.notificationData.hovered = hovered;
-                                }
-                                blocking: false
-                            }
+                            width: notifCard.cardWidth
                             Rectangle {
                                 id: topBackground
                                 anchors {
@@ -231,6 +236,7 @@ Scope {
                                 color: notifCard.cardColor
                             }
                             Rectangle {
+                                id: blurCard
                                 anchors {
                                     top: topBackground.bottom
                                     left: parent.left
@@ -492,7 +498,7 @@ Scope {
                                         Layout.preferredWidth: notifCard.cardWidth / notifCard.notificationData.actions.length
                                         Layout.preferredHeight: parent.height
                                         opacity: 0.6
-                                        color: actionHover.containsMouse ? Theme.bgButtonHover : Theme.bgButton
+                                        color: actionHover.containsMouse ? Theme.bgButto.hovered : Theme.bgButton
                                         Behavior on color {
                                             ColorAnimation {
                                                 duration: 100

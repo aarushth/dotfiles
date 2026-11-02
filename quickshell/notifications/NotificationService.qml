@@ -19,28 +19,29 @@ Singleton {
 
     NotificationServer {
         id: server
-        actionsSupported:    true
-        bodySupported:       true
+        actionsSupported: true
+        bodySupported: true
         bodyMarkupSupported: true
-        imageSupported:      true
-        keepOnReload:        false
+        imageSupported: true
+        keepOnReload: false
 
-        onNotification: function(notification) {
-            if (root.doNotDisturb) return;
+        onNotification: function (notification) {
+            if (root.doNotDisturb)
+                return;
 
-            if (!notification.appName && !notification.summary
-                && !notification.body && !notification.image) return;
+            if (!notification.appName && !notification.summary && !notification.body && !notification.image)
+                return;
 
             notification.tracked = true;
 
             const idStr = String(notification.id || "");
             if (idStr !== "") {
-                const existing = root.notifications.find(function(n) {
+                const existing = root.notifications.find(function (n) {
                     return n.notifId === idStr;
                 });
                 if (existing && !existing.closed) {
                     existing.closed = true;
-                    root.notifications = root.notifications.filter(function(n) {
+                    root.notifications = root.notifications.filter(function (n) {
                         return n !== existing;
                     });
                     existing.destroy();
@@ -52,28 +53,26 @@ Singleton {
                 seqId: String(root._seqCounter++)
             });
 
-            root.notifications.push(data)
-            if (root.notifications.length > 4) {
-                root.notifications[0].dismiss();
-            }
+            root.notifications.push(data);
         }
     }
 
     function _remove(notifData): void {
-        root.notifications = root.notifications.filter(function(n) {
+        root.notifications = root.notifications.filter(function (n) {
             return n !== notifData;
         });
     }
 
     function dismiss(notifData): void {
-        if (notifData) notifData.dismiss();
+        if (notifData)
+            notifData.dismiss();
     }
 
     function dismissAll(): void {
         const toRemove = [...root.notifications];
         for (const n of toRemove) {
             if (!n.triggerClose) {
-				n.dismiss()
+                n.dismiss();
             }
         }
     }

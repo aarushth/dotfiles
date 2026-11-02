@@ -25,18 +25,13 @@ Scope {
     PwObjectTracker {
         objects: [Pipewire.defaultAudioSink, Pipewire.defaultAudioSource]
     }
+    onVolumeChanged: show(OsdData.Mode.Volume)
+    onMicMutedChanged: show(OsdData.Mode.Mic)
     IpcHandler {
         target: "osd"
-
-        function volume() {
-            show(OsdData.Mode.Volume);
-        }
         function brightness() {
             brightnessReadProc.running = true;
             show(OsdData.Mode.Brightness);
-        }
-        function mic() {
-            show(OsdData.Mode.Mic);
         }
     }
     Process {

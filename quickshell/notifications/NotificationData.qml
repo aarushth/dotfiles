@@ -6,10 +6,10 @@ Scope {
     id: notificationData
 
     property Notification notification: null
-    property bool triggerClose: false
+    signal dismiss
 
     property string seqId: ""
-    property string notifId: String(notification.id || "")
+    property string notifId: String(notification?.id || "")
 
     property string summary: notification.summary || ""
     property string body: notification.body || ""
@@ -17,22 +17,17 @@ Scope {
     property string appName: notification.appName || ""
     property string image: notification.image || ""
     property var actions: notification.actions
-    onActionsChanged: console.warn(actions)
     property int urgency: notification.urgency
     property real expireTimeout: notification.expireTimeout > 0 ? notification.expireTimeout : defaultTimeout
-    property int rowNums: 11 + (actions.length > 0 ? 2 : 0)
-    property int cardHeight: rowNums * 15
-    property int yPos: 800
-    property bool hovered: false
-    readonly property bool timerPaused: notificationData.triggerClose || notificationData.hovered
+    onDismiss: {
+        timer.stop();
+    }
     readonly property int defaultTimeout: 5000
     readonly property Connections _conn: Connections {
         target: notificationData.notification
 
         function onClosed(): void {
-            if (notificationData.triggerClose)
-                return;
-            notificationData.triggerClose = true;
+            notificationData.dismiss();
             Qt.callLater(function () {
                 NotificationService._remove(notificationData);
                 notificationData.destroy();
@@ -81,7 +76,7 @@ Scope {
     property int timerValue: expireTimeout
     property var timer: SequentialAnimation {
         id: timer
-        paused: running && timerPaused
+        running: true
         NumberAnimation {
             target: notificationData
             property: "timerValue"
@@ -91,9 +86,6 @@ Scope {
         ScriptAction {
             script: notificationData.dismiss()
         }
-    }
-    function dismiss(): void {
-        triggerClose = true;
     }
     function completeDismiss(): void {
         Qt.callLater(function () {
@@ -107,9 +99,9 @@ Scope {
     }
 
     function invokeAction(identifier): void {
-        if (!identifier || triggerClose)
+        if (!identifier)
             return;
-        triggerClose = true;
+        dismiss();
         if (notification) {
             const action = notification.actions.find(function (a) {
                 return a.identifier === identifier;

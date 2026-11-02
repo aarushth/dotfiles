@@ -4,7 +4,6 @@
 hl.env("HYPRCURSOR_SIZE", "24")
 -- hl.env("PATH", "$PATH:/home/aarushth/.cargo/bin")
 -- dark mode
-hl.env("QT_QPA_PLATFORMTHEME", "qt6ct")
 hl.env("QT_QUICK_CONTROLS_STYLE", "org.kde.desktop")
 hl.env("QT_QPA_PLATFORM", "wayland")
 hl.env("GTK_THEME", "Adwaita:dark")

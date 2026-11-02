@@ -55,7 +55,7 @@ QtObject {
             return tempIcons[1];
         else if (temp <= 70)
             return tempIcons[2];
-        else if (volume <= 85)
+        else if (temp <= 85)
             return tempIcons[3];
         return tempIcons[4];
     }
