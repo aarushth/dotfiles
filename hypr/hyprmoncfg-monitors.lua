@@ -8,3 +8,12 @@ hl.monitor({
   sdr_min_luminance = 0.2,
   sdr_max_luminance = 80,
 })
+
+hl.monitor({
+  output = "desc:Samsung Electric Company S27R65x H4TR501058",
+  mode = "1920x1080@74.97",
+  position = "-1920x0",
+  scale = 1,
+  sdr_min_luminance = 0.2,
+  sdr_max_luminance = 80,
+})

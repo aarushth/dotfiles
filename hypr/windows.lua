@@ -15,12 +15,6 @@ hl.layer_rule({
 	},
 	order = 1,
 })
-hl.layer_rule({
-	match = {
-		namespace = ".*", -- wildcard matches all layers
-	},
-	blur = false,
-})
 hl.window_rule({
 	match = {
 		namespace = ".*", -- wildcard matches all layers

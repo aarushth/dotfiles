@@ -10,24 +10,7 @@ hl.window_rule({
 })
 hl.workspace_rule({ workspace = "name:wp1", gaps_out = 0 })
 
--- add blur to actual notification card, but not to reveal animation
-hl.layer_rule({
-	match = {
-		namespace = "quickshell-notification-card-blur",
-	},
-	blur = true,
-	order = 2,
-	no_anim = true,
-})
-hl.config({
-	decoration = {
-		blur = {
-			size = 7,
-			passes = 2,
-		},
-	},
-})
-for _, name in ipairs({ "quickshell-notification-card", "quickshell-osd", "quickshell-wlogout", "quickshell-start" }) do
+for _, name in ipairs({ "quickshell-notifications", "quickshell-osd", "quickshell-wlogout", "quickshell-start" }) do
 	hl.layer_rule({
 		match = {
 			namespace = name,

@@ -96,7 +96,6 @@ Scope {
                         id: notifCard
                         required property NotificationData modelData
                         property NotificationData notificationData: modelData
-                        property bool closing: false
                         property bool isImage: notificationData.image !== "" && notifImage.status === Image.Ready
                         property int rowNums: 11 + (notificationData.actions.length > 0 ? 2 : 0)
                         property int totalBoxes: rowNums * colNums
@@ -106,13 +105,14 @@ Scope {
                         property color cardColor: notificationData.urgency === NotificationUrgency.Critical ? Theme.urgencyCritical : notificationData.urgency === NotificationUrgency.Low ? Theme.urgencyLow : Theme.urgencyNormal
                         readonly property bool shown: notifWindow.visible
                         readonly property Region region: Region {
-                            item: notifWindow      // was: notifCard
+                            x: layout.x + notifCard.x + notifWindow.x
+                            y: layout.y + notifCard.y + notifWindow.y
+                            width: notifWindow.width
+                            height: notifWindow.height
                         }
-                        Layout.rightMargin: cardHover.hovered ? 20 : 0
                         Connections {
                             target: notificationData
                             function onDismiss() {
-                                closing = true;
                                 entryAnim.start();
                             }
                         }
@@ -189,7 +189,7 @@ Scope {
                                             if (notificationData.urgency !== NotificationUrgency.Critical) {
                                                 notificationData.timer.start();
                                             }
-                                            if (notifCard.closing) {
+                                            if (!notifWindow.visible) {
                                                 notifCard.notificationData.completeDismiss();
                                             }
                                         }
