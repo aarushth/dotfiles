@@ -255,7 +255,7 @@ Scope {
                                 verticalAlignment: Text.AlignVCenter
                                 horizontalAlignment: Text.AlignHCenter
                                 width: root.boxSize * 2
-                                height: boxSize * 2
+                                height: root.boxSize * 2
                                 text: Icons.get(notifCard.notificationData.appName.toLowerCase()) ?? "󰂚"
                                 color: Theme.textPrimary
                                 font.pixelSize: 12
@@ -293,7 +293,7 @@ Scope {
                                     bottom: appName.bottom
                                     right: parent.right
                                 }
-                                width: boxSize * 2
+                                width: root.boxSize * 2
                                 Text {
                                     anchors.fill: parent
                                     verticalAlignment: Text.AlignVCenter
@@ -323,10 +323,10 @@ Scope {
                                     top: appName.bottom
                                     left: parent.left
                                     right: parent.right
-                                    leftMargin: boxSize
-                                    rightMargin: boxSize
+                                    leftMargin: root.boxSize
+                                    rightMargin: root.boxSize
                                 }
-                                height: boxSize * 3
+                                height: root.boxSize * 3
                                 verticalAlignment: Text.AlignVCenter
                                 text: notifCard.notificationData.appName
                                 color: Theme.textSecondary
@@ -352,14 +352,14 @@ Scope {
                                 anchors {
                                     top: title.bottom
                                     left: parent.left
-                                    topMargin: boxSize / 4
-                                    leftMargin: boxSize
-                                    rightMargin: boxSize
+                                    topMargin: root.boxSize / 4
+                                    leftMargin: root.boxSize
+                                    rightMargin: root.boxSize
                                 }
                                 text: notifCard.notificationData.body
                                 color: Theme.textMuted
-                                height: boxSize * 4
-                                width: (notifCard.colNums - (notifCard.isImage ? 6 : 2)) * boxSize
+                                height: root.boxSize * 4
+                                width: (root.colNums - (notifCard.isImage ? 6 : 2)) * root.boxSize
                                 font.family: Theme.fontNormal
                                 font.pixelSize: 11
                                 wrapMode: Text.Wrap
@@ -371,12 +371,12 @@ Scope {
                                 anchors {
                                     top: title.bottom
                                     right: parent.right
-                                    rightMargin: boxSize
+                                    rightMargin: root.boxSize
                                 }
                                 color: "transparent"
                                 visible: notifCard.isImage
-                                width: boxSize * 4
-                                height: boxSize * 4
+                                width: root.boxSize * 4
+                                height: root.boxSize * 4
                                 clip: true
                                 Image {
                                     id: notifImage
@@ -396,7 +396,7 @@ Scope {
                                     right: parent.right
                                     bottom: actions.visible ? actions.top : parent.bottom
                                 }
-                                height: boxSize * 2
+                                height: root.boxSize * 2
                                 Rectangle {
                                     anchors.fill: parent
                                     color: Theme.textPrimary
@@ -417,7 +417,7 @@ Scope {
                                     anchors {
                                         verticalCenter: progressBar.verticalCenter
                                         left: progressBar.left
-                                        leftMargin: boxSize
+                                        leftMargin: root.boxSize
                                     }
                                     color: Theme.bgBase
                                     border.color: Theme.textSecondary
@@ -443,7 +443,7 @@ Scope {
                                     anchors {
                                         verticalCenter: progressBar.verticalCenter
                                         left: supIcon.right
-                                        leftMargin: boxSize / 4
+                                        leftMargin: root.boxSize / 4
                                     }
                                     color: Theme.bgBase
                                     border.color: Theme.textSecondary
@@ -467,7 +467,7 @@ Scope {
                                         top: progressBar.top
                                         bottom: progressBar.bottom
                                         left: xIcon.right
-                                        leftMargin: boxSize
+                                        leftMargin: root.boxSize
                                     }
                                     verticalAlignment: Text.AlignVCenter
                                     font.family: Theme.fontNormal
@@ -482,7 +482,7 @@ Scope {
                                     left: parent.left
                                     right: parent.right
                                 }
-                                height: boxSize * 2
+                                height: root.boxSize * 2
                                 uniformCellSizes: true
                                 spacing: 0
                                 visible: notifCard.notificationData.actions.length > 0

@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Studio.Components
 import QtQuick.Controls.Fusion
+import QtQuick.Shapes
 import Qt5Compat.GraphicalEffects
 
 import Quickshell
@@ -136,7 +137,19 @@ Scope {
                 }
             }
             OpacityMask {
+                id: arcsMask
                 anchors.fill: parent
+                maskSource: arcs
+                source: circle
+                invert: true
+                visible: false
+            }
+            OpacityMask {
+                anchors.fill: parent
+                source: arcsMask
+                maskSource: coolMask
+                invert: true
+                visible: true
                 scale: 3.0
                 Component.onCompleted: scale = 1.0
                 Behavior on scale {
@@ -145,9 +158,6 @@ Scope {
                         easing.type: Easing.OutQuint
                     }
                 }
-                maskSource: arcs
-                source: circle
-                invert: true
             }
             Item {
                 id: entryIcons
@@ -201,25 +211,72 @@ Scope {
                 }
             }
             Item {
-                anchors.centerIn: parent
-                width: innerCircleRadius
-                height: innerCircleRadius
-                Image {
-                    id: cool
-                    anchors {
-                        top: parent.top
-                        bottom: parent.bottom
-                        right: parent.right
-                        rightMargin: 10
+                anchors.fill: parent
+                Item {
+                    anchors.centerIn: parent
+                    width: innerCircleRadius
+                    height: innerCircleRadius
+                    Image {
+                        id: cool
+                        anchors {
+                            top: parent.top
+                            bottom: parent.bottom
+                            right: parent.right
+                            rightMargin: 10
+                        }
+                        fillMode: Image.PreserveAspectFit
+                        source: "cool.svg"
                     }
-                    fillMode: Image.PreserveAspectFit
-                    source: "cool.svg"
+                    Text {
+                        text: filteredEntries[(entryIcons.selectedIndex % entryIcons.numItems) % entryIcons.visibleItems]?.name ?? ""
+                        rotation: 90
+                        width: parent.height
+                        height: implicitHeight
+                        anchors {
+                            verticalCenter: parent.verticalCenter
+                            horizontalCenter: cool.left
+                            horizontalCenterOffset: -height / 2
+                        }
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font.pixelSize: 15
+                        font.family: Theme.fontFancy
+
+                        color: Theme.accentBlueLight
+                    }
                 }
-                Rectangle {
+                Item {
+                    id: coolMask
+                    anchors.fill: parent
                     visible: false
-                    anchors.fill: cool
-                    topRightRadius: 20
-                    bottomRightRadius: 20
+                    Shape {
+                        id: trapezoidShape
+                        anchors.centerIn: parent
+                        width: innerCircleRadius
+                        height: innerCircleRadius + 45
+                        ShapePath {
+                            fillColor: "steelblue"
+                            strokeColor: "black"
+                            startX: 155
+                            startY: 0
+                            PathLine {
+                                x: 215
+                                y: 30
+                            }
+                            PathLine {
+                                x: 215
+                                y: innerCircleRadius + 15
+                            }
+                            PathLine {
+                                x: 155
+                                y: innerCircleRadius + 46
+                            }
+                            PathLine {
+                                x: 155
+                                y: 25
+                            }
+                        }
+                    }
                 }
             }
         }

@@ -27,6 +27,7 @@ Scope {
     }
     onVolumeChanged: show(OsdData.Mode.Volume)
     onMicMutedChanged: show(OsdData.Mode.Mic)
+    onMutedChanged: show(OsdData.Mode.Volume)
     IpcHandler {
         target: "osd"
         function brightness() {

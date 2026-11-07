@@ -7,7 +7,7 @@ hl.on("hyprland.start", function()
 	hl.exec_cmd("qs")
 	hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
 
-	hl.exec_cmd("onedrive-gui")
+	hl.exec_cmd("drivedeck --tray")
 	-- hl.exec_cmd("flatpak run com.bitwarden.desktop")
 	--desktop portal for screenshare
 	hl.exec_cmd("systemctl --user start hyprland-session.target")

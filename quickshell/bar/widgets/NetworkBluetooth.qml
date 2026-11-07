@@ -132,8 +132,9 @@ ColumnLayout {
                 left: parent.left
             }
             font.pixelSize: 15
+            font.family: Theme.fontIcon
             width: root.boxSize * 2
-            verticalAlignment: Text.AlignTop
+            verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
         }
         Text {

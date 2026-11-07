@@ -2,18 +2,29 @@ pragma Singleton
 import QtQuick
 
 QtObject {
-    function get(id) {
-        return iconsMap.get(id.toUpperCase());
+    function get(id, looseMatch) {
+        const upper = id.toUpperCase();
+        const exact = iconsMap.get(upper);
+        if (exact !== undefined)
+            return exact;
+        if (!looseMatch)
+            return undefined;
+        for (const [pattern, icon] of iconsMap) {
+            if (upper.includes(pattern)) {
+                return icon;
+            }
+        }
+        return undefined;
     }
     readonly property var iconsMap: new Map([
+        //apps
+        ["FIREFOX", "󰈹"], ["MD.OBSIDIAN.OBSIDIAN", ""], ["SPOTATUI", ""], ["SPOTIFY", ""], ["WARP-TASKBAR", ""], ["SATTY", "󱇣"], ["DRIVEDECK", "󰏊"], ["COM.OBSPROJECT.STUDIO", "󰄄"], ["MPV", ""], ["BITWARDEN", "󰞀"], ["ORG.KDE.KDENLIVE", "󱄢"], ["ORG.INKSCAPE.INKSCAPE", ""],
+        //coding
+        ["KITTY", ""], ["COM.VISUALSTUDIO.CODEOSS", ""], ["SUN-TOOLS-JCONSOLE-JCONSOLE", ""], ["NVIM", ""], ["STM32CUBEIDE", "󰆦"], ["STM32CUBEMX", "󰻟"], ["KICAD", ""], ["GLSLVIEWER", "󰋁"], ["ARDUINO IDE", ""], ["MMS", "󱇷"], ["TOUCHDESIGNER", ""],
         // email
         ["NET.THUNDERBIRD.THUNDERBIRD", ""], ["ZOHO MAIL - DESKTOP", ""],
         // messaging
         ["ZAPFAST", ""], ["ORG.KDE.KDECONNECT.SMS", "󰵅"], ["DISCORD", ""], ["SLACK", ""],
-        //coding
-        ["KITTY", ""], ["COM.VISUALSTUDIO.CODEOSS", ""], ["SUN-TOOLS-JCONSOLE-JCONSOLE", ""], ["NVIM", ""], ["STM32CUBEIDE", "󰆦"], ["STM32CUBEIDE-2.2.0", "󰆦"], ["COM-ST-MICROXPLORER-MAINGUI-STM32CUBEMX", "󰻟"], ["COM.ST.STM32CUBEMX", "󰻟"], ["KICAD", ""], ["GLSLVIEWER", "󰋁"], ["ARDUINO IDE", ""], ["MMS", "󱇷"],
-        //apps
-        ["FIREFOX", "󰈹"], ["MD.OBSIDIAN.OBSIDIAN", ""], ["SPOTATUI", ""], ["SPOTIFY", ""], ["WARP-TASKBAR", ""], ["SATTY", "󱇣"], ["ONEDRIVEGUI", "󰏊"], ["COM.OBSPROJECT.STUDIO", "󰄄"], ["MPV", ""], ["BITWARDEN", "󰞀"], ["ORG.KDE.KDENLIVE", "󱄢"], ["ORG.INKSCAPE.INKSCAPE", ""],
         //tui
         ["BTOP", ""], ["WIFITUI", ""], ["BLUETUI", "󰂯"], ["YAZI", ""], ["CLAUDE", ""], ["CLIPSE", ""], ["HYPRMONCFG", "󰍺"],
         //games
