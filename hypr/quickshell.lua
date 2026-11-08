@@ -15,7 +15,7 @@ for _, name in ipairs({ "quickshell-notifications", "quickshell-osd", "quickshel
 		match = {
 			namespace = name,
 		},
-		order = 1,
+		order = 10,
 	})
 end
 hl.layer_rule({

@@ -19,39 +19,36 @@ ShellRoot {
         repeat: false
         onTriggered: {
             invert = false;
-            if (lockContext.message === "Place your right index finger on the fingerprint reader") {
+            if (lockContext.message === "Biopass: place your finger on the fingerprint reader") {
                 displayText = "SCAN 󰈷 FINGERPRINT";
+            } else if (lockContext.message === "Biopass: looking for your face...") {
+                displayText = "SCAN  FACE";
             } else if (lockContext.message === "Password: ") {
                 displayText = "";
             } else {
                 lockContext.restart();
-                displayText = "SCAN  FACE";
+                displayText = "SYSTEM LOCKED";
             }
         }
     }
     property bool invert: false
-    property string displayText: "SCAN  FACE"
+    property string displayText: "SYSTEM LOCKED"
 
     Connections {
         target: lockContext
 
         function onMessageChanged() {
             switch (lockContext.message) {
-            case "Failed to match fingerprint":
+            case "Biopass: place your finger on the fingerprint reader":
+                displayText = "SCAN 󰈷 FINGERPRINT";
+                break;
+            case "Biopass: looking for your face...":
+                displayText = "SCAN  FACE";
+                break;
+            case "Failed to authenticate.":
                 invert = true;
                 resetTimer.restart();
                 displayText = "ACCESS DENIED";
-                break;
-            case "Failure, timeout reached":
-                invert = true;
-                resetTimer.restart();
-                displayText = "ACCESS DENIED";
-                break;
-            case "Place your right index finger on the fingerprint reader":
-                if (!resetTimer.running) {
-                    invert = false;
-                    displayText = "SCAN 󰈷 FINGERPRINT";
-                }
                 break;
             case "Password: ":
                 if (!resetTimer.running) {

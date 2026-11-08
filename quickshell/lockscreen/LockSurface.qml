@@ -15,7 +15,11 @@ Item {
     required property string displayText
     required property int timer
     required property bool resetTimerRunning
-    onInvertChanged: console.warn(invert, lockContext.message, displayText)
+
+    // Don't assign invert/displayText here: they're bound from Lockscreen.qml,
+    // and assigning would break the binding. "VERIFYING" comes from context.verifying.
+    readonly property bool verifying: context.verifying
+    readonly property string shownText: verifying ? "VERIFYING" : displayText
 
     property int boxSize: width > 0 ? width / 12 : 0
     property int smallBoxSize: width > 0 && height > 0 ? (height - 7 * boxSize) / 2 : 0
@@ -92,7 +96,7 @@ Item {
             text: "ENTER PASSWORD"
             font.pixelSize: 20
             font.family: Theme.fontFancy
-            visible: context.responseRequired && !resetTimerRunning && displayText !== "VERIFYING"
+            visible: context.responseRequired && !resetTimerRunning && !root.verifying
         }
         TextField {
             id: password
@@ -106,7 +110,7 @@ Item {
 
             echoMode: TextInput.Password
 
-            visible: context.responseRequired && !resetTimerRunning
+            visible: context.responseRequired && !resetTimerRunning && !root.verifying
             font.pixelSize: 50
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
@@ -121,8 +125,6 @@ Item {
             onAccepted: {
                 context.submit(text);
                 clear();
-                root.displayText = "VERIFYING";
-                invert = true;
             }
         }
         Text {
@@ -131,7 +133,7 @@ Item {
             anchors.fill: mask
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
-            text: root.displayText
+            text: root.shownText
             font.family: Theme.fontFancy
             font.styleName: "Light"
             width: mask.width
@@ -145,7 +147,7 @@ Item {
             anchors.fill: mask
             maskSource: centerText
             source: mask
-            invert: root.invert
+            invert: root.invert || root.verifying
         }
         Repeater {
             model: [true, false]

@@ -11,6 +11,7 @@ import "../config/"
 
 Scope {
     id: root
+
     property bool shouldShowStart: false
     property int outerCircleRadius: 500
     property int iconCircleRadius: 360
@@ -45,8 +46,9 @@ Scope {
             contentItem {
                 Keys.onPressed: event => {
                     if (event.key == Qt.Key_Return) {
-                        let entry = filteredEntries[(entryIcons.selectedIndex % entryIcons.numItems) % entryIcons.visibleItems];
-                        entry.execute();
+                        let entry = filteredEntries[entryIcons.currentIndex];
+                        if (entry)
+                            entry.execute();
                         // console.warn(entry.id, entry.command);
                         root.shouldShowStart = false;
                         event.accepted = true;
@@ -168,6 +170,8 @@ Scope {
                 property int numItems: 12
                 property int selectedIndex: 0
                 property int visibleItems: numItems
+                // true modulo: JS % keeps the dividend's sign, so -1 % n === -1
+                property int currentIndex: visibleItems > 0 ? ((selectedIndex % visibleItems) + visibleItems) % visibleItems : -1
                 focus: true
                 Repeater {
                     model: ScriptModel {
@@ -187,7 +191,7 @@ Scope {
                         // Component.onCompleted: console.warn(modelData.id, modelData.startupClass, modelData.command)
                         x: entryIcons.size / 2 + Math.round(entryIcons.size / 2 * Math.cos(angle)) - implicitWidth / 2
                         y: entryIcons.size / 2 + Math.round(entryIcons.size / 2 * Math.sin(angle)) - implicitHeight / 2
-                        text: Icons.get(modelData.id) ?? Icons.get(modelData.startupClass) ?? Icons.get(modelData.name) ?? Icons.get(modelData.command.join()) ?? "x"
+                        text: Icons.get(modelData.id, true) ?? Icons.get(modelData.startupClass) ?? Icons.get(modelData.name) ?? Icons.get(modelData.command.join()) ?? "x"
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignHCenter
                         font.family: Theme.fontIcon
@@ -228,7 +232,7 @@ Scope {
                         source: "cool.svg"
                     }
                     Text {
-                        text: filteredEntries[(entryIcons.selectedIndex % entryIcons.numItems) % entryIcons.visibleItems]?.name ?? ""
+                        text: filteredEntries[entryIcons.currentIndex]?.name ?? ""
                         rotation: 90
                         width: parent.height
                         height: implicitHeight

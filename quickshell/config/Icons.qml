@@ -30,7 +30,7 @@ QtObject {
         //games
         ["ALEPHONE", gameIcon], ["HADES", gameIcon], ["CLASSIC MARATHON", gameIcon], ["WATCH_DOGS", gameIcon], ["GAMESCOPE", gameIcon], ["BATMAN ARKHAM ASYLUM GOTY EDITION", gameIcon], ["COM.MOJANG.MINECRAFT", "󰍳"], ["ORG.PRISMLAUNCHER.PRISMLAUNCHER", ""], ["STEAM", "󰓓"], ["THESEUS", ""],
         //system apps
-        ["WL-KBPTR", ""], ["QUICKSHELL-WALLPAPER-PICKER", "󰸉"], ["ZOOM", ""], ["ORG.FEDORAPROJECT.MEDIAWRITER", "󱊟"], ["HYPRPOLKITAGENT", "󰈷"], ["ORG.KDE.KDECONNECT.APP", ""]])
+        ["WL-KBPTR", ""], ["QUICKSHELL-WALLPAPER-PICKER", "󰸉"], ["ZOOM", ""], ["ORG.FEDORAPROJECT.MEDIAWRITER", "󱊟"], ["HYPRPOLKITAGENT", "󰈷"], ["ORG.KDE.KDECONNECT.APP", ""], ["BIOPASS", "󰌾"]])
     readonly property var brightnessIcons: ["󰹐", "󱩎", "󱩏", "󱩐", "󱩑", "󱩒", "󱩓", "󱩔", "󱩕", "󱩖", "󰛨"]
     readonly property string volumeOff: "󰖁"
     readonly property string volumeLow: "󰕿"
