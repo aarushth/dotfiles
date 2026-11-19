@@ -113,6 +113,7 @@ Item {
             visible: context.responseRequired && !resetTimerRunning && !root.verifying
             font.pixelSize: 50
             horizontalAlignment: Text.AlignHCenter
+            color: "black"
             verticalAlignment: Text.AlignVCenter
             passwordCharacter: "*"
             background: Rectangle {

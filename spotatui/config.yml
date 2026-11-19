@@ -9,6 +9,11 @@ keybindings:
   jump_to_start: ctrl-a
   jump_to_end: ctrl-e
   jump_to_album: a
+  dj_open: ctrl-j
+  dj_toggle_auto_queue: ctrl-t
+  dj_vibe_shift: ctrl-y
+  dj_toggle_fresh_only: ctrl-o
+  dj_pick_model: ctrl-g
   jump_to_artist_album: A
   jump_to_context: o
   manage_devices: d
@@ -39,11 +44,20 @@ keybindings:
   listening_party: ctrl-p
   like_track: F
   generate_recap: R
-  dj_open: ctrl-j
-  dj_toggle_auto_queue: ctrl-t
-  dj_vibe_shift: ctrl-y
-  dj_toggle_fresh_only: ctrl-o
-  dj_pick_model: ctrl-g
+  detach_pane: alt-d
+  close_pane: alt-x
+  focus_pane_left: alt-h
+  focus_pane_down: alt-j
+  focus_pane_up: alt-k
+  focus_pane_right: alt-l
+  move_pane_left: alt-H
+  move_pane_down: alt-J
+  move_pane_up: alt-K
+  move_pane_right: alt-L
+  rotate_pane: alt-r
+  grow_pane: alt-=
+  shrink_pane: alt--
+  reset_panes: alt-0
 behavior:
   language: auto
   seek_milliseconds: 5000
@@ -71,7 +85,7 @@ behavior:
   playing_icon: ▶
   paused_icon: ⏸
   set_window_title: false
-  visualizer_style: Cava
+  visualizer_style: RackEq
   player_bar_visualizer: spectrum
   relay_server_url: wss://spotatui-party.spotatui.workers.dev/ws
   stop_after_current_track: false
@@ -85,6 +99,21 @@ behavior:
   cover_art_dither: false
   cover_art_dither_algorithm: stucki
   cover_art_dither_pixel_scale: 1
+  mcp_enabled: false
+  dj_backend: agent_cli
+  dj_agent_command:
+  - claude
+  - -p
+  dj_agent_prompt_via: null
+  dj_agent_timeout_secs: 90
+  dj_agent_model: null
+  dj_model: null
+  dj_base_url: null
+  dj_api_key: null
+  dj_batch_size: 6
+  dj_history_period: 30d
+  dj_avoid_library: false
+  dj_configured: null
   keepawake_enabled: true
   enable_media_keys: true
   enable_streaming: true
@@ -123,21 +152,6 @@ behavior:
   playbar_position: bottom
   small_terminal_width: 150
   small_terminal_height: 45
-  mcp_enabled: false
-  dj_backend: agent_cli
-  dj_agent_command:
-  - claude
-  - -p
-  dj_agent_prompt_via: null
-  dj_agent_timeout_secs: 90
-  dj_agent_model: null
-  dj_model: null
-  dj_base_url: null
-  dj_api_key: null
-  dj_batch_size: 6
-  dj_history_period: 30d
-  dj_avoid_library: false
-  dj_configured: null
 theme:
   preset: Custom
   active: 76, 9, 245

@@ -2,25 +2,45 @@ pragma Singleton
 import QtQuick
 
 QtObject {
-    function get(id, looseMatch) {
-        const upper = id.toUpperCase();
-        const exact = iconsMap.get(upper);
-        if (exact !== undefined)
-            return exact;
-        if (!looseMatch)
-            return undefined;
-        for (const [pattern, icon] of iconsMap) {
-            if (upper.includes(pattern)) {
-                return icon;
+    function get(className, title) {
+        const upperClass = className?.toUpperCase() ?? "";
+        const upperTitle = title?.toUpperCase() ?? "";
+        var classIcon = classIconsMap.get(upperClass) ?? "";
+        var titleIcon = classIconsMap.get(upperTitle) ?? "";
+        if (classIcon === "") {
+            for (const [pattern, icon] of classIconsMap) {
+                if (upperClass.includes(pattern)) {
+                    classIcon = icon;
+                    break;
+                }
             }
         }
-        return undefined;
+        if (preferStrictTitles.includes(upperClass)) {
+            return titleIcon === "" ? (classIcon === "" ? undefined : classIcon) : titleIcon;
+        }
+        if (titleIcon === "") {
+            for (const [pattern, icon] of classIconsMap) {
+                if (upperTitle?.includes(pattern)) {
+                    titleIcon = icon;
+                    break;
+                }
+            }
+        }
+        if (preferClassNames.includes(upperClass)) {
+            return classIcon === "" ? (titleIcon === "" ? undefined : titleIcon) : classIcon;
+        } else if (preferTitles.includes(upperClass)) {
+            return titleIcon === "" ? (classIcon === "" ? undefined : classIcon) : titleIcon;
+        }
+        return classIcon === "" ? (titleIcon === "" ? undefined : titleIcon) : classIcon;
     }
-    readonly property var iconsMap: new Map([
+    readonly property var preferClassNames: ["FIREFOX", "COM.VISUALSTUDIO.CODEOSS"]
+    readonly property var preferTitles: ["STEAM_PROTON"]
+    readonly property var preferStrictTitles: ["KITTY"]
+    readonly property var classIconsMap: new Map([
         //apps
-        ["FIREFOX", "󰈹"], ["MD.OBSIDIAN.OBSIDIAN", ""], ["SPOTATUI", ""], ["SPOTIFY", ""], ["WARP-TASKBAR", ""], ["SATTY", "󱇣"], ["DRIVEDECK", "󰏊"], ["COM.OBSPROJECT.STUDIO", "󰄄"], ["MPV", ""], ["BITWARDEN", "󰞀"], ["ORG.KDE.KDENLIVE", "󱄢"], ["ORG.INKSCAPE.INKSCAPE", ""],
+        ["FIREFOX", "󰈹"], ["SPOTATUI", ""], ["WARP-TASKBAR", ""], ["SATTY", "󱇣"], ["DRIVEDECK", "󰏊"], ["COM.OBSPROJECT.STUDIO", "󰄄"], ["MPV", ""], ["BITWARDEN", "󰞀"], ["ORG.KDE.KDENLIVE", "󱄢"], ["ORG.INKSCAPE.INKSCAPE", ""],
         //coding
-        ["KITTY", ""], ["COM.VISUALSTUDIO.CODEOSS", ""], ["SUN-TOOLS-JCONSOLE-JCONSOLE", ""], ["NVIM", ""], ["STM32CUBEIDE", "󰆦"], ["STM32CUBEMX", "󰻟"], ["KICAD", ""], ["GLSLVIEWER", "󰋁"], ["ARDUINO IDE", ""], ["MMS", "󱇷"], ["TOUCHDESIGNER", ""],
+        ["KITTY", ""], ["COM.VISUALSTUDIO.CODEOSS", ""], ["SUN-TOOLS-JCONSOLE-JCONSOLE", ""], ["NVIM", ""], ["STM32CUBEMX", "󰻟"], ["KICAD", ""], ["GLSLVIEWER", "󰋁"], ["MMS", "󱇷"], ["TOUCHDESIGNER", ""],
         // email
         ["NET.THUNDERBIRD.THUNDERBIRD", ""], ["ZOHO MAIL - DESKTOP", ""],
         // messaging
@@ -30,7 +50,7 @@ QtObject {
         //games
         ["ALEPHONE", gameIcon], ["HADES", gameIcon], ["CLASSIC MARATHON", gameIcon], ["WATCH_DOGS", gameIcon], ["GAMESCOPE", gameIcon], ["BATMAN ARKHAM ASYLUM GOTY EDITION", gameIcon], ["COM.MOJANG.MINECRAFT", "󰍳"], ["ORG.PRISMLAUNCHER.PRISMLAUNCHER", ""], ["STEAM", "󰓓"], ["THESEUS", ""],
         //system apps
-        ["WL-KBPTR", ""], ["QUICKSHELL-WALLPAPER-PICKER", "󰸉"], ["ZOOM", ""], ["ORG.FEDORAPROJECT.MEDIAWRITER", "󱊟"], ["HYPRPOLKITAGENT", "󰈷"], ["ORG.KDE.KDECONNECT.APP", ""], ["BIOPASS", "󰌾"]])
+        ["WL-KBPTR", ""], ["QUICKSHELL-WALLPAPER-PICKER", "󰸉"], ["ZOOM", ""], ["ORG.FEDORAPROJECT.MEDIAWRITER", "󱊟"], ["HYPRPOLKITAGENT", "󰌾"], ["ORG.KDE.KDECONNECT", ""], ["BIOPASS", "󰌾"], ["KRDC", "󰌘"], ["KDE PARTITION MANAGER", ""]])
     readonly property var brightnessIcons: ["󰹐", "󱩎", "󱩏", "󱩐", "󱩑", "󱩒", "󱩓", "󱩔", "󱩕", "󱩖", "󰛨"]
     readonly property string volumeOff: "󰖁"
     readonly property string volumeLow: "󰕿"

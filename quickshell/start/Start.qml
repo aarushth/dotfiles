@@ -16,18 +16,6 @@ Scope {
     property int outerCircleRadius: 500
     property int iconCircleRadius: 360
     property int innerCircleRadius: 230
-    property var arcsList: {
-        let val = [];
-        for (let i = 0; i < Arcs.beginList.length; i++) {
-            val.push({
-                begin: Arcs.beginList[i],
-                end: Arcs.endList[i],
-                radius: Arcs.radiusList[i],
-                strokeWidth: Arcs.strokeWidthList[i]
-            });
-        }
-        return val;
-    }
     IpcHandler {
         target: "start"
         function toggle() {
@@ -37,6 +25,7 @@ Scope {
     LazyLoader {
         active: root.shouldShowStart
         PanelWindow {
+            id: panelRoot
             anchors {
                 top: true
                 left: true
@@ -49,8 +38,7 @@ Scope {
                         let entry = filteredEntries[entryIcons.currentIndex];
                         if (entry)
                             entry.execute();
-                        // console.warn(entry.id, entry.command);
-                        root.shouldShowStart = false;
+                        exitAnim.start();
                         event.accepted = true;
                     } else if (event.key >= 65 && event.key <= 90) {
                         filter += event.text.toUpperCase();
@@ -79,11 +67,80 @@ Scope {
             property string filter: ""
             property var filteredEntries: DesktopEntries.applications.values.filter(entry => filter == "" || entry.id.toUpperCase().includes(filter) || entry.startupClass.toUpperCase().includes(filter) || entry.name.toUpperCase().includes(filter))
             color: "transparent"
+            property int animDuration: 300
+            property int arcsListLength: Arcs.beginList.length
+            property var arcsList: {
+                let val = [];
+                for (let i = 0; i < arcsListLength; i++) {
+                    val.push({
+                        id: i,
+                        begin: Arcs.beginList[i],
+                        end: Arcs.endList[i],
+                        radius: Arcs.radiusList[i],
+                        strokeWidth: Arcs.strokeWidthList[i]
+                    });
+                }
+                return val;
+            }
+
+            ParallelAnimation {
+                id: exitAnim
+                PropertyAnimation {
+                    target: circle
+                    property: "color"
+                    to: Theme.accentYellow
+                }
+                PropertyAnimation {
+                    target: coolParent
+                    property: "rotation"
+                    from: 0
+                    to: -90
+                    duration: animDuration
+                }
+                PropertyAnimation {
+                    target: panelRoot
+                    property: "arcsListLength"
+                    to: 0
+                    duration: animDuration
+                }
+                PropertyAnimation {
+                    target: entryIcons
+                    property: "visibleIndex"
+                    to: 0
+                    duration: animDuration
+                    easing: Easing.InQuint
+                }
+
+                PropertyAnimation {
+                    target: entryIcons
+                    property: "visibleIndex"
+                    to: 0
+                    duration: animDuration
+                }
+
+                PropertyAnimation {
+                    target: mainMask
+                    property: "scale"
+                    from: 1.0
+                    to: 2.0
+                    duration: animDuration
+                    easing: Easing.InQuint
+                }
+                SequentialAnimation {
+                    PauseAnimation {
+                        duration: animDuration + 10
+                    }
+                    ScriptAction {
+                        script: root.shouldShowStart = false
+                    }
+                }
+            }
             Item {
-                id: circle
+                id: circleRoot
                 anchors.fill: parent
                 visible: false
                 Rectangle {
+                    id: circle
                     anchors.centerIn: parent
                     width: outerCircleRadius
                     height: outerCircleRadius
@@ -102,7 +159,6 @@ Scope {
                     width: 180
                     height: width
                     fillColor: "#00ffffff"
-                    strokeColor: "red"
                     begin: 0
                     end: 360
                     strokeWidth: width / 2
@@ -117,7 +173,10 @@ Scope {
                     strokeWidth: 10
                 }
                 Repeater {
-                    model: arcsList
+                    model: ScriptModel {
+                        values: arcsList
+                        objectProp: "id"
+                    }
                     delegate: ArcItem {
                         required property var modelData
                         property int time: (Math.random() + 1) * 5000
@@ -142,23 +201,26 @@ Scope {
                 id: arcsMask
                 anchors.fill: parent
                 maskSource: arcs
-                source: circle
+                source: circleRoot
                 invert: true
                 visible: false
             }
             OpacityMask {
+                id: mainMask
                 anchors.fill: parent
                 source: arcsMask
                 maskSource: coolMask
                 invert: true
                 visible: true
                 scale: 3.0
-                Component.onCompleted: scale = 1.0
-                Behavior on scale {
-                    NumberAnimation {
-                        duration: 400
-                        easing.type: Easing.OutQuint
-                    }
+                Component.onCompleted: introAnim.start()
+                PropertyAnimation {
+                    id: introAnim
+                    target: mainMask
+                    property: "scale"
+                    to: 1.0
+                    duration: 400
+                    easing.type: Easing.OutQuint
                 }
             }
             Item {
@@ -168,19 +230,23 @@ Scope {
                 width: size
                 height: size
                 property int numItems: 12
+                property int visibleIndex: visibleItems
+                onVisibleIndexChanged: console.warn(visibleIndex)
                 property int selectedIndex: 0
                 property int visibleItems: numItems
-                // true modulo: JS % keeps the dividend's sign, so -1 % n === -1
                 property int currentIndex: visibleItems > 0 ? ((selectedIndex % visibleItems) + visibleItems) % visibleItems : -1
                 focus: true
                 Repeater {
                     model: ScriptModel {
                         values: filteredEntries.slice(0, entryIcons.numItems)
+                        objectProp: "id"
                         onValuesChanged: entryIcons.visibleItems = values.length
                     }
                     delegate: TextItem {
                         required property int index
-                        property int actualIndex: entryIcons.visibleItems == 12 ? index - entryIcons.selectedIndex : (index - entryIcons.selectedIndex) % entryIcons.visibleItems
+                        property int actualIndex: entryIcons.visibleItems == entryIcons.numItems ? index - entryIcons.selectedIndex : (index - entryIcons.selectedIndex) % entryIcons.visibleItems
+                        property int ringIndex: ((actualIndex % entryIcons.visibleItems) + entryIcons.visibleItems) % entryIcons.visibleItems
+                        visible: ringIndex == 0 || ringIndex < entryIcons.visibleIndex
                         required property var modelData
                         property real angle: -Math.PI / 2 - Math.PI * 2 * actualIndex / entryIcons.numItems
                         Behavior on angle {
@@ -188,10 +254,9 @@ Scope {
                                 duration: 150
                             }
                         }
-                        // Component.onCompleted: console.warn(modelData.id, modelData.startupClass, modelData.command)
                         x: entryIcons.size / 2 + Math.round(entryIcons.size / 2 * Math.cos(angle)) - implicitWidth / 2
                         y: entryIcons.size / 2 + Math.round(entryIcons.size / 2 * Math.sin(angle)) - implicitHeight / 2
-                        text: Icons.get(modelData.id, true) ?? Icons.get(modelData.startupClass) ?? Icons.get(modelData.name) ?? Icons.get(modelData.command.join()) ?? "x"
+                        text: Icons.get(modelData.id, modelData.startupClass) ?? Icons.get(modelData.name, modelData.command.join()) ?? ""
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignHCenter
                         font.family: Theme.fontIcon
@@ -215,7 +280,9 @@ Scope {
                 }
             }
             Item {
+                id: coolParent
                 anchors.fill: parent
+                rotation: 0
                 Item {
                     anchors.centerIn: parent
                     width: innerCircleRadius
@@ -245,7 +312,6 @@ Scope {
                         verticalAlignment: Text.AlignVCenter
                         font.pixelSize: 15
                         font.family: Theme.fontFancy
-
                         color: Theme.accentBlueLight
                     }
                 }
@@ -255,29 +321,30 @@ Scope {
                     visible: false
                     Shape {
                         id: trapezoidShape
+                        rotation: coolParent.rotation
                         anchors.centerIn: parent
                         width: innerCircleRadius
-                        height: innerCircleRadius + 45
+                        height: innerCircleRadius + 65
                         ShapePath {
                             fillColor: "steelblue"
                             strokeColor: "black"
-                            startX: 155
+                            startX: 135
                             startY: 0
                             PathLine {
                                 x: 215
-                                y: 30
+                                y: 38
                             }
                             PathLine {
                                 x: 215
-                                y: innerCircleRadius + 15
+                                y: innerCircleRadius + 30
                             }
                             PathLine {
-                                x: 155
-                                y: innerCircleRadius + 46
+                                x: 135
+                                y: innerCircleRadius + 60
                             }
                             PathLine {
-                                x: 155
-                                y: 25
+                                x: 135
+                                y: 0
                             }
                         }
                     }

@@ -4,6 +4,7 @@ import "../config"
 
 Rectangle {
     id: root
+
     property bool selected: false
     property bool emphasized: true
     property string text: ""

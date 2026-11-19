@@ -34,6 +34,9 @@ Scope {
             brightnessReadProc.running = true;
             show(OsdData.Mode.Brightness);
         }
+        function volume() {
+            show(OsdData.Mode.Volume);
+        }
     }
     Process {
         id: brightnessReadProc

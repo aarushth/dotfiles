@@ -198,7 +198,7 @@ Item {
                     left: parent.left
                 }
                 width: parent.width / 3
-                text: Icons.get("spotify")
+                text: Icons.get("spotatui")
                 font.family: Theme.fontIcon
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
@@ -241,6 +241,15 @@ Item {
         id: base
     }
     TapHandler {
-        onTapped: DesktopEntries.byId("spotify").execute()
+        readonly property var process: Process {
+            command: ["hyprctl", "dispatch", "hl.dsp.focus({window = \"title:^(spotatui)$\"})"]
+        }
+        onTapped: {
+            if (root.player != undefined) {
+                process.startDetached();
+            } else {
+                DesktopEntries.byId("spotatui").execute();
+            }
+        }
     }
 }

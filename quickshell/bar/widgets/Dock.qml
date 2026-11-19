@@ -78,7 +78,7 @@ RowLayout {
                         right: parent.right
                     }
                     height: root.boxSize * 3
-                    text: wsBound.liveToplevels.map(toplevel => Icons.get(toplevel.title, false) ?? Icons.get(toplevel.wayland?.appId, true) ?? "").join(" ")
+                    text: wsBound.liveToplevels.map(toplevel => Icons.get(toplevel.wayland?.appId, toplevel.title) ?? "").join(" ")
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     font.pixelSize: root.boxSize * 2 - 2

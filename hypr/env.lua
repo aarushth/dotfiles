@@ -6,6 +6,8 @@ hl.env("HYPRCURSOR_SIZE", "24")
 -- dark mode
 hl.env("QT_QUICK_CONTROLS_STYLE", "org.kde.desktop")
 hl.env("QT_QPA_PLATFORM", "wayland")
+-- route Qt file dialogs (KDE Connect, etc.) through xdg-desktop-portal -> termfilechooser/yazi
+hl.env("QT_QPA_PLATFORMTHEME", "xdgdesktopportal")
 hl.env("GTK_THEME", "Adwaita:dark")
 hl.env("QS_ICON_THEME", "AdwaitaLegacy")
 hl.env("PATH", os.getenv("PATH") .. ":" .. os.getenv("HOME") .. "/.cargo/bin")

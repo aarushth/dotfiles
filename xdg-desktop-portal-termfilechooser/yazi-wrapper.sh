@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
-set -x
 
 set -e
-if [ "$6" -ge 4 ]; then
+if [ "${6:-0}" -ge 4 ]; then
     set -x
 fi
 

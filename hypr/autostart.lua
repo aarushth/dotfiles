@@ -5,7 +5,7 @@
 hl.on("hyprland.start", function()
 	hl.exec_cmd("awww-daemon --no-cache")
 	hl.exec_cmd("qs")
-	hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
+	hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP QT_QPA_PLATFORM QT_QPA_PLATFORMTHEME QT_QUICK_CONTROLS_STYLE")
 
 	hl.exec_cmd("drivedeck --tray")
 	-- hl.exec_cmd("flatpak run com.bitwarden.desktop")

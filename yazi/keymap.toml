@@ -2,7 +2,7 @@
 prepend_keymap = [
   { on = ["R"], run = "plugin recycle-bin", desc = "Open Recycle Bin menu" },
   { on = ["M"], run = "plugin mount"},
-  { on = ["P"], run = "plugin chmod", desc = "Chmod on selected files"},
+  { on = ["X"], run = "plugin chmod", desc = "Chmod on selected files"},
   { on = ["Q"], run = "quit", desc = "quit yazi, overrider Q to behave same as q"}
 ]
 

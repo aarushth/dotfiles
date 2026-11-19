@@ -23,6 +23,12 @@ hl.device({
 	sensitivity = -0.75,
 	scroll_factor = 0.2,
 })
+
+hl.device({
+	name = "sinowealth-game-mouse",
+	sensitivity = -0.75,
+	scroll_factor = 0.2,
+})
 hl.device({
 	name = "elan0678:00-04f3:3195-touchpad",
 	enabled = true,
@@ -110,12 +116,16 @@ hl.bind(MainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
 -- Laptop multimedia keys for volume and LCD brightness
 hl.bind(
 	"XF86AudioRaiseVolume",
-	hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ 0 & wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 2%+"),
+	hl.dsp.exec_cmd(
+		"wpctl set-mute @DEFAULT_AUDIO_SINK@ 0 & wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 2%+ & qs ipc call osd volume"
+	),
 	{ locked = true, repeating = true }
 )
 hl.bind(
 	"XF86AudioLowerVolume",
-	hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ 0 & wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%-"),
+	hl.dsp.exec_cmd(
+		"wpctl set-mute @DEFAULT_AUDIO_SINK@ 0 & wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%- & qs ipc call osd volume"
+	),
 	{ locked = true, repeating = true }
 )
 hl.bind(

@@ -2,6 +2,13 @@ return {
 	"nvim-lualine/lualine.nvim",
 	dependencies = { "nvim-tree/nvim-web-devicons", "arkav/lualine-lsp-progress", "EdenEast/nightfox.nvim" },
 	config = function()
+		local function get_wordcount()
+			local wc = vim.fn.wordcount()
+			if wc.visual_words then
+				return wc.visual_words .. " words (sel)"
+			end
+			return wc.words .. " words"
+		end
 		require("lualine").setup({
 			options = {
 				disabled_filetypes = {
@@ -26,7 +33,7 @@ return {
 				lualine_x = {
 					"lsp_progress",
 					"diff",
-					"encoding",
+					get_wordcount,
 					"fileformat",
 				},
 				lualine_y = { "filetype" },
