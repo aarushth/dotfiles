@@ -88,14 +88,14 @@ return {
 	end,
 	keys = {
 		{
-			"<leader>nf",
+			"<leader>wf",
 			function()
 				require("neogen").generate({ type = "func" })
 			end,
 			desc = "Generate Javadoc for function",
 		},
 		{
-			"<leader>nc",
+			"<leader>wc",
 			function()
 				require("neogen").generate({ type = "class" })
 			end,

@@ -48,7 +48,7 @@ QtObject {
         //tui
         ["BTOP", ""], ["WIFITUI", ""], ["BLUETUI", "󰂯"], ["YAZI", ""], ["CLAUDE", ""], ["CLIPSE", ""], ["HYPRMONCFG", "󰍺"],
         //games
-        ["ALEPHONE", gameIcon], ["HADES", gameIcon], ["CLASSIC MARATHON", gameIcon], ["WATCH_DOGS", gameIcon], ["GAMESCOPE", gameIcon], ["BATMAN ARKHAM ASYLUM GOTY EDITION", gameIcon], ["COM.MOJANG.MINECRAFT", "󰍳"], ["ORG.PRISMLAUNCHER.PRISMLAUNCHER", ""], ["STEAM", "󰓓"], ["THESEUS", ""],
+        ["ALEPHONE", gameIcon], ["HADES", gameIcon], ["CLASSIC MARATHON", gameIcon], ["WATCH_DOGS", gameIcon], ["GAMESCOPE", gameIcon], ["BATMAN ARKHAM ASYLUM GOTY EDITION", gameIcon], ["MINECRAFT", "󰍳"], ["ORG.PRISMLAUNCHER.PRISMLAUNCHER", ""], ["STEAM", "󰓓"], ["THESEUS", ""],
         //system apps
         ["WL-KBPTR", ""], ["QUICKSHELL-WALLPAPER-PICKER", "󰸉"], ["ZOOM", ""], ["ORG.FEDORAPROJECT.MEDIAWRITER", "󱊟"], ["HYPRPOLKITAGENT", "󰌾"], ["ORG.KDE.KDECONNECT", ""], ["BIOPASS", "󰌾"], ["KRDC", "󰌘"], ["KDE PARTITION MANAGER", ""]])
     readonly property var brightnessIcons: ["󰹐", "󱩎", "󱩏", "󱩐", "󱩑", "󱩒", "󱩓", "󱩔", "󱩕", "󱩖", "󰛨"]

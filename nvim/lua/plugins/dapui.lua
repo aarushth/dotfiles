@@ -67,6 +67,38 @@ return {
 			end,
 		})
 
+		-- Once the program exits (or is Ctrl-C'd), the next key pressed in the
+		-- console's terminal mode makes nvim wipe the buffer and close its
+		-- window, which breaks dap-ui's layout and every later launch until a
+		-- restart. Drop to normal mode as soon as the process exits, and refuse
+		-- to re-enter terminal mode on a dead terminal, so the console (and its
+		-- output) survives and nvim-dap can reuse it for the next run.
+		vim.api.nvim_create_autocmd("TermClose", {
+			callback = function(args)
+				if vim.b[args.buf]["dap-type"] == nil then
+					return
+				end
+				vim.b[args.buf].dap_term_exited = true
+				if vim.api.nvim_get_current_buf() == args.buf then
+					vim.cmd.stopinsert()
+				end
+			end,
+		})
+		vim.api.nvim_create_autocmd("TermOpen", {
+			callback = function(args)
+				vim.b[args.buf].dap_term_exited = nil
+			end,
+		})
+		vim.api.nvim_create_autocmd("TermEnter", {
+			callback = function(args)
+				if vim.b[args.buf].dap_term_exited then
+					vim.schedule(function()
+						vim.cmd.stopinsert()
+					end)
+				end
+			end,
+		})
+
 		-- Deliberately not closing on event_terminated/event_exited so the
 		-- console output stays visible after the program ends; <leader>du closes it.
 	end,

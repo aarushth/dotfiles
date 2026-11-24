@@ -68,6 +68,7 @@ end)
 hl.bind(MainMod .. " + E", hl.dsp.exec_cmd("env LAUNCH_YAZI=1 " .. Terminal))
 hl.bind(MainMod .. " + V", hl.dsp.exec_cmd(floatingTuiCmd(ClipboardManager)))
 hl.bind(MainMod .. " + M", hl.dsp.exec_cmd(floatingTuiCmd(MonitorManager)))
+hl.bind("XF86Display", hl.dsp.exec_cmd(floatingTuiCmd(MonitorManager)))
 hl.bind("CTRL + ALT + Backspace", function()
 	OpenInCustomWorkspace(
 		TaskManager,

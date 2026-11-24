@@ -231,7 +231,6 @@ Scope {
                 height: size
                 property int numItems: 12
                 property int visibleIndex: visibleItems
-                onVisibleIndexChanged: console.warn(visibleIndex)
                 property int selectedIndex: 0
                 property int visibleItems: numItems
                 property int currentIndex: visibleItems > 0 ? ((selectedIndex % visibleItems) + visibleItems) % visibleItems : -1

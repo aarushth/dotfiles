@@ -1,8 +1,10 @@
 {
   "Comment.nvim": { "branch": "master", "commit": "e30b7f2008e52442154b66f7c519bfd2f1e32acb" },
   "FixCursorHold.nvim": { "branch": "master", "commit": "1900f89dc17c603eec29960f57c00bd9ae696495" },
+  "LuaSnip": { "branch": "master", "commit": "0abc8f390b278c3b4aabc4c004ac8a088b65cf24" },
   "aerial.nvim": { "branch": "master", "commit": "28fe6e822ae344544c379d60fcb13c9519a1f08a" },
   "autoclose.nvim": { "branch": "main", "commit": "bcad8e84d9cd78ba73433cb396b68e489af11e31" },
+  "blink-cmp-latex": { "branch": "main", "commit": "4f2910b98dabed17a1667ab806354faa8763098e" },
   "blink.cmp": { "branch": "main", "commit": "7b31e1b6497be70f620bbad83a789929248697ac" },
   "blink.lib": { "branch": "main", "commit": "fd9a48ebbe6ec30d5dfcc5b42c243941ccdca1aa" },
   "bufferline.nvim": { "branch": "main", "commit": "655133c3b4c3e5e05ec549b9f8cc2894ac6f51b3" },
@@ -16,6 +18,7 @@
   "markview.nvim": { "branch": "main", "commit": "aadb6d817577d553bbef61e8b9073f1bf4b87e08" },
   "mason-lspconfig.nvim": { "branch": "main", "commit": "3a5cd6d562a01f6829a35ae761dc383264ea452b" },
   "mason.nvim": { "branch": "main", "commit": "2a6940af80375532e5e9e7c1f2fc6319a1b7a69d" },
+  "mdmath.nvim": { "branch": "main", "commit": "699acb27fd34bfdf92a43ce0abdd17f0c7a948fe" },
   "neogen": { "branch": "main", "commit": "23e7e9f883d01289ebd90e98025acc860ea26366" },
   "neotest": { "branch": "master", "commit": "27bf921498043f7ecd821d6db68d05de244bbd02" },
   "neotest-java": { "branch": "main", "commit": "30cbbd23e6dca0309500632052bc3fe2ba4c3d6d" },
